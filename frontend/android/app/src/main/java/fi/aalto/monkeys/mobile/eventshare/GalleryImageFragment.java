@@ -1,6 +1,7 @@
 package fi.aalto.monkeys.mobile.eventshare;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,6 +9,8 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridLayout;
 import android.widget.GridView;
@@ -38,6 +41,7 @@ public class GalleryImageFragment extends Fragment {
         gridView.setAdapter(new ImageAdapter(getContext()));
         gridView.setPadding(0,0,0,0);
         gridView.setNumColumns(columns);
+        gridView.setOnItemClickListener(clickListener);
 
         // Get a suitable image height and width for filling the screen
         Display display = getActivity().getWindowManager().getDefaultDisplay();
@@ -48,6 +52,16 @@ public class GalleryImageFragment extends Fragment {
 
         return rootView;
     }
+
+    AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
+        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+            // Start the fullscreen viewer for selected image
+            Intent intent = new Intent(getContext(), GalleryFullScreenActivity.class);
+            String image = "http://i.imgur.com/DvpvklR.png";
+            intent.putExtra("image_path", image);
+            startActivity(intent);
+        }
+    };
 
 
     public class ImageAdapter extends BaseAdapter {
