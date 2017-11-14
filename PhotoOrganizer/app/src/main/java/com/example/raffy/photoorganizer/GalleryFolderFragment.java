@@ -1,4 +1,4 @@
-package fi.aalto.monkeys.mobile.eventshare;
+package com.example.raffy.photoorganizer;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -89,7 +89,7 @@ public class GalleryFolderFragment extends Fragment {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            holder.imageView.setImageResource(R.mipmap.empty_folder);
+            holder.imageView.setImageResource(R.mipmap.ic_launcher);
             holder.txtTitle.setText(folders.get(position).name);
             return convertView;
         }

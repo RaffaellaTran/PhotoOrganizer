@@ -13,7 +13,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class Gallery extends FragmentActivity {
+public class GalleryActivity extends FragmentActivity {
 
     private static final int NUM_PAGES = 2;
     ViewPager mPager;
