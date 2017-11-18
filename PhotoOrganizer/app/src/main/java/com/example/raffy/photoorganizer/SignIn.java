@@ -45,6 +45,12 @@ public class SignIn extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.sign_up);
 
+        auth = FirebaseAuth.getInstance();
+        if (auth.getCurrentUser() != null) {
+            // User is logged in
+            startActivity(new Intent(SignIn.this, MainActivity.class));
+        } else{
+
         //Get Firebase auth instance
         auth = FirebaseAuth.getInstance();
 
@@ -124,28 +130,7 @@ public class SignIn extends AppCompatActivity {
                         });
 
             }
-        });
+        });}
     }
 
-
-  /*  FirebaseAuth auth = FirebaseAuth.getInstance();
-    FirebaseUser user = auth.getCurrentUser();
-
-    String url = "http://www.example.com/verify?uid=" + user.getUid();
-    ActionCodeSettings actionCodeSettings = ActionCodeSettings.newBuilder()
-            .setUrl(url)
-            .setIOSBundleId("com.example.ios")
-            // The default for this is populated with the current android package name.
-            .setAndroidPackageName("com.example.android", false, null)
-            .build();
-
-user.sendEmailVerification(actionCodeSettings)
-            .addOnCompleteListener(new OnCompleteListener<Void>() {
-        @Override
-        public void onComplete(@NonNull Task<Void> task) {
-            if (task.isSuccessful()) {
-                Log.d(TAG, "Email sent.");
-            }
-        }
-    });*/
 }
