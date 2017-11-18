@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">PhotoOrganizer</string>
+    <string name="name">Name</string>
+    <string name="password">Password</string>
+    <string name="register">REGISTER</string>
+    <string name="email">Email</string>
+    <string name="settings">Settings</string>
+    <string name="take_photo">Take photo</string>
+    <string name="camera">camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="group_management">Group management</string>
+    <string name="label">label</string>
+    <string name="image">image</string>
 </resources>
