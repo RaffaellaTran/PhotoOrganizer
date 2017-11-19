@@ -33,6 +33,7 @@ dependencies {
     //compile 'com.google.firebase:firebase-core:11.6.0'
     compile 'com.google.android.gms:play-services-location:11.6.0'
     compile 'com.google.android.gms:play-services-places:11.6.0'
+    compile 'com.google.android.gms:play-services-vision:11.6.0'
 
 
     // Firebase
