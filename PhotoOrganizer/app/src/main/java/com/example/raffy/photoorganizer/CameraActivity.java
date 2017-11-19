@@ -83,7 +83,7 @@ public class CameraActivity extends AppCompatActivity {
                         Boolean hasBarcodes = barcodes.size() > 1;
                         Boolean hasFaces = faces.size() > 1;
                         // TODO
-                        String temp = String.format("TODO implementation (barcodes: %s, faces: %s)",
+                        String temp = String.format("Barcodes: %s, faces: %s. TODO put image somewhere",
                                 hasBarcodes, hasFaces);
                         Toast.makeText(context.get(), temp, Toast.LENGTH_LONG).show();
                     }
