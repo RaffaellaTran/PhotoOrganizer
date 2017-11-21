@@ -13,7 +13,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SignIn">
+        <activity android:name=".Registration">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,5 +26,9 @@
         <activity android:name=".CameraActivity"/>
         <activity android:name=".GroupManagementActivity"/>
         <activity android:name=".SettingsActivity"/>
+        <activity android:name=".JoinActivity"/>
+        <activity android:name=".CreateGroupActivity"/>
+        <activity android:name=".DeleteActivity"/>
+        <activity android:name=".LoginActivity"/>
     </application>
 </manifest>
