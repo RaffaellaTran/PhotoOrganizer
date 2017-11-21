@@ -3,9 +3,13 @@ package com.example.raffy.photoorganizer;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,11 +23,16 @@ public class MainActivity extends AppCompatActivity {
     };
     Intent intent;
 
+    private FirebaseAuth auth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //Get Firebase auth instance
+        auth = FirebaseAuth.getInstance();
+        
         gridView = (GridView) findViewById(R.id.gridView);
         CustomGridAdapter customGridAdapter = new CustomGridAdapter(getApplicationContext(), data);
         gridView.setAdapter(customGridAdapter);
@@ -57,5 +66,34 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.search:
+                //your code here
+
+                Intent intent = new Intent(MainActivity.this, Registration.class)
+                        .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                finish();
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                auth.signOut();
+                startActivity(intent);
+
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
 }

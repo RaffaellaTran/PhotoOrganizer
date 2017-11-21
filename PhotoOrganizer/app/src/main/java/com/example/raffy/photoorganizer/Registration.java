@@ -1,6 +1,7 @@
 package com.example.raffy.photoorganizer;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +9,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,16 +20,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import static android.content.ContentValues.TAG;
-
 /**
  * Created by Raffy on 10/11/2017.
  */
 
-public class SignIn extends AppCompatActivity {
+public class Registration extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword, inputName;
-    private Button btnSignUp;
+    private Button btnSignUp, btnSignIn;
   //  private ProgressBar progressBar;
     private TextView txtSignIn;
     private FirebaseAuth auth;
@@ -44,11 +42,12 @@ public class SignIn extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.sign_up);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         auth = FirebaseAuth.getInstance();
         if (auth.getCurrentUser() != null) {
             // User is logged in
-            startActivity(new Intent(SignIn.this, MainActivity.class));
+            startActivity(new Intent(Registration.this, MainActivity.class));
         } else{
 
         //Get Firebase auth instance
@@ -59,6 +58,7 @@ public class SignIn extends AppCompatActivity {
         inputName= (EditText) findViewById(R.id.ins_name);
         inputEmail = (EditText) findViewById(R.id.ins_mail);
         inputPassword = (EditText) findViewById(R.id.ins_pass);
+        btnSignIn = (Button) findViewById(R.id.sign_in_button);
       //  progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
 
@@ -69,6 +69,13 @@ public class SignIn extends AppCompatActivity {
             }
         });
 
+            btnSignIn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(Registration.this, LoginActivity.class));
+                    finish();
+                }
+            });
 
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,16 +109,16 @@ public class SignIn extends AppCompatActivity {
                 //create user
 
                 auth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(SignIn.this, new OnCompleteListener<AuthResult>() {
+                        .addOnCompleteListener(Registration.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                Toast.makeText(SignIn.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(Registration.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
                           //      progressBar.setVisibility(View.GONE);
                                 // If sign in fails, display a message to the user. If sign in succeeds
                                 // the auth state listener will be notified and logic to handle the
                                 // signed in user can be handled in the listener.
                                 if (!task.isSuccessful()) {
-                                    Toast.makeText(SignIn.this, "Authentication failed." + task.getException(),
+                                    Toast.makeText(Registration.this, "Authentication failed." + task.getException(),
                                             Toast.LENGTH_SHORT).show();
                                 } else {
 
@@ -123,7 +130,7 @@ public class SignIn extends AppCompatActivity {
 
                                     mDatabase.child(userId).setValue(user);
 
-                                    startActivity(new Intent(SignIn.this, MainActivity.class));
+                                    startActivity(new Intent(Registration.this, MainActivity.class));
                                     finish();
                                 }
                             }

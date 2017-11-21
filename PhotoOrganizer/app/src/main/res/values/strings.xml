@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">PhotoOrganizer</string>
-    <string name="name">Name</string>
     <string name="password">Password</string>
     <string name="register">REGISTER</string>
     <string name="email">Email</string>
@@ -11,4 +10,21 @@
     <string name="group_management">Group management</string>
     <string name="label">label</string>
     <string name="image">image</string>
+    <string name="create_group">Create group</string>
+    <string name="join_a_group">Join a group</string>
+    <string name="delete_a_group">Delete a group</string>
+    <string name="group_duration">Group duration:</string>
+    <string name="minutes">minutes</string>
+    <string name="create">CREATE</string>
+    <string name="group_information">GROUP INFORMATION</string>
+    <string name="name">Name</string>
+    <string name="members">Members</string>
+    <string name="add">ADD</string>
+    <string name="expiration">Expiration</string>
+    <string name="scan_to_join">Scan to join!</string>
+    <string name="new_group">NEW GROUP</string>
+    <string name="group_name">Group name:</string>
+    <string name="login">LOGIN</string>
+    <string name="already">Already registered. Login Me!</string>
+    <string name="register_here">Register here!!</string>
 </resources>
