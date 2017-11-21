@@ -20,7 +20,6 @@ android {
 }
 
 dependencies {
-
     compile fileTree(dir: 'libs', include: ['*.jar'])
     //noinspection GradleCompatible
     compile 'com.android.support:design:26.1.0'
@@ -34,6 +33,7 @@ dependencies {
     //compile 'com.google.firebase:firebase-core:11.6.0'
     compile 'com.google.android.gms:play-services-location:11.6.0'
     compile 'com.google.android.gms:play-services-places:11.6.0'
+    compile 'com.google.android.gms:play-services-vision:11.6.0'
 
 
     // Firebase
@@ -57,6 +57,10 @@ dependencies {
     //noinspection GradleCompatible
     androidTestCompile 'com.android.support.test:runner:1.0.1'
     androidTestCompile 'com.android.support:support-annotations:26.1.0'
+
+    // Gallery
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.github.chrisbanes:PhotoView:2.1.3'
 
 
 }

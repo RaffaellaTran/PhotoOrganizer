@@ -17,7 +17,11 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven{
+
+        maven {
+            url "https://jitpack.io" // Fullscreen Image viewer
+        }
+        maven {
             url "https://maven.google.com" // Google's Maven repository
         }
     }
