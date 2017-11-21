@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WiFi"
+        tools:layout_editor_absoluteX="35dp"
+        tools:layout_editor_absoluteY="95dp" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mobile data network"
+        tools:layout_editor_absoluteX="35dp"
+        tools:layout_editor_absoluteY="186dp" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="327dp"
+        android:layout_height="62dp"
+        android:text="Specify the image quality when uploading or synchronizing pictures under:"
+        tools:layout_editor_absoluteX="31dp"
+        tools:layout_editor_absoluteY="17dp" />
+
+    <Switch
+        android:id="@+id/switch5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Low "
+        tools:layout_editor_absoluteX="48dp"
+        tools:layout_editor_absoluteY="220dp" />
+
+    <Switch
+        android:id="@+id/switch8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Low "
+        tools:layout_editor_absoluteX="48dp"
+        tools:layout_editor_absoluteY="129dp" />
+
+    <Switch
+        android:id="@+id/switch9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Full "
+        tools:layout_editor_absoluteX="212dp"
+        tools:layout_editor_absoluteY="129dp" />
+
+    <Switch
+        android:id="@+id/switch10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="High "
+        tools:layout_editor_absoluteX="130dp"
+        tools:layout_editor_absoluteY="129dp" />
+
+    <Switch
+        android:id="@+id/switch6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Full "
+        tools:layout_editor_absoluteX="212dp"
+        tools:layout_editor_absoluteY="220dp" />
+
+    <Switch
+        android:id="@+id/switch7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="High "
+        tools:layout_editor_absoluteX="130dp"
+        tools:layout_editor_absoluteY="220dp" />
+
+</android.support.constraint.ConstraintLayout>
