@@ -64,12 +64,23 @@
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/create_group_btn"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="120dp"
-        android:gravity="center"
-        android:text="@string/create"
-        android:textColor="#001FFF" />
+        android:layout_gravity="center">
+
+        <Button
+            android:id="@+id/create_group_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create"
+            android:textColor="#001FFF" />
+
+        <Button
+            android:id="@+id/cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cancel"
+            android:textColor="#001FFF" />
+    </LinearLayout>
 </LinearLayout>

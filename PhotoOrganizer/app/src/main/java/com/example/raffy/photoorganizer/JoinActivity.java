@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 /**
- * Created by Raffy on 21/11/2017.
+ * Use this dummy activity to wrap methods regarding the join group camera intent.
  */
 
 public class JoinActivity extends AppCompatActivity {
