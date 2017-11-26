@@ -27,6 +27,8 @@ import static com.example.raffy.photoorganizer.QRCameraPreview.getCameraInstance
 
 /**
  * Use this dummy activity to wrap methods regarding the join group camera intent.
+ *
+ * This camera intent closes automatically when it recognizes a QR code.
  */
 
 public class JoinActivity extends AppCompatActivity {
