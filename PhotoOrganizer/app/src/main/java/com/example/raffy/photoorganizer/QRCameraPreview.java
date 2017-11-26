@@ -7,6 +7,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Source: https://developer.android.com/guide/topics/media/camera.html
@@ -84,6 +85,15 @@ public class QRCameraPreview extends SurfaceView implements SurfaceHolder.Callba
         Camera c = null;
         try {
             c = Camera.open(); // attempt to get a Camera instance
+            // https://stackoverflow.com/questions/27021347/android-surfaceview-preview-blurry
+            Camera.Parameters parameters = c.getParameters();
+            List<String> focusModes = parameters.getSupportedFocusModes();
+            if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+            } else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+            }
+            c.setParameters(parameters);
         }
         catch (Exception e){
             // Camera is not available (in use or does not exist)
