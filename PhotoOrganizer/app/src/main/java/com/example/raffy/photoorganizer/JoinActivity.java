@@ -3,6 +3,7 @@ package com.example.raffy.photoorganizer;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -87,8 +88,10 @@ public class JoinActivity extends AppCompatActivity {
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                //Bitmap bitmap = mPreview.getBitmap();
-                //new ExamineImageTask(JoinActivity.this).execute(bitmap);
+                Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+                Canvas c = new Canvas(bitmap);
+                mPreview.draw(c);
+                new ExamineImageTask(JoinActivity.this).execute(bitmap);
             }
         }, 0, 1000);
     }
