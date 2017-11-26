@@ -10,6 +10,7 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.create_group_layout);
+        setTitle(R.string.create_group);
 
         Button button_cancel = findViewById(R.id.cancel);
         button_cancel.setOnClickListener(this);
