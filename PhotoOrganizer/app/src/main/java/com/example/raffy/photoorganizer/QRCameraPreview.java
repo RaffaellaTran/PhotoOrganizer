@@ -1,13 +1,9 @@
 package com.example.raffy.photoorganizer;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.util.Log;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.TextureView;
 
 import java.io.IOException;
@@ -33,7 +29,6 @@ public class QRCameraPreview extends TextureView implements TextureView.SurfaceT
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
         // The Surface has been created, now tell the camera where to draw the preview.
-        Log.e("!!!", "toimiiko?");
         try {
             mCamera.setPreviewTexture(surfaceTexture);
             mCamera.startPreview();

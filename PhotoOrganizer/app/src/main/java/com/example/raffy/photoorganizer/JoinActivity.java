@@ -3,8 +3,6 @@ package com.example.raffy.photoorganizer;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -13,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.util.SparseArray;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -21,8 +18,6 @@ import android.widget.Toast;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
 
 import java.lang.ref.WeakReference;
 import java.util.Timer;
@@ -94,7 +89,7 @@ public class JoinActivity extends AppCompatActivity {
         mCamera = getCameraInstance();
         // Create our Preview view and set it as the content of our activity.
         mPreview = new QRCameraPreview(this, mCamera);
-        final FrameLayout preview = findViewById(R.id.camera_preview);
+        FrameLayout preview = findViewById(R.id.camera_preview);
         preview.addView(mPreview);
 
         // Timer
@@ -102,18 +97,9 @@ public class JoinActivity extends AppCompatActivity {
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                /*runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        final Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-                        Canvas c = new Canvas(bitmap);
-                        mPreview.draw(c);
-                        new ExamineImageTask(JoinActivity.this).execute(bitmap);
-                    }
-                });*/
-                Bitmap bm = mPreview.getBitmap();
-                if (bm != null)
-                    new ExamineImageTask(JoinActivity.this).execute(bm);
+                Bitmap bitmap = mPreview.getBitmap();
+                if (bitmap != null)
+                    new ExamineImageTask(JoinActivity.this).execute(bitmap);
             }
         }, 0, 1000);
     }
