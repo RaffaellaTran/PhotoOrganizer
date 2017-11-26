@@ -38,6 +38,8 @@ public class JoinActivity extends AppCompatActivity {
                         new String[]{android.Manifest.permission.CAMERA},
                         PERMISSIONS_REQUEST_CAMERA);
             }
+        } else {
+            setPreview();
         }
     }
 
@@ -47,12 +49,7 @@ public class JoinActivity extends AppCompatActivity {
             case PERMISSIONS_REQUEST_CAMERA:
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Create an instance of Camera
-                    mCamera = getCameraInstance();
-                    // Create our Preview view and set it as the content of our activity.
-                    mPreview = new QRCameraPreview(this, mCamera);
-                    FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
-                    preview.addView(mPreview);
+                    setPreview();
                 } else {
                     Toast.makeText(this, "Camera permission is denied!", Toast.LENGTH_LONG).show();
                 }
@@ -60,5 +57,14 @@ public class JoinActivity extends AppCompatActivity {
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
+    }
+
+    private void setPreview() {
+        // Create an instance of Camera
+        mCamera = getCameraInstance();
+        // Create our Preview view and set it as the content of our activity.
+        mPreview = new QRCameraPreview(this, mCamera);
+        FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
+        preview.addView(mPreview);
     }
 }
