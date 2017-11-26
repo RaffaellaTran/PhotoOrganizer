@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -93,7 +94,7 @@ public class JoinActivity extends AppCompatActivity {
         mCamera = getCameraInstance();
         // Create our Preview view and set it as the content of our activity.
         mPreview = new QRCameraPreview(this, mCamera);
-        FrameLayout preview = findViewById(R.id.camera_preview);
+        final FrameLayout preview = findViewById(R.id.camera_preview);
         preview.addView(mPreview);
 
         // Timer
@@ -101,10 +102,18 @@ public class JoinActivity extends AppCompatActivity {
         mTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
-                Canvas c = new Canvas(bitmap);
-                mPreview.draw(c);
-                new ExamineImageTask(JoinActivity.this).execute(bitmap);
+                /*runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final Bitmap bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888);
+                        Canvas c = new Canvas(bitmap);
+                        mPreview.draw(c);
+                        new ExamineImageTask(JoinActivity.this).execute(bitmap);
+                    }
+                });*/
+                Bitmap bm = mPreview.getBitmap();
+                if (bm != null)
+                    new ExamineImageTask(JoinActivity.this).execute(bm);
             }
         }, 0, 1000);
     }
@@ -138,8 +147,6 @@ public class JoinActivity extends AppCompatActivity {
                         if (barcodes.size() > 0) {
                             Toast.makeText(context.get(), "Barcode found", Toast.LENGTH_SHORT).show();
                             context.get().finish();
-                        } else {
-                            Toast.makeText(context.get(), "No barcode", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
