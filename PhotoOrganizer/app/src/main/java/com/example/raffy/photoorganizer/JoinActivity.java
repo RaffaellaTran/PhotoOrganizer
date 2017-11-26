@@ -43,6 +43,7 @@ public class JoinActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.join_group_layout);
+        setTitle(R.string.join_group_hint);
 
         if (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -57,6 +58,18 @@ public class JoinActivity extends AppCompatActivity {
         } else {
             setPreview();
         }
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        mTimer.cancel();
+        super.onDetachedFromWindow();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mTimer.cancel();
+        super.onDestroy();
     }
 
     @Override
@@ -123,9 +136,10 @@ public class JoinActivity extends AppCompatActivity {
                     public void run() {
                         // TODO
                         if (barcodes.size() > 0) {
-                            Toast.makeText(context.get(), "Barcode found", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context.get(), "Barcode found", Toast.LENGTH_SHORT).show();
+                            context.get().finish();
                         } else {
-                            Toast.makeText(context.get(), "No barcode", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context.get(), "No barcode", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

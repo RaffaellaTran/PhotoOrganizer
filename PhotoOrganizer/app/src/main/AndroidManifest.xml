@@ -27,7 +27,7 @@
         <activity android:name=".CameraActivity"/>
         <activity android:name=".GroupManagementActivity"/>
         <activity android:name=".SettingsActivity"/>
-        <activity android:name=".JoinActivity"/>
+        <activity android:name=".JoinActivity" android:screenOrientation="landscape"/>
         <activity android:name=".CreateGroupActivity"/>
         <activity android:name=".DeleteActivity"/>
         <activity android:name=".LoginActivity"/>

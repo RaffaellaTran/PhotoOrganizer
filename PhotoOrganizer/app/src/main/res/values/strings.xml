@@ -12,6 +12,7 @@
     <string name="image">image</string>
     <string name="create_group">Create group</string>
     <string name="join_a_group">Join a group</string>
+    <string name="join_group_hint">Scan a QR code</string>
     <string name="delete_a_group">Delete a group</string>
     <string name="group_duration">Group duration:</string>
     <string name="minutes">minutes</string>
