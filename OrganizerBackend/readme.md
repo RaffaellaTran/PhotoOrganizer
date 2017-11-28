@@ -21,3 +21,21 @@ $ flask run
 
 
 #Should probably work...
+
+## Windows (by Aleksi)
+
+```
+' Install Python and set PATH
+set PATH=%PATH%;C:\Python27
+set PATH=%PATH%;C:\Python27\Scripts
+' Activate virtualenv
+cd %HOMEPATH%
+pip install virtualenv
+virtualenv venv
+venv\Scripts\activate
+' Setup backend
+cd ProjectBackend
+pip install -r requirements.txt
+set FLASK_APP=main.py
+flask run
+```
