@@ -5,10 +5,21 @@
     android:layout_height="fill_parent">
 
 
-    <ImageView
-        android:id="@+id/selectedImage"
+    <Button
+        android:id="@+id/create_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/partner" />
+        android:text="@string/create_group" />
 
+    <Button
+        android:id="@+id/join_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/join_a_group" />
+
+    <Button
+        android:id="@+id/delete_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/delete_a_group" />
 </LinearLayout>
