@@ -3,10 +3,14 @@ from flask import Flask, request, jsonify, Response
 import google.auth.transport.requests
 import google.oauth2.id_token
 from firebase import firebase
-from google.cloud import datastore, storage, vision
+from google.cloud import datastore, storage, vision, types
 from datetime import datetime
 from settings import *
 from firebase_admin import auth
+import io
+import os
+
+
 
 app = Flask(__name__)
 
@@ -62,18 +66,28 @@ def leave_group():
     return jsonify(response)
 
 
-@app.route('/label', methods=['GET','POST'])
+@app.route('/label', methods=['POST'])
 def label():
-    #photo = request.files['file']
-
 
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
-    test = fb.get('/test', None)
 
-    current_datetime = datetime.now()
+    try:
+        #Get image from request
+        img = request.files.get('imagefile','')
 
-    label = "Faces"
-    vision_client = vision.Client()
+        #Init gcloud vision client
+        vision_client = vision.ImageAnnotatorClient()
+        image = types.Image(content = img)
 
-    return 'Test'
+        #Get response and labels from vision API
+        response = client.label_detection(image = image)
+        labels = client.label_annotations
+
+        for label in lables:
+            print(label)
+
+    except Exception as err:
+        return jsonify(err)
+
+    return response
