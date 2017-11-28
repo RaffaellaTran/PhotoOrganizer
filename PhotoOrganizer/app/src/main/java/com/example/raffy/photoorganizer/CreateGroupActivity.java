@@ -54,6 +54,8 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                 finish();
                 break;
             case R.id.create_group_btn:
+                if (nameField.getText().toString().equals("") || durationField.getText().toString().equals(""))
+                    return;
                 Calendar now = Calendar.getInstance();
                 now.add(Calendar.MINUTE, Integer.parseInt(durationField.getText().toString()));
                 Group group = new Group(nameField.getText().toString(), now);
