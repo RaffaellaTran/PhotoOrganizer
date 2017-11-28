@@ -1,80 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/wifiText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
         android:text="WiFi"
-        tools:layout_editor_absoluteX="35dp"
-        tools:layout_editor_absoluteY="95dp" />
+        app:layout_constraintBottom_toTopOf="@+id/lowWifiSwitch"
+        app:layout_constraintEnd_toStartOf="@+id/lowWifiSwitch"
+        app:layout_constraintStart_toStartOf="@+id/lowWifiSwitch" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/mobileDataText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="35dp"
+        android:layout_marginTop="186dp"
         android:text="Mobile data network"
-        tools:layout_editor_absoluteX="35dp"
-        tools:layout_editor_absoluteY="186dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/textView3"
-        android:layout_width="327dp"
-        android:layout_height="62dp"
+        android:id="@+id/settingsText"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="26dp"
+        android:layout_marginStart="26dp"
+        android:layout_marginTop="17dp"
         android:text="Specify the image quality when uploading or synchronizing pictures under:"
-        tools:layout_editor_absoluteX="31dp"
-        tools:layout_editor_absoluteY="17dp" />
+        app:layout_constraintBottom_toTopOf="@+id/wifiText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Switch
-        android:id="@+id/switch5"
+        android:id="@+id/lowMobileSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
         android:text="Low "
-        tools:layout_editor_absoluteX="48dp"
-        tools:layout_editor_absoluteY="220dp" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/highMobileSwitch"
+        app:layout_constraintEnd_toStartOf="@+id/highMobileSwitch" />
 
     <Switch
-        android:id="@+id/switch8"
+        android:id="@+id/lowWifiSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
         android:text="Low "
-        tools:layout_editor_absoluteX="48dp"
-        tools:layout_editor_absoluteY="129dp" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/highWifiSwitch"
+        app:layout_constraintEnd_toStartOf="@+id/highWifiSwitch" />
 
     <Switch
-        android:id="@+id/switch9"
+        android:id="@+id/fullWifiSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Full "
-        tools:layout_editor_absoluteX="212dp"
-        tools:layout_editor_absoluteY="129dp" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/highWifiSwitch"
+        app:layout_constraintEnd_toEndOf="@+id/fullMobileSwitch"
+        app:layout_constraintStart_toStartOf="@+id/fullMobileSwitch" />
 
     <Switch
-        android:id="@+id/switch10"
+        android:id="@+id/highWifiSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="11dp"
         android:text="High "
-        tools:layout_editor_absoluteX="130dp"
-        tools:layout_editor_absoluteY="129dp" />
+        app:layout_constraintBottom_toTopOf="@+id/mobileDataText"
+        app:layout_constraintEnd_toStartOf="@+id/fullWifiSwitch" />
 
     <Switch
-        android:id="@+id/switch6"
+        android:id="@+id/fullMobileSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="49dp"
         android:text="Full "
-        tools:layout_editor_absoluteX="212dp"
-        tools:layout_editor_absoluteY="220dp" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/highMobileSwitch"
+        app:layout_constraintStart_toEndOf="@+id/mobileDataText" />
 
     <Switch
-        android:id="@+id/switch7"
+        android:id="@+id/highMobileSwitch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="11dp"
+        android:layout_marginTop="15dp"
         android:text="High "
-        tools:layout_editor_absoluteX="130dp"
-        tools:layout_editor_absoluteY="220dp" />
+        app:layout_constraintEnd_toStartOf="@+id/fullMobileSwitch"
+        app:layout_constraintTop_toBottomOf="@+id/mobileDataText" />
 
 </android.support.constraint.ConstraintLayout>
