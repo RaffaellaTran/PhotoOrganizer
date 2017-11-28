@@ -20,10 +20,9 @@ def create_group():
 
     data = request.values
 
-    #Uncomment these to check for uid_token
-    #id_token = data['token']
-    #decoded_token = auth.verify_token(id_token)
-    #uid = decoded_token['uid']
+    id_token = data['token']
+    decoded_token = auth.verify_token(id_token)
+    uid = decoded_token['uid']
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
@@ -43,6 +42,11 @@ def create_group():
 def join_group():
     data = request.values
 
+    #Firebase auth
+    id_token = data['token']
+    decoded_token = auth.verify_token(id_token)
+    uid = decoded_token['uid']
+
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
     join_token = data['join_token']
@@ -56,7 +60,15 @@ def join_group():
 
 @app.route('/leave_group', methods=['DELETE'])
 def leave_group():
+
+
     data = request.values
+
+    #Firebase auth
+    id_token = data['token']
+    decoded_token = auth.verify_token(id_token)
+    uid = decoded_token['uid']
+
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
     user = data['user']
@@ -66,16 +78,30 @@ def leave_group():
     return jsonify(response)
 
 
+
+
 @app.route('/label', methods=['POST'])
 def label():
+
+    data = request.values
+
+    #Firebase auth
+    id_token = data['token']
+    decoded_token = auth.verify_token(id_token)
+    uid = decoded_token['uid']
 
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
     try:
         #Get image from request
-        img = request.files.get('imagefile','')
-
+        if('imagefile' not in request.files)
+            return jsonify({
+                'api_internal_error': False,
+                'error': 'HTTP/400 Bad request'
+            }), 400
+        img = request.files['imagefile']
+        image_name = data['identifier']
         #Init gcloud vision client
         vision_client = vision.ImageAnnotatorClient()
         image = types.Image(content = img)
@@ -84,8 +110,25 @@ def label():
         response = client.label_detection(image = image)
         labels = client.label_annotations
 
+        #Init storage client for labeled pictures
+        storage_client = storage.Client()
+
+        #Get storage bucket
+        bucket = storage_client.get_bucket(FIREBASE_BUCKET_URL)
+        picture_blob = bucket.get_blob(image_name)
+
+        #Save file temporarily
+        path = os.path.join(FILE_TEMP_DIR, image_name)
+        img.save(path)
+
+        #Upload picture from file to cloud storage
+        picture_blob.upload_from_file(path)
+
         for label in lables:
             print(label)
+
+
+
 
     except Exception as err:
         return jsonify(err)
