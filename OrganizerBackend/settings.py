@@ -1,3 +1,8 @@
 FIREBASE_PROJECT_URL = 'https://mcc-fall-2017-g08.firebaseio.com'
 FIREBASE_BUCKET_URL = 'mcc-fall-2017-g08.appspot.com'
 FILE_TEMP_DIR = '/tmp'
+FIREBASE_SECRET = 'H0CEXXcrPBdvDsFO0wiiE6qamUQQaw9CF8FXzH7T'
+FIREBASE_ADMIN_JSON = 'mcc-fall-2017-g08-08f682d78f50.json'
+
+
+TOKEN = 'eyJhbGciOiAiUlMyNTYiLCAidHlwIjogIkpXVCIsICJraWQiOiAiZjEzNjdiNDMzZDg1MTYzNzk3YTgzYzM3OGIzZDgxOTMyOWUxM2VmZCJ9'

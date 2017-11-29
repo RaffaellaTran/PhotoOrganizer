@@ -3,10 +3,11 @@ from flask import Flask, request, jsonify, Response
 import google.auth.transport.requests
 import google.oauth2.id_token
 from firebase import firebase
-from google.cloud import datastore, storage, vision, types
+from google.cloud import datastore, storage, vision
 from datetime import datetime
 from settings import *
-from firebase_admin import auth
+import firebase_admin
+from firebase_admin import auth, credentials
 import io
 import os
 
@@ -20,8 +21,11 @@ def create_group():
 
     data = request.values
 
+    cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
+    firebase_admin.initialize_app(cred)
+
     id_token = data['token']
-    decoded_token = auth.verify_token(id_token)
+    decoded_token = auth.verify_id_token(id_token)
     uid = decoded_token['uid']
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
@@ -35,7 +39,12 @@ def create_group():
     return jsonify(response)
 
 
+@app.route('/gimme', methods=['GET'])
+def gimme():
+    cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
+    firebase_admin.initialize_app(cred)
 
+    return jsonify(custom_token.uid)
 
 #Join
 @app.route('/join_group', methods=['POST'])
@@ -95,20 +104,13 @@ def label():
 
     try:
         #Get image from request
-        if('imagefile' not in request.files)
+        if 'imagefile' not in request.files:
             return jsonify({
                 'api_internal_error': False,
                 'error': 'HTTP/400 Bad request'
             }), 400
         img = request.files['imagefile']
         image_name = data['identifier']
-        #Init gcloud vision client
-        vision_client = vision.ImageAnnotatorClient()
-        image = types.Image(content = img)
-
-        #Get response and labels from vision API
-        response = client.label_detection(image = image)
-        labels = client.label_annotations
 
         #Init storage client for labeled pictures
         storage_client = storage.Client()
@@ -124,9 +126,16 @@ def label():
         #Upload picture from file to cloud storage
         picture_blob.upload_from_file(path)
 
-        for label in lables:
-            print(label)
 
+        #Init gcloud vision client
+        vision_client = vision.ImageAnnotatorClient()
+
+        #Get response and labels from vision API
+        response = client.annotate_image({'image': {'source': {'image_uri': 'gs://' + FIREBASE_BUCKET_URL + '/' + image_name }},
+                    'features': [{'type': vision.enums.Feature.Type.FACE_DETECTION}], })
+
+
+        return jsonify(response.annotations)
 
 
 
