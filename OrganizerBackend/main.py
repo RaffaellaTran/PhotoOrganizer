@@ -75,18 +75,58 @@ def leave_group():
     return jsonify(response)
 
 
+
 @app.route('/label', methods=['POST'])
 def label():
 
     data = request.values
-    files = request.files
 
+    #Firebase auth
     id_token = data['token']
-    decoded_token = auth.verify_id_token(id_token)
+    decoded_token = auth.verify_token(id_token)
     uid = decoded_token['uid']
 
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
-    if not 'picture' in files:
-        return jsonify(""), 400
+    try:
+        #Get image from request
+        if 'imagefile' not in request.files:
+            return jsonify({
+                'api_internal_error': False,
+                'error': 'HTTP/400 Bad request'
+            }), 400
+        img = request.files['imagefile']
+        image_name = data['identifier']
+
+        #Init storage client for labeled pictures
+        storage_client = storage.Client()
+
+        #Get storage bucket
+        bucket = storage_client.get_bucket(FIREBASE_BUCKET_URL)
+        picture_blob = bucket.get_blob(image_name)
+
+        #Save file temporarily
+        path = os.path.join(FILE_TEMP_DIR, image_name)
+        img.save(path)
+
+        #Upload picture from file to cloud storage
+        picture_blob.upload_from_file(path)
+
+
+        #Init gcloud vision client
+        vision_client = vision.ImageAnnotatorClient()
+
+        #Get response and labels from vision API
+        response = client.annotate_image({'image': {'source': {'image_uri': 'gs://' + FIREBASE_BUCKET_URL + '/' + image_name }},
+                    'features': [{'type': vision.enums.Feature.Type.FACE_DETECTION}], })
+
+
+        return jsonify(response.annotations)
+
+
+
+    except Exception as err:
+        return jsonify(err)
+
+    return response
