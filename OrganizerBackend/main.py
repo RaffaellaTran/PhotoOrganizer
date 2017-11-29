@@ -14,15 +14,13 @@ import os
 
 
 app = Flask(__name__)
-
+cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
+firebase_admin.initialize_app(cred)
 
 @app.route('/create_group', methods=['POST'])
 def create_group():
 
     data = request.values
-
-    cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
-    firebase_admin.initialize_app(cred)
 
     id_token = data['token']
     decoded_token = auth.verify_id_token(id_token)
@@ -36,15 +34,9 @@ def create_group():
 
     putdata = {'owner': owner, 'expiration_time': expiration_time }
     response = fb.put('/groups',group_name, putdata)
+
     return jsonify(response)
 
-
-@app.route('/gimme', methods=['GET'])
-def gimme():
-    cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
-    firebase_admin.initialize_app(cred)
-
-    return jsonify(custom_token.uid)
 
 #Join
 @app.route('/join_group', methods=['POST'])
