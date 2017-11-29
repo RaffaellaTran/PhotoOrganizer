@@ -1,0 +1,10 @@
+Flask==0.12.2
+google-auth==1.2.1
+python-firebase==1.2
+requests==2.18.4
+google-cloud-vision==0.28.0
+google-cloud-storage==1.6.0
+google-cloud-datastore==1.4.0
+google-cloud==0.30.0
+firebase-admin==2.0.0
+flask-restful==0.3.6

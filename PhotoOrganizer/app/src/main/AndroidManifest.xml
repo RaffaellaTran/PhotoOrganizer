@@ -3,6 +3,7 @@
     package="com.example.raffy.photoorganizer">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <uses-feature android:name="android.hardware.camera" android:required="true" />
 
@@ -13,22 +14,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Registration">
+        <activity android:name=".Registration" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".GalleryActivity"/>
-        <activity android:name=".GalleryFullScreenActivity" />
-        <activity android:name=".CameraActivity"/>
-        <activity android:name=".GroupManagementActivity"/>
-        <activity android:name=".SettingsActivity"/>
-        <activity android:name=".JoinActivity"/>
-        <activity android:name=".CreateGroupActivity"/>
-        <activity android:name=".DeleteActivity"/>
-        <activity android:name=".LoginActivity"/>
+        <activity android:name=".MainActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".GalleryActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".GalleryFullScreenActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".CameraActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".GroupManagementActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".SettingsActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".JoinActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".CreateGroupActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".DeleteActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>
     </application>
 </manifest>
