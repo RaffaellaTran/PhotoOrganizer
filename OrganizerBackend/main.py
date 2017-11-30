@@ -8,6 +8,7 @@ from datetime import datetime
 from settings import *
 import firebase_admin
 from firebase_admin import auth, credentials
+import uuid
 
 app = Flask(__name__)
 
@@ -20,9 +21,12 @@ def create_group():
 
     data = request.values
 
-    id_token = data['token']
-    decoded_token = auth.verify_id_token(id_token)
-    uid = decoded_token['uid']
+    try:
+        id_token = data['token']
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+    except ValueError:
+        return jsonify("Token has expired or was not included"), 401
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
@@ -30,8 +34,10 @@ def create_group():
     expiration_time = data['expiration_time']
     owner = data['owner']
 
-    putdata = {'owner': owner, 'expiration_time': expiration_time }
-    response = fb.put('/groups',group_name, putdata)
+    putdata = {'owner': uid, 'expiration_time': expiration_time, 'join_token': uuid.uuid4().hex, 'users': [] }
+    response = fb.put('/groups', group_name, putdata)
+    push_response = fb.post('/groups/' + group_name + '/users/', uuid.uuid4().hex)
+
     return jsonify(response)
 
 
@@ -41,9 +47,12 @@ def create_group():
 def join_group():
     data = request.values
 
-    id_token = data['token']
-    decoded_token = auth.verify_id_token(id_token)
-    uid = decoded_token['uid']
+    try:
+        id_token = data['token']
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+    except ValueError:
+        return jsonify("Token has expired or was not included"), 401
 
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
@@ -52,18 +61,28 @@ def join_group():
     group_name = data['group_name']
     user = data['user']
 
-    putdata = {user : 'true'}
-    response = fb.put('/groups/' + group_name, user, True)
-    return jsonify(response)
+    group = fb.get('/groups/' + group_name + '/join_token', None)
+
+
+    if group == join_token:
+        response = fb.post('/groups/' + group_name + '/users/', uuid.uuid4().hex)
+        set_new = fb.put('/groups/' + group_name, 'join_token', uuid.uuid4().hex)
+        return jsonify(response)
+
+    else:
+        return jsonify({'error': 'The token has expired'}), 400
 
 
 @app.route('/leave_group', methods=['DELETE'])
 def leave_group():
     data = request.values
 
-    id_token = data['token']
-    decoded_token = auth.verify_id_token(id_token)
-    uid = decoded_token['uid']
+    try:
+        id_token = data['token']
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+    except ValueError:
+        return jsonify("Token has expired or was not included"), 401
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
@@ -81,10 +100,12 @@ def label():
 
     data = request.values
 
-    #Firebase auth
-    id_token = data['token']
-    decoded_token = auth.verify_token(id_token)
-    uid = decoded_token['uid']
+    try:
+        id_token = data['token']
+        decoded_token = auth.verify_id_token(id_token)
+        uid = decoded_token['uid']
+    except ValueError:
+        return jsonify("Token has expired or was not included"), 401
 
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
