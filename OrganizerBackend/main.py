@@ -36,7 +36,7 @@ def create_group():
 
     putdata = {'owner': uid, 'expiration_time': expiration_time, 'join_token': uuid.uuid4().hex, 'users': [] }
     response = fb.put('/groups', group_name, putdata)
-    push_response = fb.post('/groups/' + group_name + '/users/', uuid.uuid4().hex)
+    push_response = fb.put('/groups/' + group_name + '/users/', uid, user)
 
     return jsonify(response)
 
@@ -52,7 +52,7 @@ def join_group():
         decoded_token = auth.verify_id_token(id_token)
         uid = decoded_token['uid']
     except ValueError:
-        return jsonify("Token has expired or was not included"), 401
+        return jsonify("Authorization token has expired or was not included"), 401
 
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
@@ -65,12 +65,12 @@ def join_group():
 
 
     if group == join_token:
-        response = fb.post('/groups/' + group_name + '/users/', uuid.uuid4().hex)
+        response = fb.put('/groups/' + group_name + '/users/', uid, user)
         set_new = fb.put('/groups/' + group_name, 'join_token', uuid.uuid4().hex)
         return jsonify(response)
 
     else:
-        return jsonify({'error': 'The token has expired'}), 400
+        return jsonify({'error': 'The join token has expired, or is not valid'}), 400
 
 
 @app.route('/leave_group', methods=['DELETE'])
@@ -86,11 +86,9 @@ def leave_group():
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
-
-    user = data['user']
     group_name = data['group_name']
 
-    response = fb.delete('/groups/' + group_name, user)
+    response = fb.delete('/groups/' + group_name + '/users', uid)
     return jsonify(response)
 
 
