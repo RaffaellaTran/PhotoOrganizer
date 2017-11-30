@@ -45,3 +45,20 @@ group_name : {name of the group to be joined}
 [DELETE] localhost:5000/leave_group
 token : {firebase auth token}
 group_name : {name of the group to be left from}
+## Windows (by Aleksi)
+
+```
+' Install Python and set PATH
+set PATH=%PATH%;C:\Python27
+set PATH=%PATH%;C:\Python27\Scripts
+' Activate virtualenv
+cd %HOMEPATH%
+pip install virtualenv
+virtualenv venv
+venv\Scripts\activate
+' Setup backend
+cd ProjectBackend
+pip install -r requirements.txt
+set FLASK_APP=main.py
+flask run
+```

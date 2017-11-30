@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "672954146858",
+    "firebase_url": "https://mcc-fall-2017-g08.firebaseio.com",
+    "project_id": "mcc-fall-2017-g08",
+    "storage_bucket": "mcc-fall-2017-g08.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:672954146858:android:77512c67ad86de00",
+        "android_client_info": {
+          "package_name": "com.example.raffy.photoorganizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "672954146858-6hks2fut97cku5rpqmnqdodvntllpim1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBo2uzfnnLYu6Ej0vuSeW05kQSd7qtUWrc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
