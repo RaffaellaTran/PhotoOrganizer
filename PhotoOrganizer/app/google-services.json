@@ -1,27 +1,27 @@
 {
   "project_info": {
-    "project_number": "873033579359",
-    "firebase_url": "https://photoorganizer-2b983.firebaseio.com",
-    "project_id": "photoorganizer-2b983",
-    "storage_bucket": "photoorganizer-2b983.appspot.com"
+    "project_number": "672954146858",
+    "firebase_url": "https://mcc-fall-2017-g08.firebaseio.com",
+    "project_id": "mcc-fall-2017-g08",
+    "storage_bucket": "mcc-fall-2017-g08.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:873033579359:android:77512c67ad86de00",
+        "mobilesdk_app_id": "1:672954146858:android:77512c67ad86de00",
         "android_client_info": {
           "package_name": "com.example.raffy.photoorganizer"
         }
       },
       "oauth_client": [
         {
-          "client_id": "873033579359-tm1bj74nspneuasjkook0geeg0a98tb2.apps.googleusercontent.com",
+          "client_id": "672954146858-6hks2fut97cku5rpqmnqdodvntllpim1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAzWbXZKuePjFGVAXiFubUlrzXzkvFkJOk"
+          "current_key": "AIzaSyBo2uzfnnLYu6Ej0vuSeW05kQSd7qtUWrc"
         }
       ],
       "services": {

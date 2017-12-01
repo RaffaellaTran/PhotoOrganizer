@@ -69,4 +69,4 @@ Icon
 
 OrganizerBackend/lib
 OrganizerBackend/venv
-
+*.pyc
