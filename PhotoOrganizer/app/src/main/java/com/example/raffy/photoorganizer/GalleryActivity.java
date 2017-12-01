@@ -1,6 +1,7 @@
 package com.example.raffy.photoorganizer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -20,7 +21,7 @@ import java.util.List;
 
 public class GalleryActivity extends AppCompatActivity {
 
-    List<GalleryAlbum> album = new ArrayList<GalleryAlbum>();
+    List<GalleryAlbum> albums = new ArrayList<GalleryAlbum>();
     GridView gridView;
 
     @Override
@@ -30,12 +31,12 @@ public class GalleryActivity extends AppCompatActivity {
 
         GalleryAlbum test = new GalleryAlbum();
         test.name = "test";
-        album.add(test);
-        album.add(test);
-        album.add(test);
-        album.add(test);
-        album.add(test);
-        album.add(test);
+        albums.add(test);
+        albums.add(test);
+        albums.add(test);
+        albums.add(test);
+        albums.add(test);
+        albums.add(test);
 
         gridView = findViewById(R.id.folder_grid);
         gridView.setAdapter(new FolderAdapter(getApplicationContext()));
@@ -46,7 +47,11 @@ public class GalleryActivity extends AppCompatActivity {
 
     AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-
+            // Start the album viewer for selected album
+            Intent intent = new Intent(getApplicationContext(), GalleryAlbumActivity.class);
+            GalleryAlbum album = (GalleryAlbum) gridView.getItemAtPosition(position);
+            intent.putExtra("group_name", album.name);
+            startActivity(intent);
         }
     };
 
@@ -61,11 +66,11 @@ public class GalleryActivity extends AppCompatActivity {
         }
 
         public int getCount() {
-            return album.size();
+            return albums.size();
         }
 
         public Object getItem(int position) {
-            return null;
+            return albums.get(position);
         }
 
         public long getItemId(int position) {
@@ -86,7 +91,8 @@ public class GalleryActivity extends AppCompatActivity {
             }
 
             holder.imageView.setImageResource(R.mipmap.ic_launcher);
-            holder.txtTitle.setText(album.get(position).name);
+            GalleryAlbum album = (GalleryAlbum) gridView.getItemAtPosition(position);
+            holder.txtTitle.setText(album.name);
             return convertView;
         }
 
