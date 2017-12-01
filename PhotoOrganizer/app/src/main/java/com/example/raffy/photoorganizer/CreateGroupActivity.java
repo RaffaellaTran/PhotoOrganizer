@@ -1,8 +1,10 @@
 package com.example.raffy.photoorganizer;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -10,8 +12,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -23,6 +29,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -54,12 +61,30 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                 finish();
                 break;
             case R.id.create_group_btn:
+                // check that fields are not empty
                 if (nameField.getText().toString().equals("") || durationField.getText().toString().equals(""))
                     return;
-                Calendar now = Calendar.getInstance();
-                now.add(Calendar.MINUTE, Integer.parseInt(durationField.getText().toString()));
-                Group group = new Group(nameField.getText().toString(), now);
-                new Http(this).execute(group);
+                // get instances
+                final Calendar now = Calendar.getInstance();
+                final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                final ProgressDialog progress = new ProgressDialog(this);
+                progress.show();
+                // get token and start progress
+                user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<GetTokenResult> task) {
+                        String token = task.getResult().getToken();
+                        now.add(Calendar.MINUTE, Integer.parseInt(durationField.getText().toString()));
+                        Group group = new Group(nameField.getText().toString(), now, user.getUid());
+                        new Http(CreateGroupActivity.this, token, progress).execute(group);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("!!!", e.getMessage());
+                        Toast.makeText(CreateGroupActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
         }
     }
@@ -67,15 +92,17 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
     private static class Http extends AsyncTask<Group, Void, String> {
 
         private WeakReference<Activity> context;
+        private String token;
+        private ProgressDialog progress;
 
-        Http(Activity context) {
+        Http(Activity context, String token, ProgressDialog progress) {
             this.context = new WeakReference<>(context);
+            this.token = token;
+            this.progress = progress;
         }
 
         @Override
         protected String doInBackground(Group... groups) {
-            // TODO needs to be tested + handled
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             OkHttpClient client = new OkHttpClient();
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
                     new Locale("fi", "FI"));
@@ -83,13 +110,13 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                 try {
                     String expiration = format.format(group.getExpires().getTime());
 
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("group_name", group.getName());
-                    jsonObject.put("expiration_time", expiration);
-                    jsonObject.put("owner", user.getUid());
-
-                    MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-                    RequestBody body = RequestBody.create(JSON, jsonObject.toString());
+                    RequestBody body = new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("token", token)
+                            .addFormDataPart("group_name", group.getName())
+                            .addFormDataPart("expiration_time", expiration)
+                            .addFormDataPart("user", group.getUser())
+                            .build();
                     Request request = new Request.Builder()
                             .url("http://10.0.2.2:5000/create_group")  // TODO
                             .post(body)
@@ -100,8 +127,6 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                     return "Group created! " + response.toString();
                 } catch (IOException e) {
                     return "Network error: " + e.getMessage();
-                } catch (JSONException e) {
-                    return "JSON error: " + e.getMessage();
                 }
             }
             return null;
@@ -110,8 +135,11 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
         @Override
         protected void onPostExecute(String message) {
             super.onPostExecute(message);
-            Log.i("GROUPS", message);
-            Toast.makeText(context.get(), message, Toast.LENGTH_LONG).show();
+            if (message != null) {
+                Log.i("GROUPS", message);
+                Toast.makeText(context.get(), message, Toast.LENGTH_LONG).show();
+            }
+            progress.dismiss();
         }
     }
 }
