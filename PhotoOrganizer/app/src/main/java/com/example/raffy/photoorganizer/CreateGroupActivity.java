@@ -67,6 +67,7 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                 // get instances
                 final Calendar now = Calendar.getInstance();
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user == null) break;
                 final ProgressDialog progress = new ProgressDialog(this);
                 progress.show();
                 // get token and start progress
@@ -104,11 +105,9 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
         @Override
         protected String doInBackground(Group... groups) {
             OkHttpClient client = new OkHttpClient();
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
-                    new Locale("fi", "FI"));
             for (Group group : groups) {
                 try {
-                    String expiration = format.format(group.getExpires().getTime());
+                    String expiration = Group.getDateFormat().format(group.getExpires().getTime());
 
                     RequestBody body = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)

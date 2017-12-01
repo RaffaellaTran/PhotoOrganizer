@@ -1,8 +1,8 @@
 package com.example.raffy.photoorganizer;
 
-/**
- * Created by Raffy on 14/11/2017.
- */
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 public class User {
 
     private String name;
@@ -40,5 +40,9 @@ public class User {
         this.email = email;
     }
 
+    public static String getUid() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        return user.getUid();
+    }
 
 }
