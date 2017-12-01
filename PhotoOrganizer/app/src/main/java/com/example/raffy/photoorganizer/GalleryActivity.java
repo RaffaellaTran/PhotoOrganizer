@@ -1,57 +1,99 @@
 package com.example.raffy.photoorganizer;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
-public class GalleryActivity extends FragmentActivity {
+import java.util.ArrayList;
+import java.util.List;
 
-    private static final int NUM_PAGES = 2;
-    ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
+/**
+ * Created by Anton on 13.11.2017.
+ */
+
+public class GalleryActivity extends AppCompatActivity {
+
+    List<GalleryAlbum> album = new ArrayList<GalleryAlbum>();
+    GridView gridView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_gallery);
+        setContentView(R.layout.album_grid);
 
-        mPager = (ViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new GalleryPageAdapter(getSupportFragmentManager());
-        mPager.setAdapter(mPagerAdapter);
+        GalleryAlbum test = new GalleryAlbum();
+        test.name = "test";
+        album.add(test);
+        album.add(test);
+        album.add(test);
+        album.add(test);
+        album.add(test);
+        album.add(test);
+
+        gridView = findViewById(R.id.folder_grid);
+        gridView.setAdapter(new FolderAdapter(getApplicationContext()));
+
+        gridView.setOnItemClickListener(clickListener);
     }
 
-    @Override
-    public void onBackPressed() {
-        if (mPager.getCurrentItem() == 0) {
-            // If the user is currently looking at the first step, allow the system to handle the
-            // Back button. This calls finish() on this activity and pops the back stack.
-            super.onBackPressed();
-        } else {
-            // Otherwise, select the previous step.
-            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
-        }
-    }
 
-    private class GalleryPageAdapter extends FragmentPagerAdapter {
-        public GalleryPageAdapter(FragmentManager fm) {
-            super(fm);
-        }
+    AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
+        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 
-        @Override
-        public Fragment getItem(int position) {
-            if (position == 0)
-                return new GalleryFolderFragment();
-            else
-                return new GalleryImageFragment();
+        }
+    };
+
+    public class FolderAdapter extends BaseAdapter {
+
+
+
+        private Context mContext;
+
+        public FolderAdapter(Context c) {
+            mContext = c;
         }
 
-        @Override
         public int getCount() {
-            return NUM_PAGES;
+            return album.size();
         }
+
+        public Object getItem(int position) {
+            return null;
+        }
+
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        // create a new ImageView for each item referenced by the Adapter
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder = null;
+            if (convertView == null) {
+                convertView = View.inflate(mContext, R.layout.album_view, null);
+                holder = new ViewHolder();
+                holder.txtTitle = (TextView) convertView.findViewById(R.id.name);
+                holder.imageView = (ImageView) convertView.findViewById(R.id.image);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            holder.imageView.setImageResource(R.mipmap.ic_launcher);
+            holder.txtTitle.setText(album.get(position).name);
+            return convertView;
+        }
+
+        private class ViewHolder {
+            ImageView imageView;
+            TextView txtTitle;
+        }
+
     }
 }

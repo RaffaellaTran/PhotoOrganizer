@@ -4,9 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -20,7 +19,7 @@ import com.squareup.picasso.Picasso;
  * Created by Anton on 13.11.2017.
  */
 
-public class GalleryImageFragment extends Fragment {
+public class GalleryAlbumActivity extends AppCompatActivity {
 
 
 
@@ -30,31 +29,28 @@ public class GalleryImageFragment extends Fragment {
     int columns = 3;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(
-                R.layout.image_grid, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.image_grid);
 
-        gridView = rootView.findViewById(R.id.grid);
-        gridView.setAdapter(new ImageAdapter(getContext()));
+        gridView = findViewById(R.id.grid);
+        gridView.setAdapter(new ImageAdapter(getApplicationContext()));
         gridView.setPadding(0,0,0,0);
         gridView.setNumColumns(columns);
         gridView.setOnItemClickListener(clickListener);
 
         // Get a suitable image height and width for filling the screen
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
         imageWidth = size.x / columns;
         imageHeight = imageWidth;
-
-        return rootView;
     }
 
     AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
             // Start the fullscreen viewer for selected image
-            Intent intent = new Intent(getContext(), GalleryFullScreenActivity.class);
+            Intent intent = new Intent(getApplicationContext(), GalleryImageActivity.class);
             String image = "http://i.imgur.com/DvpvklR.png";
             intent.putExtra("image_path", image);
             startActivity(intent);

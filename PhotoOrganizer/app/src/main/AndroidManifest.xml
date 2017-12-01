@@ -23,7 +23,8 @@
         </activity>
         <activity android:name=".MainActivity" android:screenOrientation="portrait"/>
         <activity android:name=".GalleryActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".GalleryFullScreenActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".GalleryAlbumActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".GalleryImageActivity" android:screenOrientation="portrait"/>
         <activity android:name=".CameraActivity" android:screenOrientation="portrait"/>
         <activity android:name=".GroupManagementActivity" android:screenOrientation="portrait"/>
         <activity android:name=".SettingsActivity" android:screenOrientation="portrait"/>
