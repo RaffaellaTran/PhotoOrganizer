@@ -60,8 +60,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
         final TextView group_expires_field = findViewById(R.id.expires);
         final TextView group_members_field = findViewById(R.id.members);
 
-        final ProgressDialog progress = new ProgressDialog(this);
-        progress.show();
+        final ProgressDialog progress = ApiHttp.getProgressDialog(this);
         Group.getMyGroup(new Group.GetMyGroupResult() {
             @Override
             public void react(@Nullable Group group) {
@@ -140,8 +139,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
     private static void startDeleteGroupAction(final Activity context, final Group group) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
-        final ProgressDialog progress = new ProgressDialog(context);
-        progress.show();
+        final ProgressDialog progress = ApiHttp.getProgressDialog(context);
         // get token and start progress
         user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override

@@ -149,7 +149,6 @@ public class JoinActivity extends AppCompatActivity {
                             String joinCode = qr.split(":")[1];
                             startJoinGroupAction(context.get(), groupName, joinCode);
                             Toast.makeText(context.get(), "Barcode found", Toast.LENGTH_SHORT).show();
-                            context.get().finish();
                         }
                     }
                 });
@@ -161,8 +160,7 @@ public class JoinActivity extends AppCompatActivity {
     private static void startJoinGroupAction(final Activity context, final String group_name, final String join_code) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
-        final ProgressDialog progress = new ProgressDialog(context);
-        progress.show();
+        final ProgressDialog progress = ApiHttp.getProgressDialog(context);
         // get token and start progress
         user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
@@ -179,7 +177,12 @@ public class JoinActivity extends AppCompatActivity {
                         .url("http://10.0.2.2:5000/join_group")  // TODO
                         .post(body)
                         .build();
-                new ApiHttp(context, progress).execute(request);
+                new ApiHttp(context, progress).addAfter(new ApiHttp.After() {
+                    @Override
+                    public void run() {
+                        context.finish();
+                    }
+                }).execute(request);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

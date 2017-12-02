@@ -68,8 +68,6 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                 final Calendar now = Calendar.getInstance();
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                 if (user == null) break;
-                final ProgressDialog progress = new ProgressDialog(this);
-                progress.show();
                 // start progress
                 now.add(Calendar.MINUTE, Integer.parseInt(durationField.getText().toString()));
                 Group group = new Group(nameField.getText().toString(), now, user.getUid(), new String[]{user.getUid()});
@@ -81,8 +79,7 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
     private static void startCreateGroupAction(final Activity context, final Group group) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
-        final ProgressDialog progress = new ProgressDialog(context);
-        progress.show();
+        final ProgressDialog progress = ApiHttp.getProgressDialog(context);
         // get token and start progress
         user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
             @Override
