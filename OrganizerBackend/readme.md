@@ -45,6 +45,14 @@ group_name : {name of the group to be joined}
 [DELETE] localhost:5000/leave_group
 token : {firebase auth token}
 group_name : {name of the group to be left from}
+
+
+[POST] localhost:5000/label
+token : {firebase auth token}
+group_name : {name of the group to be left from}
+imagefile : {file that is to be uploaded}
+
+
 ## Windows (by Aleksi)
 
 ```
