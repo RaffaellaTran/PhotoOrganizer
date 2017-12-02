@@ -62,7 +62,7 @@ def join_group():
 
     join_token = data['join_token']
     group_name = data['group_name']
-    usir = data['user']
+    user = data['user']
 
     group = fb.get('/groups/' + group_name + '/join_token', None)
 
@@ -90,8 +90,14 @@ def leave_group():
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
     group_name = data['group_name']
+    group_uri = '/groups/' + group_name
 
-    response = fb.delete('/groups/' + group_name + '/users', uid)
+    get = fb.get(group_uri + '/owner', None)
+
+    if get == uid:
+        response = fb.delete('/groups', group_name)
+    else:
+        response = fb.delete(group_uri + '/users', uid)
     return jsonify(response)
 
 
@@ -163,5 +169,3 @@ def label():
 
     except Exception as err:
         return jsonify(str(err))
-
-    
