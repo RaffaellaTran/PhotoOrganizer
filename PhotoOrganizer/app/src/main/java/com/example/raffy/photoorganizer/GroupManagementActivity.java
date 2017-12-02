@@ -148,7 +148,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                         .addFormDataPart("group_name", group.getName())
                         .build();
                 Request request = new Request.Builder()
-                        .url("http://10.0.2.2:5000/leave_group")  // TODO
+                        .url("http://10.0.2.2:5000/delete_group")  // TODO
                         .delete(body)
                         .build();
                 new Http(context, token, progress).execute(request);
