@@ -159,10 +159,10 @@ def label():
         response = vision_client.face_detection(image = image)
 
         faces = False
-        if response != "":
+        if len(response.face_annotations) != 0:
             faces = True
 
-        picture_json = {"owner" : uid, "bucket_identifier" : bucket_uri, "faces" : faces  }
+        picture_json = {"owner" : uuid.uuid4().hex, "bucket_identifier" : bucket_uri, "faces" : faces  }
         res = fb.post("/pictures/" + group, picture_json)
 
         return jsonify(res)
