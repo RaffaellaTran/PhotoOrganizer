@@ -70,3 +70,6 @@ Icon
 OrganizerBackend/lib
 OrganizerBackend/venv
 
+#Compiled python binaries
+*.pyc
+
