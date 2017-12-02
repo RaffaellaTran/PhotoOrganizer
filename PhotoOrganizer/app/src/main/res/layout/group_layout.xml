@@ -4,6 +4,96 @@
     android:orientation="vertical" android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/myGroupInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/info_name"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/name"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            app:layout_constraintTop_toTopOf="@id/myGroupInfo"
+            app:layout_constraintBottom_toTopOf="@id/info_expires"
+            app:layout_constraintLeft_toLeftOf="@id/myGroupInfo"
+            app:layout_constraintRight_toLeftOf="@id/name"/>
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/myGroupInfo"
+            app:layout_constraintBottom_toTopOf="@id/expires"
+            app:layout_constraintLeft_toRightOf="@id/info_name"
+            app:layout_constraintRight_toRightOf="@id/myGroupInfo"/>
+
+        <TextView
+            android:id="@+id/info_expires"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/expiration"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            app:layout_constraintTop_toBottomOf="@id/info_name"
+            app:layout_constraintBottom_toTopOf="@id/info_members"
+            app:layout_constraintLeft_toLeftOf="@id/myGroupInfo"
+            app:layout_constraintRight_toLeftOf="@id/expires"/>
+
+        <TextView
+            android:id="@+id/expires"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/name"
+            app:layout_constraintBottom_toTopOf="@id/members"
+            app:layout_constraintLeft_toRightOf="@id/info_expires"
+            app:layout_constraintRight_toRightOf="@id/myGroupInfo"/>
+
+        <TextView
+            android:id="@+id/info_members"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="@string/members"
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            app:layout_constraintTop_toBottomOf="@id/info_expires"
+            app:layout_constraintBottom_toTopOf="@id/delete_group"
+            app:layout_constraintLeft_toLeftOf="@id/myGroupInfo"
+            app:layout_constraintRight_toLeftOf="@id/members"/>
+
+        <TextView
+            android:id="@+id/members"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/expires"
+            app:layout_constraintBottom_toTopOf="@id/add_member"
+            app:layout_constraintLeft_toRightOf="@id/info_members"
+            app:layout_constraintRight_toRightOf="@id/myGroupInfo"/>
+
+        <Button
+            android:id="@+id/delete_group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/leave_group"
+            app:layout_constraintTop_toBottomOf="@id/info_members"
+            app:layout_constraintBottom_toBottomOf="@id/myGroupInfo"
+            app:layout_constraintLeft_toLeftOf="@id/myGroupInfo"
+            app:layout_constraintRight_toLeftOf="@id/add_member"/>
+
+        <Button
+            android:id="@+id/add_member"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_member"
+            app:layout_constraintTop_toBottomOf="@id/members"
+            app:layout_constraintBottom_toBottomOf="@id/myGroupInfo"
+            app:layout_constraintLeft_toRightOf="@id/delete_group"
+            app:layout_constraintRight_toRightOf="@id/myGroupInfo"/>
+
+    </android.support.constraint.ConstraintLayout>
 
     <Button
         android:id="@+id/create_group"
@@ -16,10 +106,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/join_a_group" />
-
-    <Button
-        android:id="@+id/delete_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/delete_a_group" />
 </LinearLayout>
