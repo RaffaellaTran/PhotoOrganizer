@@ -156,7 +156,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                         .url("http://10.0.2.2:5000/leave_group")  // TODO
                         .delete(body)
                         .build();
-                new Http(context, token, progress).execute(request);
+                new ApiHttp(context, progress).execute(request);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -165,44 +165,6 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private static class Http extends AsyncTask<Request, Void, String> {
-
-        private WeakReference<Activity> context;
-        private String token;
-        private ProgressDialog progress;
-
-        Http(Activity context, String token, ProgressDialog progress) {
-            this.context = new WeakReference<>(context);
-            this.token = token;
-            this.progress = progress;
-        }
-
-        @Override
-        protected String doInBackground(Request... requests) {
-            OkHttpClient client = new OkHttpClient();
-            for (Request request : requests) {
-                try {
-                    Response response = client.newCall(request).execute();
-                    context.get().finish();
-                    return "Success! " + response.toString();
-                } catch (IOException e) {
-                    return "Network error: " + e.getMessage();
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String message) {
-            super.onPostExecute(message);
-            if (message != null) {
-                Log.i("GROUPS", message);
-                Toast.makeText(context.get(), message, Toast.LENGTH_LONG).show();
-            }
-            progress.dismiss();
-        }
     }
 
 }
