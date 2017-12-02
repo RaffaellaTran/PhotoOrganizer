@@ -76,6 +76,12 @@ public class Group {
                             Date date = getDateFormat().parse(snapshot.child("expiration_time").getValue().toString());
                             Calendar calendar = Calendar.getInstance();
                             calendar.setTime(date);
+                            Calendar now = Calendar.getInstance();
+                            if (now.compareTo(calendar) > 0) {
+                                // expired!
+                                result.react(null);
+                                return;
+                            }
                             Group group = new Group(name, calendar, user.getUid(), users);
                             result.react(group);
                             return;
