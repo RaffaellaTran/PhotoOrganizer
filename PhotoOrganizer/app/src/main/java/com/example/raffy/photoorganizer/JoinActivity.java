@@ -145,8 +145,8 @@ public class JoinActivity extends AppCompatActivity {
                     public void run() {
                         if (barcodes.size() > 0) {
                             String qr = barcodes.valueAt(0).displayValue;
-                            String groupName = qr.split("-")[0];
-                            String joinCode = qr.split("-")[1];
+                            String groupName = qr.split(":")[0];
+                            String joinCode = qr.split(":")[1];
                             startJoinGroupAction(context.get(), groupName, joinCode);
                             Toast.makeText(context.get(), "Barcode found", Toast.LENGTH_SHORT).show();
                             context.get().finish();
