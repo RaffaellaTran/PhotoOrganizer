@@ -4,11 +4,14 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 from firebase import firebase
 from google.cloud import datastore, storage, vision
+from google.cloud.vision import types
 from datetime import datetime
 from settings import *
 import firebase_admin
 from firebase_admin import auth, credentials
 import uuid
+import os
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
@@ -59,7 +62,7 @@ def join_group():
 
     join_token = data['join_token']
     group_name = data['group_name']
-    usir = data['user']
+    user = data['user']
 
     group = fb.get('/groups/' + group_name + '/join_token', None)
 
@@ -107,8 +110,14 @@ def leave_group():
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
     group_name = data['group_name']
+    group_uri = '/groups/' + group_name
 
-    response = fb.delete('/groups/' + group_name + '/users', uid)
+    get = fb.get(group_uri + '/owner', None)
+
+    if get == uid:
+        response = fb.delete('/groups', group_name)
+    else:
+        response = fb.delete(group_uri + '/users', uid)
     return jsonify(response)
 
 
@@ -135,37 +144,48 @@ def label():
                 'api_internal_error': False,
                 'error': 'HTTP/400 Bad request'
             }), 400
+
+
         img = request.files['imagefile']
-        image_name = data['identifier']
+        group = data['group_name']
+        image_name = secure_filename(img.filename)
 
         #Init storage client for labeled pictures
         storage_client = storage.Client()
 
         #Get storage bucket
         bucket = storage_client.get_bucket(FIREBASE_BUCKET_URL)
-        picture_blob = bucket.get_blob(image_name)
+
+        picture_blob = bucket.blob(image_name)
 
         #Save file temporarily
         path = os.path.join(FILE_TEMP_DIR, image_name)
         img.save(path)
 
+
+
         #Upload picture from file to cloud storage
-        picture_blob.upload_from_file(path)
+        picture_blob.upload_from_filename(path)
 
+        os.remove(path)
 
+        bucket_uri = 'gs://' + FIREBASE_BUCKET_URL + '/' + image_name
         #Init gcloud vision client
         vision_client = vision.ImageAnnotatorClient()
+        image = types.Image()
+        image.source.image_uri = bucket_uri
 
         #Get response and labels from vision API
-        response = client.annotate_image({'image': {'source': {'image_uri': 'gs://' + FIREBASE_BUCKET_URL + '/' + image_name }},
-                    'features': [{'type': vision.enums.Feature.Type.FACE_DETECTION}], })
+        response = vision_client.face_detection(image = image)
 
+        faces = False
+        if response != "":
+            faces = True
 
-        return jsonify(response.annotations)
+        picture_json = {"owner" : uid, "bucket_identifier" : bucket_uri, "faces" : faces  }
+        res = fb.post("/pictures/" + group, picture_json)
 
-
+        return jsonify(res)
 
     except Exception as err:
-        return jsonify(err)
-
-    return response
+        return jsonify(str(err))
