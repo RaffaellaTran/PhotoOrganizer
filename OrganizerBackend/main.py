@@ -37,7 +37,7 @@ def create_group():
     expiration_time = data['expiration_time']
     user = data['user']
 
-    putdata = {'owner': uid, 'expiration_time': expiration_time, 'join_token': uuid.uuid4().hex, 'users': [] }
+    putdata = {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [] }
     response = fb.put('/groups', group_name, putdata)
     push_response = fb.put('/groups/' + group_name + '/users/', uid, user)
 
