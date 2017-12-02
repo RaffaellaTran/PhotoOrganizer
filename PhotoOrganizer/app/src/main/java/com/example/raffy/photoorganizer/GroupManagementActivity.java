@@ -113,7 +113,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                         .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                startDeleteGroupAction(GroupManagementActivity.this, mGroup, !delete);
+                                startDeleteGroupAction(GroupManagementActivity.this, mGroup);
                             }
                         }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
                     @Override
@@ -128,7 +128,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
         }
     }
 
-    private static void startDeleteGroupAction(final Activity context, final Group group, final boolean justLeave) {
+    private static void startDeleteGroupAction(final Activity context, final Group group) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
         final ProgressDialog progress = new ProgressDialog(context);
@@ -144,7 +144,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                         .addFormDataPart("group_name", group.getName())
                         .build();
                 Request request = new Request.Builder()
-                        .url("http://10.0.2.2:5000/" + (justLeave ? "leave_group" : "delete_group"))  // TODO
+                        .url("http://10.0.2.2:5000/leave_group")  // TODO
                         .delete(body)
                         .build();
                 new Http(context, token, progress).execute(request);

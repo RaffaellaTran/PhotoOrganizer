@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
@@ -72,16 +73,10 @@ public class Group {
                         for (int i = 0; i < childrenCount; i++) {
                             users[i] = children.next().getValue().toString();
                         }
-                        if (owner.equals(user.getUid())) {
+                        if (Arrays.asList(users).contains(user.getUid())) {
                             Date date = getDateFormat().parse(snapshot.child("expiration_time").getValue().toString());
                             Calendar calendar = Calendar.getInstance();
                             calendar.setTime(date);
-                            Calendar now = Calendar.getInstance();
-                            if (now.compareTo(calendar) > 0) {
-                                // expired!
-                                result.react(null);
-                                return;
-                            }
                             Group group = new Group(name, calendar, user.getUid(), users);
                             result.react(group);
                             return;
