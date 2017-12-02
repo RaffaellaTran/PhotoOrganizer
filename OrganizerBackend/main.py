@@ -161,8 +161,7 @@ def label():
 
         return jsonify(res)
 
-
     except Exception as err:
         return jsonify(str(err))
 
-    return response
+    
