@@ -62,5 +62,8 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.github.chrisbanes:PhotoView:2.1.3'
 
+    // Http
+    compile 'com.squareup.okio:okio:1.13.0'
+    compile 'com.squareup.okhttp3:okhttp:3.7.0'
 }
 apply plugin: 'com.google.gms.google-services'
