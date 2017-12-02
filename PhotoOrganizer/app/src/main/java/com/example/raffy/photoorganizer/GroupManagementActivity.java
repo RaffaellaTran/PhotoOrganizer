@@ -52,13 +52,18 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                     button_create.setVisibility(View.GONE);
                     button_join.setVisibility(View.GONE);
                     // set delete/leave button
-                    if (group.getUser().equals(User.getUid())) {
+                    if (group.getOwner().equals(User.getUid())) {
                         button_delete.setText(getString(R.string.delete_a_group));
                     }
                     // fill group panel
                     group_name_field.setText(group.getName());
                     group_expires_field.setText(Group.getDateFormat().format(group.getExpires().getTime()));
-                    group_members_field.setText("TODO");
+                    StringBuilder membersString = new StringBuilder();
+                    for (String member : group.getUsers()) {
+                        membersString.append(member);
+                        membersString.append(" ");
+                    }
+                    group_members_field.setText(membersString.toString());
                 }
             }
         });
@@ -77,7 +82,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                 startActivity(intent); // start Intent
                 break;
             case R.id.delete_group:
-                if (mGroup != null && mGroup.getUser().equals(User.getUid())) {
+                if (mGroup != null && mGroup.getOwner().equals(User.getUid())) {
                     // delete group
                     new AlertDialog.Builder(this)
                         .setTitle(getString(R.string.delete_a_group))

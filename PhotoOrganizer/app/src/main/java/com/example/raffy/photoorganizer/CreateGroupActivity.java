@@ -76,7 +76,7 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                     public void onComplete(@NonNull Task<GetTokenResult> task) {
                         String token = task.getResult().getToken();
                         now.add(Calendar.MINUTE, Integer.parseInt(durationField.getText().toString()));
-                        Group group = new Group(nameField.getText().toString(), now, user.getUid());
+                        Group group = new Group(nameField.getText().toString(), now, user.getUid(), new String[]{user.getUid()});
                         new Http(CreateGroupActivity.this, token, progress).execute(group);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -114,7 +114,7 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                             .addFormDataPart("token", token)
                             .addFormDataPart("group_name", group.getName())
                             .addFormDataPart("expiration_time", expiration)
-                            .addFormDataPart("user", group.getUser())
+                            .addFormDataPart("user", group.getOwner())
                             .build();
                     Request request = new Request.Builder()
                             .url("http://10.0.2.2:5000/create_group")  // TODO

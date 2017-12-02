@@ -2,6 +2,7 @@ package com.example.raffy.photoorganizer;
 
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -15,18 +16,21 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
 
 public class Group {
 
     private String name;
     private Calendar expires;
-    private String user;
+    private String owner;
+    private String[] users;
 
-    public Group(String name, Calendar expires, String user) {
+    public Group(String name, Calendar expires, String owner, String[] users) {
         this.name = name;
         this.expires = expires;
-        this.user = user;
+        this.owner = owner;
+        this.users = users;
     }
 
     public String getName() {
@@ -37,8 +41,12 @@ public class Group {
         return this.expires;
     }
 
-    public String getUser() {
-        return this.user;
+    public String getOwner() {
+        return this.owner;
+    }
+
+    public String[] getUsers() {
+        return this.users;
     }
 
     static SimpleDateFormat getDateFormat() {
@@ -54,28 +62,34 @@ public class Group {
         groups.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String name = snapshot.getKey();
-                    String owner = snapshot.child("owner").getValue().toString();
-                    if (owner.equals(user.getUid())) {
-                        try {
+                try {
+                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                        String name = snapshot.getKey();
+                        String owner = snapshot.child("owner").getValue().toString();
+                        int childrenCount = (int) snapshot.child("users").getChildrenCount();
+                        Iterator<DataSnapshot> children = snapshot.child("users").getChildren().iterator();
+                        String[] users = new String[childrenCount];
+                        for (int i = 0; i < childrenCount; i++) {
+                            users[i] = children.next().getValue().toString();
+                        }
+                        if (owner.equals(user.getUid())) {
                             Date date = getDateFormat().parse(snapshot.child("expiration_time").getValue().toString());
                             Calendar calendar = Calendar.getInstance();
                             calendar.setTime(date);
-                            Group group = new Group(name, calendar, user.getUid());
+                            Group group = new Group(name, calendar, user.getUid(), users);
                             result.react(group);
                             return;
-                        } catch (ParseException e) {
-                            // TODO
                         }
                     }
+                } catch (ParseException|NullPointerException e) {
+                    result.react(null);
                 }
                 result.react(null);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // TODO
+                result.react(null);
             }
         });
     }
