@@ -76,25 +76,6 @@ def join_group():
         return jsonify({'error': 'The join token has expired, or is not valid'}), 400
 
 
-@app.route('/delete_group', methods=['DELETE'])
-def delete_group():
-    data = request.values
-
-    try:
-        id_token = data['token']
-        decoded_token = auth.verify_id_token(id_token)
-        uid = decoded_token['uid']
-    except ValueError:
-        return jsonify("Token has expired or was not included"), 401
-
-    fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
-
-    group_name = data['group_name']
-
-    response = fb.delete('/groups', group_name)
-    return jsonify(response)
-
-
 
 @app.route('/leave_group', methods=['DELETE'])
 def leave_group():
