@@ -35,4 +35,5 @@
     <string name="add_member">Add a member</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="join_group_code">Join group with this QR</string>
 </resources>

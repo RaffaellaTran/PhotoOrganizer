@@ -26,7 +26,6 @@ import com.google.firebase.auth.GetTokenResult;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.util.Calendar;
 
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -41,7 +40,11 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.group_layout);
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
         final ConstraintLayout myGroupPanel = findViewById(R.id.myGroupInfo);
 
         final Button button_create = findViewById(R.id.create_group);
@@ -67,10 +70,13 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                     setTitle(getString(R.string.create_join));
                     // hide group panel
                     myGroupPanel.setVisibility(View.GONE);
+                    button_create.setVisibility(View.VISIBLE);
+                    button_join.setVisibility(View.VISIBLE);
                 } else {
                     mGroup = group;
                     setTitle(getString(R.string.group_information));
                     // hide create/join buttons
+                    myGroupPanel.setVisibility(View.VISIBLE);
                     button_create.setVisibility(View.GONE);
                     button_join.setVisibility(View.GONE);
                     // set delete/leave button
@@ -89,7 +95,6 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                 }
             }
         });
-
     }
 
     public void onClick(View v) {
@@ -123,7 +128,11 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                 }).show();
                 break;
             case R.id.add_member:
-                // TODO
+                if (mGroup != null && mGroup.getJoinCode() != null) {
+                    intent = new Intent(GroupManagementActivity.this, AddMemberActivity.class);
+                    intent.putExtra("join_code", mGroup.getJoinCode());
+                    startActivity(intent);
+                }
                 break;
         }
     }
