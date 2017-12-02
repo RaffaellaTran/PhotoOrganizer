@@ -26,6 +26,7 @@ public class Group {
     private Calendar expires;
     private String owner;
     private String[] users;
+    private String joinCode;
 
     public Group(String name, Calendar expires, String owner, String[] users) {
         this.name = name;
@@ -50,6 +51,11 @@ public class Group {
         return this.users;
     }
 
+    @Nullable
+    public String getJoinCode() {
+        return this.joinCode;
+    }
+
     static SimpleDateFormat getDateFormat() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
                 new Locale("fi", "FI"));
@@ -67,6 +73,7 @@ public class Group {
                     for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                         String name = snapshot.getKey();
                         String owner = snapshot.child("owner").getValue().toString();
+                        String joinCode = snapshot.child("join_token").getValue().toString();
                         int childrenCount = (int) snapshot.child("users").getChildrenCount();
                         Iterator<DataSnapshot> children = snapshot.child("users").getChildren().iterator();
                         String[] users = new String[childrenCount];
@@ -77,7 +84,8 @@ public class Group {
                             Date date = getDateFormat().parse(snapshot.child("expiration_time").getValue().toString());
                             Calendar calendar = Calendar.getInstance();
                             calendar.setTime(date);
-                            Group group = new Group(name, calendar, user.getUid(), users);
+                            Group group = new Group(name, calendar, owner, users);
+                            group.joinCode = joinCode;
                             result.react(group);
                             return;
                         }
