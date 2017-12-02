@@ -104,27 +104,23 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                 startActivity(intent); // start Intent
                 break;
             case R.id.delete_group:
-                if (mGroup != null && mGroup.getOwner().equals(User.getUid())) {
-                    // delete group
-                    new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.delete_a_group))
-                        .setMessage(getString(R.string.delete_group_confirmation))
+                // delete group
+                final boolean delete = mGroup != null && mGroup.getOwner().equals(User.getUid());
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(delete ? R.string.delete_a_group : R.string.leave_group))
+                        .setMessage(getString(delete ? R.string.delete_group_confirmation : R.string.leave_group_confirmation))
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .setPositiveButton(getString(R.string.yes), new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                startDeleteGroupAction(GroupManagementActivity.this, mGroup);
+                                startDeleteGroupAction(GroupManagementActivity.this, mGroup, !delete);
                             }
                         }).setNegativeButton(getString(R.string.no), new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                //
-                            }
-                        }).show();
-                } else {
-                    // leave group
-                    // TODO
-                }
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        //
+                    }
+                }).show();
                 break;
             case R.id.add_member:
                 // TODO
@@ -132,7 +128,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
         }
     }
 
-    private static void startDeleteGroupAction(final Activity context, final Group group) {
+    private static void startDeleteGroupAction(final Activity context, final Group group, final boolean justLeave) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
         final ProgressDialog progress = new ProgressDialog(context);
@@ -148,7 +144,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                         .addFormDataPart("group_name", group.getName())
                         .build();
                 Request request = new Request.Builder()
-                        .url("http://10.0.2.2:5000/delete_group")  // TODO
+                        .url("http://10.0.2.2:5000/" + (justLeave ? "leave_group" : "delete_group"))  // TODO
                         .delete(body)
                         .build();
                 new Http(context, token, progress).execute(request);
