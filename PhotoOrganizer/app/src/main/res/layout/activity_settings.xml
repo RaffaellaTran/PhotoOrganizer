@@ -3,27 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:layout_editor_absoluteY="81dp">
 
     <TextView
         android:id="@+id/wifiText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="9dp"
         android:text="WiFi"
-        app:layout_constraintBottom_toTopOf="@+id/lowWifiSwitch"
-        app:layout_constraintEnd_toStartOf="@+id/lowWifiSwitch"
-        app:layout_constraintStart_toStartOf="@+id/lowWifiSwitch" />
+        app:layout_constraintBottom_toTopOf="@+id/wifiRadioGroup"
+        app:layout_constraintStart_toStartOf="@+id/settingsText"
+        app:layout_constraintTop_toBottomOf="@+id/settingsText" />
 
     <TextView
         android:id="@+id/mobileDataText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
         android:layout_marginStart="35dp"
-        android:layout_marginTop="186dp"
         android:text="Mobile data network"
+        app:layout_constraintBottom_toTopOf="@+id/mobileRadioGroup"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/wifiRadioGroup" />
 
     <TextView
         android:id="@+id/settingsText"
@@ -39,60 +42,96 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Switch
-        android:id="@+id/lowMobileSwitch"
+    <RadioGroup
+        android:id="@+id/wifiRadioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:text="Low "
-        app:layout_constraintBaseline_toBaselineOf="@+id/highMobileSwitch"
-        app:layout_constraintEnd_toStartOf="@+id/highMobileSwitch" />
-
-    <Switch
-        android:id="@+id/lowWifiSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="12dp"
-        android:text="Low "
-        app:layout_constraintBaseline_toBaselineOf="@+id/highWifiSwitch"
-        app:layout_constraintEnd_toStartOf="@+id/highWifiSwitch" />
-
-    <Switch
-        android:id="@+id/fullWifiSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Full "
-        app:layout_constraintBaseline_toBaselineOf="@+id/highWifiSwitch"
-        app:layout_constraintEnd_toEndOf="@+id/fullMobileSwitch"
-        app:layout_constraintStart_toStartOf="@+id/fullMobileSwitch" />
-
-    <Switch
-        android:id="@+id/highWifiSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
-        android:layout_marginEnd="11dp"
-        android:text="High "
+        android:layout_marginBottom="24dp"
+        android:checkedButton="@+id/wifiRadioBtnHigh"
+        android:gravity="center"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toTopOf="@+id/mobileDataText"
-        app:layout_constraintEnd_toStartOf="@+id/fullWifiSwitch" />
+        app:layout_constraintStart_toStartOf="@+id/wifiText"
+        app:layout_constraintTop_toBottomOf="@+id/wifiText">
 
-    <Switch
-        android:id="@+id/fullMobileSwitch"
+        <RadioButton
+            android:id="@+id/wifiRadioBtnLow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="7dp"
+            android:layout_weight="1"
+            android:text="Low"
+            app:layout_constraintStart_toStartOf="@+id/wifiRadioGroup"
+            app:layout_constraintTop_toTopOf="@+id/wifiRadioGroup" />
+
+        <RadioButton
+            android:id="@+id/wifiRadioBtnHigh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:layout_weight="1"
+            android:text="High"
+            app:layout_constraintEnd_toStartOf="@+id/wifiRadioBtnFull"
+            app:layout_constraintTop_toTopOf="@+id/wifiRadioGroup" />
+
+        <RadioButton
+            android:id="@+id/wifiRadioBtnFull"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="9dp"
+            android:layout_marginTop="7dp"
+            android:layout_weight="1"
+            android:text="Full"
+            app:layout_constraintEnd_toEndOf="@+id/wifiRadioGroup"
+            app:layout_constraintTop_toTopOf="@+id/wifiRadioGroup" />
+
+    </RadioGroup>
+
+    <RadioGroup
+        android:id="@+id/mobileRadioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="49dp"
-        android:text="Full "
-        app:layout_constraintBaseline_toBaselineOf="@+id/highMobileSwitch"
-        app:layout_constraintStart_toEndOf="@+id/mobileDataText" />
+        android:layout_marginBottom="237dp"
+        android:checkedButton="@+id/mobileRadioBtnHigh"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/mobileDataText"
+        app:layout_constraintTop_toBottomOf="@+id/mobileDataText">
 
-    <Switch
-        android:id="@+id/highMobileSwitch"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="11dp"
-        android:layout_marginTop="15dp"
-        android:text="High "
-        app:layout_constraintEnd_toStartOf="@+id/fullMobileSwitch"
-        app:layout_constraintTop_toBottomOf="@+id/mobileDataText" />
+        <RadioButton
+            android:id="@+id/mobileRadioBtnLow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:text="Low"
+            app:layout_constraintStart_toStartOf="@+id/mobileRadioGroup"
+            app:layout_constraintTop_toTopOf="@+id/mobileRadioGroup" />
+
+        <RadioButton
+            android:id="@+id/mobileRadioBtnHigh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:text="High"
+            app:layout_constraintStart_toEndOf="@+id/mobileDataText"
+            app:layout_constraintTop_toTopOf="@+id/mobileRadioGroup" />
+
+        <RadioButton
+            android:id="@+id/mobileRadioBtnFull"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:text="Full"
+            app:layout_constraintEnd_toEndOf="@+id/mobileRadioGroup"
+            app:layout_constraintTop_toTopOf="@+id/mobileRadioGroup" />
+
+    </RadioGroup>
 
 </android.support.constraint.ConstraintLayout>
