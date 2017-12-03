@@ -3,14 +3,10 @@ package com.example.raffy.photoorganizer;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Switch;
-import android.widget.TextView;
-import android.widget.ToggleButton;
 
 /**
  * Created by Raffy on 15/11/2017.
