@@ -22,6 +22,37 @@ $ flask run
 
 #Should probably work...
 
+
+
+#Working API routes:
+
+The API accepts HTTP [POST, GET, DELETE] requests at the moment
+
+[POST] localhost:5000/create_group
+required fields:
+token : {firebase auth token}
+group_name : {name of the group to be created}
+expiration_time : {YYYY-MM-DD HH:SS format}
+user: {name of the user to be displayed to other users}
+
+[POST] localhost:5000/join_group
+required fields:
+token : {firebase auth token}
+join_token : {single use token from group info}
+user: {name of the user to be displayed to other users}
+group_name : {name of the group to be joined}
+
+[DELETE] localhost:5000/leave_group
+token : {firebase auth token}
+group_name : {name of the group to be left from}
+
+
+[POST] localhost:5000/label
+token : {firebase auth token}
+group_name : {name of the group to be left from}
+imagefile : {file that is to be uploaded}
+
+
 ## Windows (by Aleksi)
 
 ```

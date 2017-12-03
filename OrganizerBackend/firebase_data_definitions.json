@@ -1,0 +1,27 @@
+groups: [
+    {
+        "group_name": "name",
+        "users": [
+            {id: "username"},
+            {id: "username"},
+            {id: "username"}
+        ],
+        "expiration_date": "yyyy-MM-dd HH:ss",
+        "owner": "uid",
+        "join_token": "token"
+    }
+]
+
+pictures: [
+    {
+        "id": {
+            group_name: name,
+            owner: uid,
+            bucket_identifier: id,
+            label: labels
+        }
+    },
+    {
+        "id": {}
+    }
+]
