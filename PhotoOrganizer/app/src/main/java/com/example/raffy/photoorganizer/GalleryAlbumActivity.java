@@ -82,8 +82,9 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
             // Start the fullscreen viewer for selected image
             Intent intent = new Intent(getApplicationContext(), GalleryImageActivity.class);
-            String image = "http://i.imgur.com/DvpvklR.png";
-            intent.putExtra("image_path", image);
+            GalleryImage img = (GalleryImage) parent.getItemAtPosition(position);
+            Uri path = img.downloadUri;
+            intent.putExtra("image_path", path.toString());
             startActivity(intent);
         }
     };
