@@ -2,8 +2,12 @@ package com.example.raffy.photoorganizer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Point;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Display;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -14,6 +18,7 @@ import android.widget.TextView;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +32,9 @@ public class GalleryActivity extends AppCompatActivity {
     List<GalleryAlbum> albums = new ArrayList<GalleryAlbum>();
     GridView gridView;
 
+    int imageWidth;
+    int imageHeight;
+
     // Get a reference to the database service
     FirebaseDatabase db;
 
@@ -34,6 +42,14 @@ public class GalleryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.album_grid);
+
+        // Get a suitable image height and width for filling the screen
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int columns = 2;
+        imageWidth = size.x / columns;
+        imageHeight = imageWidth;
 
         GalleryAlbum test = new GalleryAlbum("group1");
         albums.add(test);
@@ -101,7 +117,24 @@ public class GalleryActivity extends AppCompatActivity {
             }
 
             holder.imageView.setImageResource(R.mipmap.ic_launcher);
+
+
+
             GalleryAlbum album = (GalleryAlbum) gridView.getItemAtPosition(position);
+            if (album.images.size() > 0) {
+                // Display the first image as thumbnail
+                Uri imageUri = album.images.get(0).downloadUri;
+                try {
+                    Picasso.with(mContext).load(imageUri)
+                            .placeholder(R.mipmap.ic_launcher)
+                            .error(R.mipmap.ic_launcher)
+                            .resize(imageWidth, imageHeight)
+                            .centerCrop()
+                            .into(holder.imageView);
+                } catch (IllegalArgumentException exception) {
+                    Log.d("Picasso", exception.toString());
+                }
+            }
             holder.txtTitle.setText(album.name);
             Integer numImages = album.images.size();
             holder.txtImages.setText(numImages.toString());
