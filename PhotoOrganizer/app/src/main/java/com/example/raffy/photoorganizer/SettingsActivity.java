@@ -1,5 +1,7 @@
 package com.example.raffy.photoorganizer;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -7,6 +9,7 @@ import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 /**
@@ -14,16 +17,6 @@ import android.widget.ToggleButton;
  */
 
 public class SettingsActivity extends AppCompatActivity {
-
-    /*
-    // Switches
-    ImageQualitySwitches wifiSwitches = new ImageQualitySwitches();
-    ImageQualitySwitches mobileSwitches = new ImageQualitySwitches();
-
-    // ToggleButtons
-    ImageQualityToggleBtn wifiToggleBtn = new ImageQualityToggleBtn();
-    ImageQualityToggleBtn mobileToggleBtn = new ImageQualityToggleBtn();
-    */
 
     // RadioButtons
     ImageQualityRadioBtn wifiRadioBtn = new ImageQualityRadioBtn();
@@ -33,13 +26,16 @@ public class SettingsActivity extends AppCompatActivity {
     ImageQuality wifiQuality = new ImageQuality();
     ImageQuality mobileQuality = new ImageQuality();
 
-    // Qualities
-
+    // Qualities, NOT IN USE
     public enum Quality {
         LOW,
         HIGH,
         FULL
     }
+
+    // SharedPreferences
+    public static final String PREFERENCES = "preferences";
+    SharedPreferences sharedpreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,28 +52,94 @@ public class SettingsActivity extends AppCompatActivity {
         this.mobileRadioBtn.full = (RadioButton) findViewById(R.id.mobileRadioBtnFull);
         this.mobileRadioBtn.radioBtns = (RadioGroup) findViewById(R.id.mobileRadioGroup);
 
+        sharedpreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+
+        setRadioButtons();
+
         setWifiImageQuality();
         setMobileImageQuality();
 
-        /*
-        this.wifiSwitches.low = (Switch) findViewById(R.id.lowWifiSwitch);
-        this.mobileSwitches.low = (Switch) findViewById(R.id.lowMobileSwitch);
-        this.wifiSwitches.high = (Switch) findViewById(R.id.highWifiSwitch);
-        this.mobileSwitches.high = (Switch) findViewById(R.id.highMobileSwitch);
-        this.wifiSwitches.full = (Switch) findViewById(R.id.fullWifiSwitch);
-        this.mobileSwitches.full = (Switch) findViewById(R.id.fullMobileSwitch);
+        Log.d("WIFI_IMAGE_QUALITY", "onCheckedChanged: quality:" + this.wifiQuality.getQuality() + "Height:" + this.wifiQuality.getHeight() + "Width:" + this.wifiQuality.getWidth());
+        Log.d("MOBILE_IMAGE_QUALITY", "onCheckedChanged: quality:" + this.mobileQuality.getQuality() + "Height:" + this.mobileQuality.getHeight() + "Width:" + this.mobileQuality.getWidth());
 
-        if (!this.wifiSwitches.atleastOneSwitchIsTrue()) {
-            this.wifiSwitches.high.setChecked(true);
+        //TODO: Update image quality when btn is pushed (onClicklistener)
+        //TODO: pass imagequality object to main.
+        //TODO: make button stay the way they are after leaving and coming back
+
+        this.wifiRadioBtn.radioBtns.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // checkedId is the RadioButton selected
+                setWifiImageQuality();
+
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                editor.putInt("wifiWidth", wifiQuality.getWidth());
+                editor.putInt("wifiHeight", wifiQuality.getHeight());
+                editor.putString("wifiQuality", wifiQuality.getQuality());
+                editor.commit();
+
+                Log.d("WIFI_IMAGE_QUALITY", "onCheckedChanged: quality:" + wifiQuality.getQuality() + "Height:" + wifiQuality.getHeight() + "Width:" + wifiQuality.getWidth());
+            }
+        });
+
+
+        this.mobileRadioBtn.radioBtns.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // checkedId is the RadioButton selected
+                setMobileImageQuality();
+
+                SharedPreferences.Editor editor = sharedpreferences.edit();
+                editor.putInt("mobileWidth", mobileQuality.getWidth());
+                editor.putInt("mobileHeight", mobileQuality.getHeight());
+                editor.putString("mobileQuality", mobileQuality.getQuality());
+                editor.commit();
+
+                Log.d("MOBILE_IMAGE_QUALITY", "onCheckedChanged: quality:" + mobileQuality.getQuality() + "Height:" + mobileQuality.getHeight() + "Width:" + mobileQuality.getWidth());
+            }
+        });
+    }
+
+    public void setRadioButtons() {
+        String wQuality = this.sharedpreferences.getString("wifiQuality", this.wifiQuality.HIGH);
+        String mQuality = this.sharedpreferences.getString("mobileQuality", this.mobileQuality.HIGH);
+        this.sharedpreferences.getAll();
+
+
+        if (wQuality.equals(this.wifiQuality.LOW)) {
+            this.wifiRadioBtn.low.setChecked(true);
         }
 
-        if (!this.mobileSwitches.atleastOneSwitchIsTrue()) {
-            this.mobileSwitches.high.setChecked(true);
+        else if (wQuality.equals(this.wifiQuality.HIGH)) {
+            this.wifiRadioBtn.high.setChecked(true);
         }
 
-        setImageQuality(this.wifiSwitches, this.wifiQuality);
-        setImageQuality(this.mobileSwitches, this.mobileQuality);
-        */
+        else if (wQuality.equals(this.wifiQuality.FULL)) {
+            this.wifiRadioBtn.full.setChecked(true);
+        }
+
+        else {
+            this.wifiRadioBtn.high.setChecked(true);
+        }
+
+        if (mQuality.equals(this.mobileQuality.LOW)) {
+            this.mobileRadioBtn.low.setChecked(true);
+        }
+
+        else if (mQuality.equals(this.mobileQuality.HIGH)) {
+            this.mobileRadioBtn.high.setChecked(true);
+        }
+
+        else if (mQuality.equals(this.mobileQuality.FULL)) {
+            this.mobileRadioBtn.full.setChecked(true);
+        }
+
+        else {
+            this.mobileRadioBtn.high.setChecked(true);
+        }
+
     }
 
     public void setWifiImageQuality() {
@@ -108,76 +170,6 @@ public class SettingsActivity extends AppCompatActivity {
         else {
             this.mobileQuality.setImageQualityToHigh();
         }
-    }
-}
-
-class ImageQualitySwitches {
-
-    Switch low;
-    Switch high;
-    Switch full;
-
-    boolean switchIsOn(Switch s) {
-        return s.isChecked();
-    }
-
-    void setSwitchToTrueOthersToFalse(Switch s) {
-        s.setChecked(true);
-
-        if (!s.equals(this.low)) {
-            this.low.setChecked(false);
-        }
-
-        if (!s.equals(this.high)) {
-            this.high.setChecked(false);
-        }
-
-        if (!s.equals(this.full)) {
-            this.full.setChecked(false);
-        }
-    }
-
-    boolean atleastOneSwitchIsTrue() {
-        if (this.low.isChecked() || this.high.isChecked() || this.full.isChecked()) {
-            return true;
-        }
-        return false;
-    }
-}
-
-class ImageQualityToggleBtn {
-
-    ToggleButton low;
-    ToggleButton high;
-    ToggleButton full;
-
-    boolean toggleButtonIsOn(ToggleButton t) {
-        return t.isChecked();
-    }
-
-    void setToggleButtonToTrueOthersToFalse(Switch s) {
-        s.setChecked(true);
-
-        this.full.isClickable();
-
-        if (!s.equals(this.low)) {
-            this.low.setChecked(false);
-        }
-
-        if (!s.equals(this.high)) {
-            this.high.setChecked(false);
-        }
-
-        if (!s.equals(this.full)) {
-            this.full.setChecked(false);
-        }
-    }
-
-    boolean atleastOneSwitchIsTrue() {
-        if (this.low.isChecked() || this.high.isChecked() || this.full.isChecked()) {
-            return true;
-        }
-        return false;
     }
 }
 
@@ -245,24 +237,37 @@ class ImageQuality {
     public void setImageQualityToLow() {
         this.setWidth(640);
         this.setHeight(480);
-        this.setQuality(LOW);
+        this.setQuality(this.LOW);
     }
 
     public void setImageQualityToHigh() {
         this.setWidth(1280);
         this.setHeight(960);
-        this.setQuality(HIGH);
+        this.setQuality(this.HIGH);
     }
 
     public void setImageQualityToFull() {
-        this.setQuality(FULL);
+        this.setWidth(0);
+        this.setHeight(0);
+        this.setQuality(this.FULL);
     }
 }
 
-/*
+// NOT IN USE!
 class Quality {
     String LOW = "low";
     String HIGH = "high";
     String FULL = "full";
+
+    public String getLOW() {
+        return LOW;
+    }
+
+    public String getHIGH() {
+        return HIGH;
+    }
+
+    public String getFULL() {
+        return FULL;
+    }
 }
-*/
