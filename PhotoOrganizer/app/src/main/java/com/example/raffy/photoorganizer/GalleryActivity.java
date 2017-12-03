@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -13,9 +12,6 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -39,7 +35,7 @@ public class GalleryActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.album_grid);
 
-        GalleryAlbum test = new GalleryAlbum("test");
+        GalleryAlbum test = new GalleryAlbum("group1");
         albums.add(test);
         albums.add(test);
         albums.add(test);
@@ -55,36 +51,9 @@ public class GalleryActivity extends AppCompatActivity {
         db = FirebaseDatabase.getInstance();
 
         DatabaseReference picturesRef = db.getReference("pictures/group1");
-        AlbumListener testListener = new AlbumListener(test);
+        AlbumListener testListener = new AlbumListener(test, gridView.getAdapter());
         picturesRef.addChildEventListener(testListener);
 
-    }
-
-    class AlbumListener implements ChildEventListener {
-
-        GalleryAlbum album;
-        public AlbumListener(GalleryAlbum album) {
-            this.album = album;
-        }
-
-        @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            GalleryImage img = dataSnapshot.getValue(GalleryImage.class);
-            Log.d("Gallery", img.owner + img.bucket_identifier + img.faces);
-            album.images.add(img);
-        }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) { }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) { }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) { }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) { }
     }
 
 
@@ -93,15 +62,12 @@ public class GalleryActivity extends AppCompatActivity {
             // Start the album viewer for selected album
             Intent intent = new Intent(getApplicationContext(), GalleryAlbumActivity.class);
             GalleryAlbum album = (GalleryAlbum) gridView.getItemAtPosition(position);
-            intent.putExtra("group_name", album.name);
+            intent.putExtra("album", album.name);
             startActivity(intent);
         }
     };
 
     public class FolderAdapter extends BaseAdapter {
-
-
-
         private Context mContext;
 
         public FolderAdapter(Context c) {
