@@ -149,7 +149,7 @@ def label():
 
         os.remove(path)
 
-        bucket_uri = 'gs://' + FIREBASE_BUCKET_URL + '/' + image_name
+        bucket_uri = image_name
         #Init gcloud vision client
         vision_client = vision.ImageAnnotatorClient()
         image = types.Image()
