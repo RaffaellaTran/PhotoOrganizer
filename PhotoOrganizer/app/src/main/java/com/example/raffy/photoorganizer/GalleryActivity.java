@@ -16,12 +16,18 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Anton on 13.11.2017.
@@ -31,6 +37,7 @@ public class GalleryActivity extends AppCompatActivity {
 
     List<GalleryAlbum> albums = new ArrayList<GalleryAlbum>();
     GridView gridView;
+    TextView infoText;
 
     int imageWidth;
     int imageHeight;
@@ -51,25 +58,61 @@ public class GalleryActivity extends AppCompatActivity {
         imageWidth = size.x / columns;
         imageHeight = imageWidth;
 
-        GalleryAlbum test = new GalleryAlbum("group1");
-        albums.add(test);
-        albums.add(test);
-        albums.add(test);
-        albums.add(test);
-        albums.add(test);
-        albums.add(test);
-
+        // Setup the grid view
         gridView = findViewById(R.id.folder_grid);
         gridView.setAdapter(new FolderAdapter(getApplicationContext()));
-
         gridView.setOnItemClickListener(clickListener);
 
+        // Set info text
+        infoText = findViewById(R.id.info);
+        infoText.setText("Nothing to display \nYou don't belong in any groups!");
+
+        // Get all FireBase related variables
         db = FirebaseDatabase.getInstance();
+        db.getReference("groups/").addChildEventListener(groupListener);
+    }
 
-        DatabaseReference picturesRef = db.getReference("pictures/group1");
-        AlbumListener testListener = new AlbumListener(test, gridView.getAdapter());
-        picturesRef.addChildEventListener(testListener);
+    static class Group {
+        // A simple class for easier parsing of Firebase Groups (Is this necessary?)
+        Map<String, String> users = new HashMap<>();
+        public Group() {}
+    }
 
+    ChildEventListener groupListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            // Add a new album for this group if current user is in the group
+            Group group = dataSnapshot.getValue(Group.class);
+            String uid = FirebaseAuth.getInstance().getUid();
+            if (group.users.containsKey(uid)) {
+                addAlbum(dataSnapshot.getKey());
+            }
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {}
+    };
+
+    void addAlbum(String name) {
+        // Adds a new album to the grid view
+        GalleryAlbum album = new GalleryAlbum(name);
+        albums.add(album);
+
+        // Add a listener for all images in this album
+        AlbumListener listener = new AlbumListener(album, gridView.getAdapter());
+        db.getReference("pictures/" + name).addChildEventListener(listener);
+
+        // Hide info text
+        infoText.setVisibility(View.GONE);
     }
 
 
@@ -138,6 +181,8 @@ public class GalleryActivity extends AppCompatActivity {
             holder.txtTitle.setText(album.name);
             Integer numImages = album.images.size();
             holder.txtImages.setText(numImages.toString());
+            holder.imageView.getLayoutParams().height = imageHeight;
+            holder.imageView.getLayoutParams().width = imageWidth;
             return convertView;
         }
 
