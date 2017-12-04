@@ -50,12 +50,13 @@ public class GalleryAlbumActivity extends AppCompatActivity {
 
     FirebaseDatabase db;
     FirebaseStorage storage;
+    FirebaseStorage storageSmall;
+    FirebaseStorage storageLarge;
 
     Map<String, ImageAdapter> imageAdapterMap;
 
     LinearLayout layout;
     TextView title;
-    GridView gridView;
     int imageWidth;
     int imageHeight;
     int columns = 3;
@@ -92,23 +93,12 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         mainAlbum = new GalleryAlbum(albumPath);
         title.setText(mainAlbum.name);
 
-        /*
-        // TODO: Remove this part
-        View view = getLayoutInflater().inflate(R.layout.image_grid, null);
-        gridView = view.findViewById(R.id.grid);
-        gridView.setAdapter(new ImageAdapter(getApplicationContext(), mainAlbum));
-        gridView.setPadding(0,0,0,0);
-        gridView.setNumColumns(columns);
-        gridView.setOnItemClickListener(clickListener);
-        TextView title = view.findViewById(R.id.albumName);
-        title.setText(mainAlbum.name);
-        layout.addView(view);
-        */
-
         // Start synchronizing album images from firebase
         db = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
+
         DatabaseReference picturesRef = db.getReference("pictures/" + albumPath);
+        AlbumListener albumListener = new AlbumListener(onNewImage, onImageUri);
         picturesRef.addChildEventListener(albumListener);
     }
 
@@ -117,69 +107,33 @@ public class GalleryAlbumActivity extends AppCompatActivity {
             // Start the fullscreen viewer for selected image
             Intent intent = new Intent(getApplicationContext(), GalleryImageActivity.class);
             GalleryImage img = (GalleryImage) parent.getItemAtPosition(position);
-            Uri path = img.downloadUri;
-            intent.putExtra("image_path", path.toString());
+            Uri imageUri = img.getDownloadUri(SettingsHelper.getImageQuality(getApplicationContext()));
+            intent.putExtra("image_path", imageUri.toString());
             startActivity(intent);
         }
     };
 
-    ChildEventListener albumListener = new ChildEventListener() {
+    // Create listener for adding new images to the album
+    AlbumListener.AlbumEventListener onNewImage = new AlbumListener.AlbumEventListener() {
         @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-            final GalleryImage img = dataSnapshot.getValue(GalleryImage.class);
-            mainAlbum.images.add(img);
+        public void callback(GalleryImage image) {
+            // Add image to the main album (redundant?)
+            mainAlbum.images.add(image);
 
             // Add the new image under the correct title
-            final String sortedTitle = getSortedName(img, sortedBy);
+            final String sortedTitle = getSortedName(image, sortedBy);
             if (!imageAdapterMap.containsKey(sortedTitle))
                 addGridViewForAlbum(new GalleryAlbum(sortedTitle));
-            imageAdapterMap.get(sortedTitle).addImage(img);
-
-            // Get image storage reference
-            StorageReference ref;
-            try {
-                ref = storage.getReference(img.bucket_identifier);
-            } catch (IllegalArgumentException exception) {
-                Log.d("AlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
-                ref = null;
-            }
-
-            // Get image download url
-            if (ref != null) {
-                ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        img.downloadUri = uri;
-                        imageAdapterMap.get(sortedTitle).notifyDataSetChanged();  // Update the gridview
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Log.d("AlbumListener", exception.toString());
-                        imageAdapterMap.get(sortedTitle).notifyDataSetChanged();  // Update the gridview
-                    }
-                });
-            }
+            imageAdapterMap.get(sortedTitle).addImage(image);
         }
+    };
 
+    // Create listener for updating imageViews when the image URL becomes available
+    AlbumListener.AlbumEventListener onImageUri = new AlbumListener.AlbumEventListener() {
         @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-        }
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
+        public void callback(GalleryImage image) {
+            String sortedTitle = getSortedName(image, sortedBy);
+            imageAdapterMap.get(sortedTitle).notifyDataSetChanged();  // Update the gridview
         }
     };
 
@@ -199,37 +153,6 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         imageAdapterMap.put(album.name, adapter);
     }
 
-    List<GalleryAlbum> getSorted(GalleryAlbum album, SortOption sortBy) {
-        // Sorts the images in given album to multiple different albums by given SortOption
-        List<GalleryAlbum> sorted = new ArrayList<>();
-        if (sortBy == SortOption.FACES) {
-            // Sort images by faces
-            sorted.add(new GalleryAlbum("People"));
-            sorted.add(new GalleryAlbum("No People"));
-            for (GalleryImage image : album.images) {
-                if (image.faces == true)
-                    sorted.get(0).images.add(image);
-                else
-                    sorted.get(1).images.add(image);
-            }
-        }
-        else {
-            // Sort images by owner
-            Map<String, GalleryAlbum> authors = new HashMap<>();
-            for (GalleryImage image : album.images) {
-                String owner = image.owner;
-                if (!authors.containsKey(owner)) {
-                    authors.put(owner, new GalleryAlbum(owner));
-                }
-                authors.get(owner).images.add(image);
-            }
-            for (GalleryAlbum a : authors.values()) {
-                sorted.add(a);
-            }
-        }
-        return sorted;
-    }
-
     String getSortedName(GalleryImage image, SortOption sortBy) {
         // Returns the name of the sortgroup in which given image belongs
         if (sortBy == SortOption.FACES) {
@@ -246,7 +169,6 @@ public class GalleryAlbumActivity extends AppCompatActivity {
                 return "Unknown user";
         }
     }
-
 
     public class ImageAdapter extends BaseAdapter {
         private Context context;
@@ -283,7 +205,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
                 //imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 //imageView.setPadding(8, 8, 8, 8);
             }
-            Uri imageUri = getItem(position).downloadUri;
+            Uri imageUri = getItem(position).getDownloadUri(SettingsHelper.getImageQuality(getApplicationContext()));
             try {
                 Picasso.with(context).load(imageUri)
                         .placeholder(R.drawable.ic_launcher_foreground)

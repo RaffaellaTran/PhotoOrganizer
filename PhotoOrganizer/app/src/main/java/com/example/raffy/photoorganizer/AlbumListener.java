@@ -19,45 +19,53 @@ import com.google.firebase.storage.StorageReference;
  */
 class AlbumListener implements ChildEventListener {
 
-    GalleryAlbum album;
-    Adapter adapter;
-    FirebaseStorage storage;
+    interface AlbumEventListener {
+        // Listener for custom callbacks
+        void callback(GalleryImage image);
+    }
 
-    public AlbumListener(GalleryAlbum album, Adapter adapter) {
-        this.album = album;
-        this.adapter = adapter;
-        storage = FirebaseStorage.getInstance();
+    AlbumEventListener onNewImage;
+    AlbumEventListener onUriFetched;
+
+    public AlbumListener(AlbumEventListener onNewImage, AlbumEventListener onUriFetched) {
+        this.onNewImage = onNewImage;
+        this.onUriFetched = onUriFetched;
     }
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
         final GalleryImage img = dataSnapshot.getValue(GalleryImage.class);
-        album.images.add(img);
+        //album.images.add(img);
+        onNewImage.callback(img);
 
-        // Get image storage reference
-        StorageReference ref;
-        try {
-            ref = storage.getReference(img.bucket_identifier);
-        } catch (IllegalArgumentException exception) {
-            Log.d("AlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
-            ref = null;
-        }
+        // Get image download URIs
+        for (final SettingsHelper.ImageQuality quality : SettingsHelper.ImageQuality.values()) {
+            // Get image storage reference
+            FirebaseStorage storage = SettingsHelper.getFirebaseStorage(quality);
+            StorageReference ref;
+            try {
+                ref = storage.getReference(img.bucket_identifier);
+            } catch (IllegalArgumentException exception) {
+                Log.d("AlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
+                ref = null;
+            }
 
-        // Get image download url
-        if (ref != null) {
-            ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    img.downloadUri = uri;
-                    ((BaseAdapter) adapter).notifyDataSetChanged();  // Update the gridview
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    Log.d("AlbumListener", exception.toString());
-                    ((BaseAdapter) adapter).notifyDataSetChanged();  // Update the gridview
-                }
-            });
+            // Get URI
+            if (ref != null) {
+                ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        img.setDownloadUri(quality, uri);
+                        onUriFetched.callback(img);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.d("AlbumListener", exception.toString());
+                        onUriFetched.callback(img);
+                    }
+                });
+            }
         }
     }
 
