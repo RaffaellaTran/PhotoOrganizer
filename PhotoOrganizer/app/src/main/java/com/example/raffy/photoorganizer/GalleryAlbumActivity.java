@@ -50,8 +50,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
 
     FirebaseDatabase db;
     FirebaseStorage storage;
-    FirebaseStorage storageSmall;
-    FirebaseStorage storageLarge;
+
 
     Map<String, ImageAdapter> imageAdapterMap;
 
@@ -98,7 +97,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
 
         DatabaseReference picturesRef = db.getReference("pictures/" + albumPath);
-        AlbumListener albumListener = new AlbumListener(onNewImage, onImageUri);
+        AlbumListener albumListener = new AlbumListener(onNewImage, onImageUri, getApplicationContext());
         picturesRef.addChildEventListener(albumListener);
     }
 
@@ -107,7 +106,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
             // Start the fullscreen viewer for selected image
             Intent intent = new Intent(getApplicationContext(), GalleryImageActivity.class);
             GalleryImage img = (GalleryImage) parent.getItemAtPosition(position);
-            Uri imageUri = img.getDownloadUri(SettingsHelper.getImageQuality(getApplicationContext()));
+            Uri imageUri = img.downloadUri;
             intent.putExtra("image_path", imageUri.toString());
             startActivity(intent);
         }
@@ -205,7 +204,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
                 //imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
                 //imageView.setPadding(8, 8, 8, 8);
             }
-            Uri imageUri = getItem(position).getDownloadUri(SettingsHelper.getImageQuality(getApplicationContext()));
+            Uri imageUri = getItem(position).downloadUri;
             try {
                 Picasso.with(context).load(imageUri)
                         .placeholder(R.drawable.ic_launcher_foreground)

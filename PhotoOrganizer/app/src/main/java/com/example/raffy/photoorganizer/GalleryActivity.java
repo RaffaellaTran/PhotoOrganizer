@@ -126,7 +126,7 @@ public class GalleryActivity extends AppCompatActivity {
         };
 
         // Start listening for all FireBase events for this album
-        AlbumListener listener = new AlbumListener(onNewImage, onImageUri);
+        AlbumListener listener = new AlbumListener(onNewImage, onImageUri, getApplicationContext());
         db.getReference("pictures/" + name).addChildEventListener(listener);
 
         // Hide info text
@@ -184,7 +184,7 @@ public class GalleryActivity extends AppCompatActivity {
             GalleryAlbum album = getItem(position);
             if (album.images.size() > 0) {
                 // Display the first image as thumbnail
-                Uri imageUri = getItem(position).images.get(0).getDownloadUri(SettingsHelper.getImageQuality(getApplicationContext()));
+                Uri imageUri = getItem(position).images.get(0).downloadUri;
                 try {
                     Picasso.with(mContext).load(imageUri)
                             .placeholder(R.mipmap.ic_launcher)

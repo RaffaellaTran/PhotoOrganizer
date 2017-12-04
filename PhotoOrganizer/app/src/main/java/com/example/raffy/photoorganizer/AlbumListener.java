@@ -1,5 +1,6 @@
 package com.example.raffy.photoorganizer;
 
+import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -26,8 +27,10 @@ class AlbumListener implements ChildEventListener {
 
     AlbumEventListener onNewImage;
     AlbumEventListener onUriFetched;
+    Context context;
 
-    public AlbumListener(AlbumEventListener onNewImage, AlbumEventListener onUriFetched) {
+    public AlbumListener(AlbumEventListener onNewImage, AlbumEventListener onUriFetched, Context context) {
+        this.context = context;
         this.onNewImage = onNewImage;
         this.onUriFetched = onUriFetched;
     }
@@ -38,34 +41,32 @@ class AlbumListener implements ChildEventListener {
         //album.images.add(img);
         onNewImage.callback(img);
 
-        // Get image download URIs
-        for (final SettingsHelper.ImageQuality quality : SettingsHelper.ImageQuality.values()) {
-            // Get image storage reference
-            FirebaseStorage storage = SettingsHelper.getFirebaseStorage(quality);
-            StorageReference ref;
-            try {
-                ref = storage.getReference(img.bucket_identifier);
-            } catch (IllegalArgumentException exception) {
-                Log.d("AlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
-                ref = null;
-            }
 
-            // Get URI
-            if (ref != null) {
-                ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        img.setDownloadUri(quality, uri);
-                        onUriFetched.callback(img);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        Log.d("AlbumListener", exception.toString());
-                        onUriFetched.callback(img);
-                    }
-                });
-            }
+        // Get image storage reference
+        FirebaseStorage storage = SettingsHelper.getFirebaseStorage(SettingsHelper.getImageQuality(context));
+        StorageReference ref;
+        try {
+            ref = storage.getReference(img.bucket_identifier);
+        } catch (IllegalArgumentException exception) {
+            Log.d("AlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
+            ref = null;
+        }
+
+        // Get URI
+        if (ref != null) {
+            ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    img.downloadUri = uri;
+                    onUriFetched.callback(img);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    Log.d("AlbumListener", exception.toString());
+                    onUriFetched.callback(img);
+                }
+            });
         }
     }
 
