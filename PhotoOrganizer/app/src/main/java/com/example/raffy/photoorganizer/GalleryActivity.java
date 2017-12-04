@@ -99,7 +99,9 @@ public class GalleryActivity extends AppCompatActivity {
         public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
 
         @Override
-        public void onCancelled(DatabaseError databaseError) {}
+        public void onCancelled(DatabaseError databaseError) {
+            Log.d("GalleryGroupListener", databaseError.toString());
+        }
     };
 
     void addAlbum(String name) {

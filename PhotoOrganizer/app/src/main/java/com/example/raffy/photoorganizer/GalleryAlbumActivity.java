@@ -15,13 +15,24 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Anton on 13.11.2017.
@@ -29,11 +40,21 @@ import com.squareup.picasso.Picasso;
 
 public class GalleryAlbumActivity extends AppCompatActivity {
 
-    GalleryAlbum album;
+    enum SortOption {
+        FACES, AUTHORS
+    }
+
+    SortOption sortedBy;
+
+    GalleryAlbum mainAlbum; // Redundant?
 
     FirebaseDatabase db;
     FirebaseStorage storage;
 
+    Map<String, ImageAdapter> imageAdapterMap;
+
+    LinearLayout layout;
+    TextView title;
     GridView gridView;
     int imageWidth;
     int imageHeight;
@@ -42,7 +63,14 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.image_grid);
+        setContentView(R.layout.activity_gallery_album);
+        layout = findViewById(R.id.linearLayout);
+        title = findViewById(R.id.albumName);
+
+        // TODO: Get sorting style from shared preferences?
+        sortedBy = SortOption.FACES;
+
+        imageAdapterMap = new HashMap<>();
 
         // Get a suitable image height and width for filling the screen
         Display display = getWindowManager().getDefaultDisplay();
@@ -61,21 +89,27 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         } else {
             albumPath = (String) savedInstanceState.getSerializable("album");
         }
-        album = new GalleryAlbum(albumPath);
+        mainAlbum = new GalleryAlbum(albumPath);
+        title.setText(mainAlbum.name);
 
-        // Set up image grid
-        gridView = findViewById(R.id.grid);
-        gridView.setAdapter(new ImageAdapter(getApplicationContext()));
+        /*
+        // TODO: Remove this part
+        View view = getLayoutInflater().inflate(R.layout.image_grid, null);
+        gridView = view.findViewById(R.id.grid);
+        gridView.setAdapter(new ImageAdapter(getApplicationContext(), mainAlbum));
         gridView.setPadding(0,0,0,0);
         gridView.setNumColumns(columns);
         gridView.setOnItemClickListener(clickListener);
+        TextView title = view.findViewById(R.id.albumName);
+        title.setText(mainAlbum.name);
+        layout.addView(view);
+        */
 
         // Start synchronizing album images from firebase
         db = FirebaseDatabase.getInstance();
         storage = FirebaseStorage.getInstance();
         DatabaseReference picturesRef = db.getReference("pictures/" + albumPath);
-        AlbumListener testListener = new AlbumListener(album, gridView.getAdapter());
-        picturesRef.addChildEventListener(testListener);
+        picturesRef.addChildEventListener(albumListener);
     }
 
     AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
@@ -89,12 +123,143 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         }
     };
 
+    ChildEventListener albumListener = new ChildEventListener() {
+        @Override
+        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+            final GalleryImage img = dataSnapshot.getValue(GalleryImage.class);
+            mainAlbum.images.add(img);
+
+            // Add the new image under the correct title
+            final String sortedTitle = getSortedName(img, sortedBy);
+            if (!imageAdapterMap.containsKey(sortedTitle))
+                addGridViewForAlbum(new GalleryAlbum(sortedTitle));
+            imageAdapterMap.get(sortedTitle).addImage(img);
+
+            // Get image storage reference
+            StorageReference ref;
+            try {
+                ref = storage.getReference(img.bucket_identifier);
+            } catch (IllegalArgumentException exception) {
+                Log.d("AlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
+                ref = null;
+            }
+
+            // Get image download url
+            if (ref != null) {
+                ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        img.downloadUri = uri;
+                        imageAdapterMap.get(sortedTitle).notifyDataSetChanged();  // Update the gridview
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.d("AlbumListener", exception.toString());
+                        imageAdapterMap.get(sortedTitle).notifyDataSetChanged();  // Update the gridview
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+        }
+
+        @Override
+        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+    };
+
+    void addGridViewForAlbum(GalleryAlbum album) {
+        // Set up image grid
+        View view = getLayoutInflater().inflate(R.layout.image_grid, null);
+        GridView grid = view.findViewById(R.id.grid);
+        ImageAdapter adapter = new ImageAdapter(getApplicationContext(), album);
+        grid.setAdapter(adapter);
+        grid.setPadding(0,0,0,0);
+        grid.setNumColumns(columns);
+        grid.setOnItemClickListener(clickListener);
+        TextView title = view.findViewById(R.id.title);
+        title.setText(album.name);
+        layout.addView(view);
+
+        imageAdapterMap.put(album.name, adapter);
+    }
+
+    List<GalleryAlbum> getSorted(GalleryAlbum album, SortOption sortBy) {
+        // Sorts the images in given album to multiple different albums by given SortOption
+        List<GalleryAlbum> sorted = new ArrayList<>();
+        if (sortBy == SortOption.FACES) {
+            // Sort images by faces
+            sorted.add(new GalleryAlbum("People"));
+            sorted.add(new GalleryAlbum("No People"));
+            for (GalleryImage image : album.images) {
+                if (image.faces == true)
+                    sorted.get(0).images.add(image);
+                else
+                    sorted.get(1).images.add(image);
+            }
+        }
+        else {
+            // Sort images by owner
+            Map<String, GalleryAlbum> authors = new HashMap<>();
+            for (GalleryImage image : album.images) {
+                String owner = image.owner;
+                if (!authors.containsKey(owner)) {
+                    authors.put(owner, new GalleryAlbum(owner));
+                }
+                authors.get(owner).images.add(image);
+            }
+            for (GalleryAlbum a : authors.values()) {
+                sorted.add(a);
+            }
+        }
+        return sorted;
+    }
+
+    String getSortedName(GalleryImage image, SortOption sortBy) {
+        // Returns the name of the sortgroup in which given image belongs
+        if (sortBy == SortOption.FACES) {
+            if (image.faces == true)
+                return "People";
+            else
+                return "No People";
+        }
+        else {
+            // TODO: Get user name instead of uid
+            if (image.owner != null && !image.owner.equals(""))
+                return image.owner;
+            else
+                return "Unknown user";
+        }
+    }
+
 
     public class ImageAdapter extends BaseAdapter {
         private Context context;
+        GalleryAlbum album;
 
-        public ImageAdapter(Context c) {
+        public ImageAdapter(Context c, GalleryAlbum album) {
             context = c;
+            this.album = album;
+        }
+
+        public void addImage(GalleryImage image) {
+            album.images.add(image);
+            notifyDataSetChanged();
         }
 
         public int getCount() {
@@ -104,8 +269,6 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         public GalleryImage getItem(int position) {
             return album.images.get(position);
         }
-
-        //public GalleryImage getItem(int position) { return (GalleryImage) getItem(position); }
 
         public long getItemId(int position) {
             return 0;
