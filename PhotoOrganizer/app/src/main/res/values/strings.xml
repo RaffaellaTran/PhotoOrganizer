@@ -10,10 +10,14 @@
     <string name="group_management">Group management</string>
     <string name="label">label</string>
     <string name="image">image</string>
+    <string name="create_join">Create or join a group</string>
     <string name="create_group">Create group</string>
     <string name="join_a_group">Join a group</string>
     <string name="join_group_hint">Scan a QR code</string>
+    <string name="leave_group">Leave group</string>
     <string name="delete_a_group">Delete a group</string>
+    <string name="delete_group_confirmation">Are you sure you want to delete this group?</string>
+    <string name="leave_group_confirmation">Are you sure you want to leave this group?</string>
     <string name="group_duration">Group duration:</string>
     <string name="minutes">minutes</string>
     <string name="create">Create</string>
@@ -28,4 +32,8 @@
     <string name="already">Already registered. Login Me!</string>
     <string name="register_here">Register here!!</string>
     <string name="cancel">Cancel</string>
+    <string name="add_member">Add a member</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="join_group_code">Join group with this QR</string>
 </resources>

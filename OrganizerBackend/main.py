@@ -79,6 +79,7 @@ def join_group():
         return jsonify({'error': 'The join token has expired, or is not valid'}), 400
 
 
+
 @app.route('/leave_group', methods=['DELETE'])
 def leave_group():
     data = request.values

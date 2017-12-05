@@ -67,79 +67,44 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                 // get instances
                 final Calendar now = Calendar.getInstance();
                 final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                final ProgressDialog progress = new ProgressDialog(this);
-                progress.show();
-                // get token and start progress
-                user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<GetTokenResult> task) {
-                        String token = task.getResult().getToken();
-                        now.add(Calendar.MINUTE, Integer.parseInt(durationField.getText().toString()));
-                        Group group = new Group(nameField.getText().toString(), now, user.getUid());
-                        new Http(CreateGroupActivity.this, token, progress).execute(group);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e("!!!", e.getMessage());
-                        Toast.makeText(CreateGroupActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (user == null) break;
+                // start progress
+                now.add(Calendar.MINUTE, Integer.parseInt(durationField.getText().toString()));
+                Group group = new Group(nameField.getText().toString(), now, user.getUid(), new String[]{user.getUid()});
+                startCreateGroupAction(CreateGroupActivity.this, group);
                 break;
         }
     }
 
-    private static class Http extends AsyncTask<Group, Void, String> {
-
-        private WeakReference<Activity> context;
-        private String token;
-        private ProgressDialog progress;
-
-        Http(Activity context, String token, ProgressDialog progress) {
-            this.context = new WeakReference<>(context);
-            this.token = token;
-            this.progress = progress;
-        }
-
-        @Override
-        protected String doInBackground(Group... groups) {
-            OkHttpClient client = new OkHttpClient();
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",
-                    new Locale("fi", "FI"));
-            for (Group group : groups) {
-                try {
-                    String expiration = format.format(group.getExpires().getTime());
-
-                    RequestBody body = new MultipartBody.Builder()
-                            .setType(MultipartBody.FORM)
-                            .addFormDataPart("token", token)
-                            .addFormDataPart("group_name", group.getName())
-                            .addFormDataPart("expiration_time", expiration)
-                            .addFormDataPart("user", group.getUser())
-                            .build();
-                    Request request = new Request.Builder()
-                            .url("http://10.0.2.2:5000/create_group")  // TODO
-                            .post(body)
-                            .build();
-
-                    Response response = client.newCall(request).execute();
-                    context.get().finish();
-                    return "Group created! " + response.toString();
-                } catch (IOException e) {
-                    return "Network error: " + e.getMessage();
-                }
+    private static void startCreateGroupAction(final Activity context, final Group group) {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+        final ProgressDialog progress = ApiHttp.getProgressDialog(context);
+        // get token and start progress
+        user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                String token = task.getResult().getToken();
+                String expiration = Group.getDateFormat().format(group.getExpires().getTime());
+                RequestBody body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("token", token)
+                        .addFormDataPart("group_name", group.getName())
+                        .addFormDataPart("expiration_time", expiration)
+                        .addFormDataPart("user", group.getOwner())
+                        .build();
+                Request request = new Request.Builder()
+                        .url("http://10.0.2.2:5000/create_group")  // TODO
+                        .post(body)
+                        .build();
+                new ApiHttp(context, progress).execute(request);
             }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String message) {
-            super.onPostExecute(message);
-            if (message != null) {
-                Log.i("GROUPS", message);
-                Toast.makeText(context.get(), message, Toast.LENGTH_LONG).show();
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("!!!", e.getMessage());
+                Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
-            progress.dismiss();
-        }
+        });
     }
 }
