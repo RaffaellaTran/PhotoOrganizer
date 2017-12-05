@@ -22,13 +22,6 @@ public class SettingsActivity extends AppCompatActivity {
     ImageQuality wifiQuality = new ImageQuality();
     ImageQuality mobileQuality = new ImageQuality();
 
-    // Qualities, NOT IN USE
-    public enum Quality {
-        LOW,
-        HIGH,
-        FULL
-    }
-
     // SharedPreferences
     public static final String PREFERENCES = "preferences";
     SharedPreferences sharedpreferences;
@@ -55,13 +48,6 @@ public class SettingsActivity extends AppCompatActivity {
         setWifiImageQuality();
         setMobileImageQuality();
 
-        Log.d("WIFI_IMAGE_QUALITY", "onCheckedChanged: quality:" + this.wifiQuality.getQuality() + "Height:" + this.wifiQuality.getHeight() + "Width:" + this.wifiQuality.getWidth());
-        Log.d("MOBILE_IMAGE_QUALITY", "onCheckedChanged: quality:" + this.mobileQuality.getQuality() + "Height:" + this.mobileQuality.getHeight() + "Width:" + this.mobileQuality.getWidth());
-
-        //TODO: Update image quality when btn is pushed (onClicklistener)
-        //TODO: pass imagequality object to main.
-        //TODO: make button stay the way they are after leaving and coming back
-
         this.wifiRadioBtn.radioBtns.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
         {
             @Override
@@ -70,12 +56,8 @@ public class SettingsActivity extends AppCompatActivity {
                 setWifiImageQuality();
 
                 SharedPreferences.Editor editor = sharedpreferences.edit();
-                editor.putInt("wifiWidth", wifiQuality.getWidth());
-                editor.putInt("wifiHeight", wifiQuality.getHeight());
                 editor.putString("wifiQuality", wifiQuality.getQuality());
                 editor.commit();
-
-                Log.d("WIFI_IMAGE_QUALITY", "onCheckedChanged: quality:" + wifiQuality.getQuality() + "Height:" + wifiQuality.getHeight() + "Width:" + wifiQuality.getWidth());
             }
         });
 
@@ -88,20 +70,15 @@ public class SettingsActivity extends AppCompatActivity {
                 setMobileImageQuality();
 
                 SharedPreferences.Editor editor = sharedpreferences.edit();
-                editor.putInt("mobileWidth", mobileQuality.getWidth());
-                editor.putInt("mobileHeight", mobileQuality.getHeight());
                 editor.putString("mobileQuality", mobileQuality.getQuality());
                 editor.commit();
-
-                Log.d("MOBILE_IMAGE_QUALITY", "onCheckedChanged: quality:" + mobileQuality.getQuality() + "Height:" + mobileQuality.getHeight() + "Width:" + mobileQuality.getWidth());
             }
         });
     }
 
     public void setRadioButtons() {
-        String wQuality = this.sharedpreferences.getString("wifiQuality", this.wifiQuality.HIGH);
-        String mQuality = this.sharedpreferences.getString("mobileQuality", this.mobileQuality.HIGH);
-        this.sharedpreferences.getAll();
+        String wQuality = this.sharedpreferences.getString("wifiQuality", "high");
+        String mQuality = this.sharedpreferences.getString("mobileQuality", "high");
 
 
         if (wQuality.equals(this.wifiQuality.LOW)) {
@@ -246,24 +223,5 @@ class ImageQuality {
         this.setWidth(0);
         this.setHeight(0);
         this.setQuality(this.FULL);
-    }
-}
-
-// NOT IN USE!
-class Quality {
-    String LOW = "low";
-    String HIGH = "high";
-    String FULL = "full";
-
-    public String getLOW() {
-        return LOW;
-    }
-
-    public String getHIGH() {
-        return HIGH;
-    }
-
-    public String getFULL() {
-        return FULL;
     }
 }
