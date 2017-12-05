@@ -99,16 +99,34 @@ public class GalleryActivity extends AppCompatActivity {
         public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
 
         @Override
-        public void onCancelled(DatabaseError databaseError) {}
+        public void onCancelled(DatabaseError databaseError) {
+            Log.d("GalleryGroupListener", databaseError.toString());
+        }
     };
 
     void addAlbum(String name) {
         // Adds a new album to the grid view
-        GalleryAlbum album = new GalleryAlbum(name);
+        final GalleryAlbum album = new GalleryAlbum(name);
         albums.add(album);
 
-        // Add a listener for all images in this album
-        AlbumListener listener = new AlbumListener(album, gridView.getAdapter());
+        // Create listener for adding new images to the album
+        AlbumListener.AlbumEventListener onNewImage = new AlbumListener.AlbumEventListener() {
+            @Override
+            public void callback(GalleryImage image) {
+                album.images.add(image);
+            }
+        };
+
+        // Create listener for updating imageViews when the image URL becomes available
+        AlbumListener.AlbumEventListener onImageUri = new AlbumListener.AlbumEventListener() {
+            @Override
+            public void callback(GalleryImage image) {
+                ((BaseAdapter) gridView.getAdapter()).notifyDataSetChanged();
+            }
+        };
+
+        // Start listening for all FireBase events for this album
+        AlbumListener listener = new AlbumListener(onNewImage, onImageUri, getApplicationContext());
         db.getReference("pictures/" + name).addChildEventListener(listener);
 
         // Hide info text
@@ -137,7 +155,7 @@ public class GalleryActivity extends AppCompatActivity {
             return albums.size();
         }
 
-        public Object getItem(int position) {
+        public GalleryAlbum getItem(int position) {
             return albums.get(position);
         }
 
@@ -163,10 +181,10 @@ public class GalleryActivity extends AppCompatActivity {
 
 
 
-            GalleryAlbum album = (GalleryAlbum) gridView.getItemAtPosition(position);
+            GalleryAlbum album = getItem(position);
             if (album.images.size() > 0) {
                 // Display the first image as thumbnail
-                Uri imageUri = album.images.get(0).downloadUri;
+                Uri imageUri = getItem(position).images.get(0).downloadUri;
                 try {
                     Picasso.with(mContext).load(imageUri)
                             .placeholder(R.mipmap.ic_launcher)
