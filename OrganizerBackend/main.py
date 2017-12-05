@@ -110,12 +110,12 @@ def label():
 
     data = request.values
 
-    try:
-        id_token = data['token']
-        decoded_token = auth.verify_id_token(id_token)
-        uid = decoded_token['uid']
-    except ValueError:
-        return jsonify("Token has expired or was not included"), 401
+    #try:
+    #    id_token = data['token']
+    #    decoded_token = auth.verify_id_token(id_token)
+    #    uid = decoded_token['uid']
+    #except ValueError:
+    #    return jsonify("Token has expired or was not included"), 401
 
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
@@ -189,7 +189,7 @@ def label():
         if len(response.face_annotations) != 0:
             faces = True
 
-        picture_json = {"owner" : uid, "bucket_identifier" : image_name, "faces" : faces  }
+        picture_json = {"owner" : uuid.uuid4().hex, "bucket_identifier" : image_name, "faces" : faces  }
         res = fb.post("/pictures/" + group, picture_json)
 
         return jsonify(res)
