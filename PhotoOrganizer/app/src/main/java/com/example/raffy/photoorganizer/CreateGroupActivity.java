@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
 
 import okhttp3.MediaType;
@@ -70,7 +71,9 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                 if (user == null) break;
                 // start progress
                 now.add(Calendar.MINUTE, Integer.parseInt(durationField.getText().toString()));
-                Group group = new Group(nameField.getText().toString(), now, user.getUid(), new String[]{user.getUid()});
+                HashMap<String, String> users = new HashMap<>();
+                users.put(user.getUid(), user.getEmail());
+                Group group = new Group(nameField.getText().toString(), now, user.getUid(), users);
                 startCreateGroupAction(CreateGroupActivity.this, group);
                 break;
         }
@@ -91,7 +94,7 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                         .addFormDataPart("token", token)
                         .addFormDataPart("group_name", group.getName())
                         .addFormDataPart("expiration_time", expiration)
-                        .addFormDataPart("user", group.getOwner())
+                        .addFormDataPart("user", user.getEmail())
                         .build();
                 Request request = new Request.Builder()
                         .url("http://10.0.2.2:5000/create_group")  // TODO
