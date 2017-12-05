@@ -6,7 +6,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 
-public class GalleryFullScreenActivity extends AppCompatActivity {
+public class GalleryImageActivity extends AppCompatActivity {
 
     String imagePath;
     ImageView imageView;

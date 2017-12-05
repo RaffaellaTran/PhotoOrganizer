@@ -5,8 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="30dp"
-    android:background="?attr/colorButtonNormal"
-    android:backgroundTintMode="add"
     android:dividerPadding="10dp"
     android:orientation="vertical"
     android:padding="10dp">
@@ -20,12 +18,16 @@
         android:id="@+id/name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/LightGray"
+        android:paddingLeft="5dp"
         android:text="Name" />
 
     <TextView
         android:id="@+id/numImages"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/LightGray"
+        android:paddingLeft="5dp"
         android:text="0" />
 
 </LinearLayout>

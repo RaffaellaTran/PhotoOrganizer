@@ -13,6 +13,9 @@ import uuid
 import os
 from werkzeug.utils import secure_filename
 
+from PIL import Image
+from resizeimage import resizeimage
+
 app = Flask(__name__)
 
 cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
@@ -134,27 +137,51 @@ def label():
         #Init storage client for labeled pictures
         storage_client = storage.Client()
 
+
+        #Save file temporarily
+        path = os.path.join(FILE_TEMP_DIR, image_name)
+        small_path = os.path.join(FILE_TEMP_DIR, "small_" + image_name)
+        large_path = os.path.join(FILE_TEMP_DIR, "large_" + image_name)
+
+        img.save(path)
+
+        #Save files temporarily
+        with open(path, 'r+b') as img_file:
+            with Image.open(img_file) as img:
+                small = resizeimage.resize_contain(img, IMAGE_SIZE_SMALL)
+                small = small.convert("RGB")
+                small.save(small_path, img.format)
+                large = resizeimage.resize_contain(img, IMAGE_SIZE_LARGE)
+                large = large.convert("RGB")
+                large.save(large_path, img.format)
+
         #Get storage bucket
         bucket = storage_client.get_bucket(FIREBASE_BUCKET_URL)
 
         picture_blob = bucket.blob(image_name)
 
-        #Save file temporarily
-        path = os.path.join(FILE_TEMP_DIR, image_name)
-        img.save(path)
-
-
-
         #Upload picture from file to cloud storage
         picture_blob.upload_from_filename(path)
 
-        os.remove(path)
+        small_bucket = storage_client.get_bucket(FIREBASE_BUCKET_SMALL)
+        large_bucket = storage_client.get_bucket(FIREBASE_BUCKET_LARGE)
+        blob_small = small_bucket.blob(image_name)
+        blob_large = large_bucket.blob(image_name)
 
-        bucket_uri = 'gs://' + FIREBASE_BUCKET_URL + '/' + image_name
+        blob_small.upload_from_filename(small_path)
+        blob_large.upload_from_filename(large_path)
+
+
+        os.remove(path)
+        os.remove(small_path)
+        os.remove(large_path)
+
+
+
         #Init gcloud vision client
         vision_client = vision.ImageAnnotatorClient()
         image = types.Image()
-        image.source.image_uri = bucket_uri
+        image.source.image_uri = "gs://" + FIREBASE_BUCKET_URL + '/' + image_name
 
         #Get response and labels from vision API
         response = vision_client.face_detection(image = image)
@@ -163,7 +190,7 @@ def label():
         if len(response.face_annotations) != 0:
             faces = True
 
-        picture_json = {"owner" : uuid.uuid4().hex, "bucket_identifier" : bucket_uri, "faces" : faces  }
+        picture_json = {"owner" : uid, "bucket_identifier" : image_name, "faces" : faces  }
         res = fb.post("/pictures/" + group, picture_json)
 
         return jsonify(res)
