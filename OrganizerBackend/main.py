@@ -2,11 +2,32 @@ from flask import Flask, request, jsonify, Response
 #from flask.ext.api import status
 import google.auth.transport.requests
 import google.oauth2.id_token
+import sys
+
+class dummy:
+    def close(self):
+        pass
+    def join(self):
+        pass
+    def terminate(self):
+        pass
+
+class DummyProccessing():
+    def __init__(self):
+        pass
+    @staticmethod
+    def Pool(processes):
+        return dummy()
+
+sys.modules['firebase.async.process_pool'] = dummy()
+sys.modules['multiprocessing'] = DummyProccessing
+
 from firebase import firebase
 from google.cloud import datastore, storage, vision
 from google.cloud.vision import types
 from datetime import datetime
 from settings import *
+
 import firebase_admin
 from firebase_admin import auth, credentials
 import uuid
@@ -110,12 +131,12 @@ def label():
 
     data = request.values
 
-    try:
-        id_token = data['token']
-        decoded_token = auth.verify_id_token(id_token)
-        uid = decoded_token['uid']
-    except ValueError:
-        return jsonify("Token has expired or was not included"), 401
+    #try:
+    #    id_token = data['token']
+    #    decoded_token = auth.verify_id_token(id_token)
+    #    uid = decoded_token['uid']
+    #except ValueError:
+    #    return jsonify("Token has expired or was not included"), 401
 
 
     fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
@@ -189,7 +210,7 @@ def label():
         if len(response.face_annotations) != 0:
             faces = True
 
-        picture_json = {"owner" : uid, "bucket_identifier" : image_name, "faces" : faces  }
+        picture_json = {"owner" : uuid.uuid4().hex, "bucket_identifier" : image_name, "faces" : faces  }
         res = fb.post("/pictures/" + group, picture_json)
 
         return jsonify(res)
