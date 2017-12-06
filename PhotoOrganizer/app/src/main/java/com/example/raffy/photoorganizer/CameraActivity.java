@@ -135,6 +135,8 @@ public class CameraActivity extends AppCompatActivity {
                                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                 if (group != null && user != null)
                                     startUploadAction(group.getName(), user, bitmap);
+                                else
+                                    Toast.makeText(context.get(), "Group or user null!", Toast.LENGTH_LONG).show();
                             }
                         });
                     }
@@ -147,6 +149,7 @@ public class CameraActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             progressDialog.dismiss();
+
         }
 
         private void startUploadAction(final String groupName, FirebaseUser user, final Bitmap bitmap) {
