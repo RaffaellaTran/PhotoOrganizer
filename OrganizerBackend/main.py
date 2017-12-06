@@ -40,9 +40,12 @@ def create_group():
     expiration_time = data['expiration_time']
     user = data['user']
 
-    putdata = {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [] }
+    users = {uid: user}
+    putdata = {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': users }
+
     response = fb.put('/groups', group_name, putdata)
-    push_response = fb.put('/groups/' + group_name + '/users/', uid, user)
+
+    fb.put('/users/', uid, {'group': group_name})
 
     return jsonify(response)
 
@@ -73,6 +76,7 @@ def join_group():
     if group == join_token:
         response = fb.put('/groups/' + group_name + '/users/', uid, user)
         set_new = fb.put('/groups/' + group_name, 'join_token', uuid.uuid4().hex)
+        fb.put('/users/' + uid, 'group', group_name)
         return jsonify(response)
 
     else:
