@@ -63,7 +63,6 @@ public class CameraActivity extends AppCompatActivity {
                 Bundle extras = data.getExtras();
                 @SuppressWarnings("ConstantConditions")
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
-                //mImageView.setImageBitmap(imageBitmap);
                 new ExamineImageTask(this).execute(imageBitmap);
             }
         }
@@ -126,14 +125,17 @@ public class CameraActivity extends AppCompatActivity {
                         Group.getMyGroup(new Group.GetMyGroupResult() {
                             @Override
                             public void react(@Nullable Group group) {
-                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                if (group != null && user != null)
-                                    startUploadAction(group.getName(), user, bitmap);
-                                else if (group == null)
-                                    Toast.makeText(context.get(), "You must be in a group to take photos!", Toast.LENGTH_LONG).show();
-                                else
-                                    Toast.makeText(context.get(), "User null!", Toast.LENGTH_LONG).show();
                                 progress.dismiss();
+                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                if (group != null && user != null) {
+                                    startUploadAction(group.getName(), user, bitmap);
+                                } else {
+                                    if (group == null)
+                                        Toast.makeText(context.get(), "You must be in a group to take photos!", Toast.LENGTH_LONG).show();
+                                    else
+                                        Toast.makeText(context.get(), "User null!", Toast.LENGTH_LONG).show();
+                                    context.get().finish();
+                                }
                             }
                         });
                     }
@@ -172,6 +174,7 @@ public class CameraActivity extends AppCompatActivity {
                     Log.e("!!!", e.getMessage());
                     Toast.makeText(context.get(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     progress.dismiss();
+                    context.get().finish();
                 }
             });
         }

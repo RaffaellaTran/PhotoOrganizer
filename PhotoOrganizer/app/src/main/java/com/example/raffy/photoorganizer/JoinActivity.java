@@ -190,6 +190,7 @@ public class JoinActivity extends AppCompatActivity {
                 Log.e("!!!", e.getMessage());
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                 progress.dismiss();
+                context.finish();
             }
         });
     }
