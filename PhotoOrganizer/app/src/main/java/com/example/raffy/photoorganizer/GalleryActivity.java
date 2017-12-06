@@ -65,7 +65,7 @@ public class GalleryActivity extends AppCompatActivity {
 
         // Set info text
         infoText = findViewById(R.id.info);
-        infoText.setText("Nothing to display \nYou don't belong in any groups!");
+        infoText.setText("Nothing to display \nYou don't belong to any groups!");
 
         // Get all FireBase related variables
         db = FirebaseDatabase.getInstance();
