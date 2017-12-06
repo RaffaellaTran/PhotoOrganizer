@@ -107,6 +107,7 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
             public void onFailure(@NonNull Exception e) {
                 Log.e("!!!", e.getMessage());
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                progress.dismiss();
             }
         });
     }

@@ -146,6 +146,7 @@ public class CameraActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            progressDialog.dismiss();
         }
 
         private void startUploadAction(final String groupName, FirebaseUser user, final Bitmap bitmap) {

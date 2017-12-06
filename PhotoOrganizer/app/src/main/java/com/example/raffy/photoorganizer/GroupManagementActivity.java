@@ -161,6 +161,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
             public void onFailure(@NonNull Exception e) {
                 Log.e("!!!", e.getMessage());
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                progress.dismiss();
             }
         });
     }
