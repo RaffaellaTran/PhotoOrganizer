@@ -76,16 +76,9 @@ public class CameraActivity extends AppCompatActivity {
     private static class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
 
         private WeakReference<Activity> context;
-        private ProgressDialog progressDialog;
 
         ExamineImageTask(Activity context) {
             this.context = new WeakReference<>(context);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            progressDialog = ApiHttp.getProgressDialog(context.get());
         }
 
         @Override
@@ -129,14 +122,18 @@ public class CameraActivity extends AppCompatActivity {
                             return;
                         }
 
+                        final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
                         Group.getMyGroup(new Group.GetMyGroupResult() {
                             @Override
                             public void react(@Nullable Group group) {
                                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                 if (group != null && user != null)
                                     startUploadAction(group.getName(), user, bitmap);
+                                else if (group == null)
+                                    Toast.makeText(context.get(), "You must be in a group to take photos!", Toast.LENGTH_LONG).show();
                                 else
-                                    Toast.makeText(context.get(), "Group or user null!", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(context.get(), "User null!", Toast.LENGTH_LONG).show();
+                                progress.dismiss();
                             }
                         });
                     }
@@ -145,14 +142,8 @@ public class CameraActivity extends AppCompatActivity {
             return null;
         }
 
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            progressDialog.dismiss();
-
-        }
-
         private void startUploadAction(final String groupName, FirebaseUser user, final Bitmap bitmap) {
+            final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
             // get token and start progress
             user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
                 @Override
@@ -173,13 +164,14 @@ public class CameraActivity extends AppCompatActivity {
                             .post(body)
                             .url("http://10.0.2.2:5000/label")  // TODO
                             .build();
-                    new ApiHttp(context.get(), progressDialog).execute(request);
+                    new ApiHttp(context.get(), progress).execute(request);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
                     Log.e("!!!", e.getMessage());
                     Toast.makeText(context.get(), e.getMessage(), Toast.LENGTH_SHORT).show();
+                    progress.dismiss();
                 }
             });
         }
