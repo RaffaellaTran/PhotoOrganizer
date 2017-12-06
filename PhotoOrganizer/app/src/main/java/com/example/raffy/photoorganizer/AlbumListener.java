@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Adapter;
 import android.widget.BaseAdapter;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -84,5 +85,6 @@ class AlbumListener implements ChildEventListener {
 
     @Override
     public void onCancelled(DatabaseError databaseError) {
+        Toast.makeText(context, "Firebase error occurred!", Toast.LENGTH_SHORT).show();
     }
 }

@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -101,6 +102,7 @@ public class GalleryActivity extends AppCompatActivity {
         @Override
         public void onCancelled(DatabaseError databaseError) {
             Log.d("GalleryGroupListener", databaseError.toString());
+            Toast.makeText(getApplicationContext(), "Firebase error occurred!", Toast.LENGTH_SHORT).show();
         }
     };
 
