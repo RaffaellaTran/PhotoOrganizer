@@ -71,6 +71,10 @@ public class Group {
         groupNameRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null) {
+                    result.react(null);
+                    return;
+                }
                 String groupName = dataSnapshot.getValue().toString();
                 DatabaseReference groupRef = databaseRef.child("groups").child(groupName);
                 groupRef.addValueEventListener(new ValueEventListener() {
