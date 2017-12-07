@@ -174,7 +174,7 @@ public class JoinActivity extends AppCompatActivity {
                         .addFormDataPart("user", user.getUid())
                         .build();
                 Request request = new Request.Builder()
-                        .url("http://10.0.2.2:5000/join_group")  // TODO
+                        .url(SettingsHelper.BACKEND_URL + "/join_group")  // TODO
                         .post(body)
                         .build();
                 new ApiHttp(context, progress).addAfter(new ApiHttp.After() {

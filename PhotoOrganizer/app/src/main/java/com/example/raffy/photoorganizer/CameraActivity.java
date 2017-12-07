@@ -164,7 +164,7 @@ public class CameraActivity extends AppCompatActivity {
                             .build();
                     Request request = new Request.Builder()
                             .post(body)
-                            .url("http://10.0.2.2:5000/label")  // TODO
+                            .url(SettingsHelper.BACKEND_URL + "/label")  // TODO
                             .build();
                     new ApiHttp(context.get(), progress).execute(request);
                 }
