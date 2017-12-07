@@ -1,6 +1,7 @@
-runtime: python27
+runtime: python
 api_version: 1
 threadsafe: true
+env: flex
 
 handlers:
 - url: /static
