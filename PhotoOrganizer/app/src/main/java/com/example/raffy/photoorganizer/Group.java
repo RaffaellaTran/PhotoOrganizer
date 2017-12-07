@@ -97,7 +97,7 @@ public class Group {
                                 return;
                             }
                             result.react(null);
-                        } catch (ParseException e) {
+                        } catch (ParseException|NullPointerException e) {
                             result.react(null);
                         }
                     }
