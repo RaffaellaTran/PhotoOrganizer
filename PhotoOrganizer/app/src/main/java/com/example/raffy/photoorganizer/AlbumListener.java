@@ -29,11 +29,13 @@ class AlbumListener implements ChildEventListener {
     AlbumEventListener onNewImage;
     AlbumEventListener onUriFetched;
     Context context;
+    SettingsHelper preferences;
 
     public AlbumListener(AlbumEventListener onNewImage, AlbumEventListener onUriFetched, Context context) {
         this.context = context;
         this.onNewImage = onNewImage;
         this.onUriFetched = onUriFetched;
+        this.preferences = new SettingsHelper(this.context);
     }
 
     @Override
@@ -44,7 +46,7 @@ class AlbumListener implements ChildEventListener {
 
 
         // Get image storage reference
-        FirebaseStorage storage = SettingsHelper.getFirebaseStorage(SettingsHelper.getImageQuality(context));
+        FirebaseStorage storage = this.preferences.getFirebaseStorage(this.preferences.getImageQuality());
         StorageReference ref;
         try {
             ref = storage.getReference(img.bucket_identifier);
