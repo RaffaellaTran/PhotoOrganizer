@@ -10,5 +10,6 @@ public class GalleryImage {
     String owner = "";
     String bucket_identifier = "";
     Boolean faces = false;
-    Uri downloadUri = null;
+
+    Uri downloadUri;
 }

@@ -65,5 +65,9 @@ dependencies {
     // Http
     compile 'com.squareup.okio:okio:1.13.0'
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
+
+    // QR code library
+    compile 'com.journeyapps:zxing-android-embedded:3.0.2@aar'
+    compile 'com.google.zxing:core:3.2.0'
 }
 apply plugin: 'com.google.gms.google-services'

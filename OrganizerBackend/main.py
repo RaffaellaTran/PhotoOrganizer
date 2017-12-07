@@ -44,7 +44,6 @@ def create_group():
     expiration_time = data['expiration_time']
     user = data['user']
 
-
     db = firebase.database()
 
     putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [] }}
@@ -82,6 +81,7 @@ def join_group():
 
     else:
         return jsonify({'error': 'The join token has expired, or is not valid'}), 400
+
 
 
 @app.route('/leave_group', methods=['DELETE'])
@@ -200,4 +200,4 @@ def label():
         return jsonify(res)
 
     except Exception as err:
-        return jsonify(str(err))
+        return jsonify(str(err)), 400

@@ -1,6 +1,7 @@
 package com.example.raffy.photoorganizer;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
@@ -11,17 +12,28 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.util.SparseArray;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GetTokenResult;
 
 import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import okhttp3.MultipartBody;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 import static com.example.raffy.photoorganizer.QRCameraPreview.getCameraInstance;
 
@@ -131,15 +143,55 @@ public class JoinActivity extends AppCompatActivity {
                 context.get().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        // TODO
                         if (barcodes.size() > 0) {
+                            String qr = barcodes.valueAt(0).displayValue;
+                            String groupName = qr.split(":")[0];
+                            String joinCode = qr.split(":")[1];
+                            startJoinGroupAction(context.get(), groupName, joinCode);
                             Toast.makeText(context.get(), "Barcode found", Toast.LENGTH_SHORT).show();
-                            context.get().finish();
                         }
                     }
                 });
             }
             return null;
         }
+    }
+
+    private static void startJoinGroupAction(final Activity context, final String group_name, final String join_code) {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) return;
+        final ProgressDialog progress = ApiHttp.getProgressDialog(context);
+        // get token and start progress
+        user.getIdToken(true).addOnCompleteListener(new OnCompleteListener<GetTokenResult>() {
+            @Override
+            public void onComplete(@NonNull Task<GetTokenResult> task) {
+                String token = task.getResult().getToken();
+                RequestBody body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("token", token)
+                        .addFormDataPart("join_token", join_code)
+                        .addFormDataPart("group_name", group_name)
+                        .addFormDataPart("user", user.getUid())
+                        .build();
+                Request request = new Request.Builder()
+                        .url(SettingsHelper.BACKEND_URL + "/join_group")  // TODO
+                        .post(body)
+                        .build();
+                new ApiHttp(context, progress).addAfter(new ApiHttp.After() {
+                    @Override
+                    public void run() {
+                        context.finish();
+                    }
+                }).execute(request);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.e("!!!", e.getMessage());
+                Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                progress.dismiss();
+                context.finish();
+            }
+        });
     }
 }

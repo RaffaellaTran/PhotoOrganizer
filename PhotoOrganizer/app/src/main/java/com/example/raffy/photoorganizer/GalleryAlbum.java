@@ -8,7 +8,6 @@ import java.util.List;
  */
 
 public class GalleryAlbum {
-
     String name;
     List<GalleryImage> images;
 

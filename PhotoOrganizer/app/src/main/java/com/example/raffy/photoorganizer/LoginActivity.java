@@ -82,7 +82,7 @@ public class LoginActivity extends AppCompatActivity {
                                     if (password.length() < 6) {
                                         Toast.makeText(getApplicationContext(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
                                          }
-                                    Toast.makeText(getApplicationContext(), "You are not register!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "Registration failed!", Toast.LENGTH_SHORT).show();
                                 } else {
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(intent);

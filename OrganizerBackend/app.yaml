@@ -19,6 +19,7 @@ resources:
 
 
 env_variables:
-    #Firebase project id
     FIREBASE_PROJECT_ID: 'mcc-fall-2017-g08'
-    GOOGLE_APPLICATION_CREDENTIALS: '/Users/Qahwi/.config/gcloud/application_default_credentials.json'
+
+skip_files:
+  - venv/
