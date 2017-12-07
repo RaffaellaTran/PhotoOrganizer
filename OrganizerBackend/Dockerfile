@@ -7,7 +7,5 @@ WORKDIR /app
 RUN pip install -r requirements.txt
 ENV FLASK_APP=main.py
 
-ENTRYPOINT ["flask"]
-CMD ["run"]
-
-us.gcr.io/mcc-fall-2017-g08/test
+ENTRYPOINT ["gunicorn"]
+CMD ["-b", ":8080", "main:app"]

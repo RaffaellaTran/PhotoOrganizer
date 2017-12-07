@@ -4,6 +4,7 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 
 import pyrebase
+import json
 
 from google.cloud import datastore, storage, vision
 from google.cloud.vision import types
@@ -25,6 +26,7 @@ cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
 firebase_admin.initialize_app(cred)
 firebase = pyrebase.initialize_app(PYREBASE_CONFIG)
 
+
 @app.route('/create_group', methods=['POST'])
 def create_group():
 
@@ -45,7 +47,7 @@ def create_group():
 
     db = firebase.database()
 
-    putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [{uid:user}] }}
+    putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [] }}
     response = db.child('groups').set(putdata)
     return jsonify(response)
 
@@ -63,21 +65,19 @@ def join_group():
     except ValueError:
         return jsonify("Authorization token has expired or was not included"), 401
 
+
     join_token = data['join_token']
     group_name = data['group_name']
     user = data['user']
 
-
     db = firebase.database()
 
-    group = db.child('groups').child(group_name).child('/join_token').get().val()
+    group = db.child('groups').child(group_name).child('join_token').get().val()
 
     if group == join_token:
 
-        arr = db.child('groups').child(group_name).child('users').get().val()
-        arr.update({uuid.uuid4().hex:user})
-        response = db.child('groups').child(group_name).child('users').update(arr)
-        set_new = db.child('groups').child(group_name).update({group_name + ':' + uuid.uuid4().hex})
+        response = db.child('groups').child(group_name).child('users').update({uid:user})
+        set_new = db.child('groups').child(group_name).child('join_token').set(group_name + ':' + uuid.uuid4().hex)
         return jsonify(response)
 
     else:
