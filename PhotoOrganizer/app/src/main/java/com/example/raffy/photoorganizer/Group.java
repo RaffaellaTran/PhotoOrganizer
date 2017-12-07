@@ -1,6 +1,7 @@
 package com.example.raffy.photoorganizer;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -61,42 +62,57 @@ public class Group {
 
     static void getMyGroup(final GetMyGroupResult result) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) result.react(null);
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-        DatabaseReference groups = databaseRef.child("groups");
-        groups.addValueEventListener(new ValueEventListener() {
+        if (user == null) {
+            result.react(null);
+            return;
+        }
+        final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference groupNameRef = databaseRef.child("users").child(user.getUid()).child("group");
+        groupNameRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                try {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String name = snapshot.getKey();
-                        String owner = snapshot.child("owner").getValue().toString();
-                        String joinCode = snapshot.child("join_token").getValue().toString();
-                        int childrenCount = (int) snapshot.child("users").getChildrenCount();
-                        Iterator<DataSnapshot> children = snapshot.child("users").getChildren().iterator();
-                        HashMap<String, String> users = new HashMap<>();
-                        for (int i = 0; i < childrenCount; i++) {
-                            DataSnapshot next = children.next();
-                            users.put(next.getKey(), next.getValue().toString());
-                        }
-                        if (users.get(user.getUid()) != null) {
-                            Date date = getDateFormat().parse(snapshot.child("expiration_time").getValue().toString());
-                            Calendar calendar = Calendar.getInstance();
-                            calendar.setTime(date);
-                            Group group = new Group(name, calendar, owner, users);
-                            group.joinCode = joinCode;
-                            result.react(group);
-                            return;
+                String groupName = dataSnapshot.getValue().toString();
+                DatabaseReference groupRef = databaseRef.child("groups").child(groupName);
+                groupRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        try {
+                            String name = dataSnapshot.getKey();
+                            String owner = dataSnapshot.child("owner").getValue().toString();
+                            String joinCode = dataSnapshot.child("join_token").getValue().toString();
+                            int childrenCount = (int) dataSnapshot.child("users").getChildrenCount();
+                            Iterator<DataSnapshot> children = dataSnapshot.child("users").getChildren().iterator();
+                            HashMap<String, String> users = new HashMap<>();
+                            for (int i = 0; i < childrenCount; i++) {
+                                DataSnapshot next = children.next();
+                                users.put(next.getKey(), next.getValue().toString());
+                            }
+                            if (users.get(user.getUid()) != null) {
+                                Date date = getDateFormat().parse(dataSnapshot.child("expiration_time").getValue().toString());
+                                Calendar calendar = Calendar.getInstance();
+                                calendar.setTime(date);
+                                Group group = new Group(name, calendar, owner, users);
+                                group.joinCode = joinCode;
+                                result.react(group);
+                                return;
+                            }
+                            result.react(null);
+                        } catch (ParseException e) {
+                            result.react(null);
                         }
                     }
-                } catch (ParseException|NullPointerException e) {
-                    result.react(null);
-                }
-                result.react(null);
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Goes here if there is no such item in the database
+                        result.react(null);
+                    }
+                });
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                // Goes here if there is no such item in the database
                 result.react(null);
             }
         });
