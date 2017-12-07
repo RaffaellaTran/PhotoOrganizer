@@ -46,8 +46,9 @@ def create_group():
 
     db = firebase.database()
 
-    putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [] }}
+    putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [{uid:user}] }}
     response = db.child('groups').set(putdata)
+    update_group = db.child('users').set({uid:{'group':group_name}})
     return jsonify(response)
 
 
@@ -77,6 +78,7 @@ def join_group():
 
         response = db.child('groups').child(group_name).child('users').update({uid:user})
         set_new = db.child('groups').child(group_name).child('join_token').set(group_name + ':' + uuid.uuid4().hex)
+        update_group = db.child('users').set({uid:{'group':group_name}})
         return jsonify(response)
 
     else:
@@ -106,6 +108,7 @@ def leave_group():
         response = db.child('groups').child(group_name).remove()
     else:
         response = db.child('groups').child(group_name).child('users').child(uid).remove()
+    update_group = db.child('users').child(uid).remove()
     return jsonify(response)
 
 

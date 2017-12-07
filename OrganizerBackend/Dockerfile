@@ -8,4 +8,4 @@ RUN pip install -r requirements.txt
 ENV FLASK_APP=main.py
 
 ENTRYPOINT ["gunicorn"]
-CMD ["-b", ":8080", "main:app"]
+CMD ["-b", ":$PORT", "main:app"]
