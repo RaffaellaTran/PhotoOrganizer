@@ -62,7 +62,10 @@ public class Group {
 
     static void getMyGroup(final GetMyGroupResult result) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user == null) result.react(null);
+        if (user == null) {
+            result.react(null);
+            return;
+        }
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         DatabaseReference groupNameRef = databaseRef.child("users").child(user.getUid()).child("group");
         groupNameRef.addValueEventListener(new ValueEventListener() {
