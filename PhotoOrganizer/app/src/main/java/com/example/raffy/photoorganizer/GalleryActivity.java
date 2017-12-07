@@ -84,9 +84,8 @@ public class GalleryActivity extends AppCompatActivity {
         public void onDataChange(DataSnapshot dataSnapshot) {
             // Add a new album for this group if current user is in the group
             UserInfo userInfo = dataSnapshot.getValue(UserInfo.class);
-            String group = userInfo.group;
-            if (group != null && group.length() > 0) {
-                addAlbum(group);
+            if (userInfo != null && userInfo.group != null && userInfo.group.length() > 0) {
+                addAlbum(userInfo.group);
             }
             // TODO Remove previous group's album
         }
