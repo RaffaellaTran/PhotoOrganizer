@@ -45,7 +45,7 @@ def create_group():
 
     db = firebase.database()
 
-    putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [{uid:user}] }}
+    putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': {uid:user} }}
     response = db.child('groups').set(putdata)
     update_group = db.child('users').update({uid:{'group':group_name}})
     return jsonify(response)
