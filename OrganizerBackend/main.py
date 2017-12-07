@@ -26,7 +26,6 @@ cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
 firebase_admin.initialize_app(cred)
 firebase = pyrebase.initialize_app(PYREBASE_CONFIG)
 
-
 @app.route('/create_group', methods=['POST'])
 def create_group():
 
@@ -48,7 +47,7 @@ def create_group():
 
     putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [{uid:user}] }}
     response = db.child('groups').set(putdata)
-    update_group = db.child('users').set({uid:{'group':group_name}})
+    update_group = db.child('users').update({uid:{'group':group_name}})
     return jsonify(response)
 
 
@@ -76,9 +75,9 @@ def join_group():
 
     if group == join_token:
 
-        response = db.child('groups').child(group_name).child('users').update({uid:user})
+        response = db.child('groups').child(group_name).child('users').update({uuid.uuid4().hex:user})
         set_new = db.child('groups').child(group_name).child('join_token').set(group_name + ':' + uuid.uuid4().hex)
-        update_group = db.child('users').set({uid:{'group':group_name}})
+        update_group = db.child('users').update({uid:{'group':group_name}})
         return jsonify(response)
 
     else:
