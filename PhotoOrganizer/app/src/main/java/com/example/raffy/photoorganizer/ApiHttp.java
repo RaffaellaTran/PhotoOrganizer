@@ -35,7 +35,6 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
         for (Request request : requests) {
             try {
                 Response response = client.newCall(request).execute();
-                context.get().finish();
                 return "Success! " + response.toString();
             } catch (IOException e) {
                 return "Network error: " + e.getMessage();
@@ -52,6 +51,7 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
             Toast.makeText(context.get(), message, Toast.LENGTH_LONG).show();
         }
         progress.dismiss();
+        context.get().finish();
         if (mAfter != null) mAfter.run();
     }
 

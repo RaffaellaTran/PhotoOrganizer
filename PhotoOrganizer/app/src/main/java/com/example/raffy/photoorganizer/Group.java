@@ -1,8 +1,6 @@
 package com.example.raffy.photoorganizer;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -14,9 +12,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 
@@ -25,10 +23,10 @@ public class Group {
     private String name;
     private Calendar expires;
     private String owner;
-    private String[] users;
+    private HashMap<String, String> users;
     private String joinCode;
 
-    public Group(String name, Calendar expires, String owner, String[] users) {
+    public Group(String name, Calendar expires, String owner, HashMap<String, String> users) {
         this.name = name;
         this.expires = expires;
         this.owner = owner;
@@ -47,7 +45,7 @@ public class Group {
         return this.owner;
     }
 
-    public String[] getUsers() {
+    public HashMap<String, String> getUsers() {
         return this.users;
     }
 
@@ -76,11 +74,12 @@ public class Group {
                         String joinCode = snapshot.child("join_token").getValue().toString();
                         int childrenCount = (int) snapshot.child("users").getChildrenCount();
                         Iterator<DataSnapshot> children = snapshot.child("users").getChildren().iterator();
-                        String[] users = new String[childrenCount];
+                        HashMap<String, String> users = new HashMap<>();
                         for (int i = 0; i < childrenCount; i++) {
-                            users[i] = children.next().getValue().toString();
+                            DataSnapshot next = children.next();
+                            users.put(next.getKey(), next.getValue().toString());
                         }
-                        if (Arrays.asList(users).contains(user.getUid())) {
+                        if (users.get(user.getUid()) != null) {
                             Date date = getDateFormat().parse(snapshot.child("expiration_time").getValue().toString());
                             Calendar calendar = Calendar.getInstance();
                             calendar.setTime(date);

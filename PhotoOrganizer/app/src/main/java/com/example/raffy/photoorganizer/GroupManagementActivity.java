@@ -86,7 +86,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                     group_name_field.setText(group.getName());
                     group_expires_field.setText(Group.getDateFormat().format(group.getExpires().getTime()));
                     StringBuilder membersString = new StringBuilder();
-                    for (String member : group.getUsers()) {
+                    for (String member : group.getUsers().values()) {
                         membersString.append(member);
                         membersString.append(" ");
                     }
@@ -161,6 +161,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
             public void onFailure(@NonNull Exception e) {
                 Log.e("!!!", e.getMessage());
                 Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
+                progress.dismiss();
             }
         });
     }
