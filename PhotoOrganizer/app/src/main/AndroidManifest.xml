@@ -30,7 +30,7 @@
         <activity android:name=".SettingsActivity" android:screenOrientation="portrait"/>
         <activity android:name=".JoinActivity" android:screenOrientation="landscape"/>
         <activity android:name=".CreateGroupActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".DeleteActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".AddMemberActivity" android:screenOrientation="portrait"/>
         <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>
     </application>
 </manifest>

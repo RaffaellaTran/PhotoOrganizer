@@ -11,6 +11,8 @@ import com.google.firebase.storage.FirebaseStorage;
 
 public class SettingsHelper {
 
+    public static final String BACKEND_URL = "https://mcc-fall-2017-g08.appspot.com";
+
     public static final String BUCKET_SMALL = "gs://mcc-fall-2017-g08_small";
     public static final String BUCKET_LARGE = "gs://mcc-fall-2017-g08_large";
 

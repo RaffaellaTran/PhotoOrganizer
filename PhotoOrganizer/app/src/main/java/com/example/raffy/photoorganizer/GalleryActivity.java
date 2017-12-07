@@ -15,6 +15,7 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
@@ -22,6 +23,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -65,42 +67,33 @@ public class GalleryActivity extends AppCompatActivity {
 
         // Set info text
         infoText = findViewById(R.id.info);
-        infoText.setText("Nothing to display \nYou don't belong in any groups!");
+        infoText.setText("Nothing to display \nYou don't belong to any groups!");
 
         // Get all FireBase related variables
         db = FirebaseDatabase.getInstance();
-        db.getReference("groups/").addChildEventListener(groupListener);
+        db.getReference("users/" + FirebaseAuth.getInstance().getUid()).addValueEventListener(groupListener);
     }
 
-    static class Group {
-        // A simple class for easier parsing of Firebase Groups (Is this necessary?)
-        Map<String, String> users = new HashMap<>();
-        public Group() {}
+    static class UserInfo {
+        String group;
+        UserInfo() {}
     }
 
-    ChildEventListener groupListener = new ChildEventListener() {
+    ValueEventListener groupListener = new ValueEventListener() {
         @Override
-        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+        public void onDataChange(DataSnapshot dataSnapshot) {
             // Add a new album for this group if current user is in the group
-            Group group = dataSnapshot.getValue(Group.class);
-            String uid = FirebaseAuth.getInstance().getUid();
-            if (group.users.containsKey(uid)) {
-                addAlbum(dataSnapshot.getKey());
+            UserInfo userInfo = dataSnapshot.getValue(UserInfo.class);
+            if (userInfo != null && userInfo.group != null && userInfo.group.length() > 0) {
+                addAlbum(userInfo.group);
             }
+            // TODO Remove previous group's album
         }
-
-        @Override
-        public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
-
-        @Override
-        public void onChildRemoved(DataSnapshot dataSnapshot) {}
-
-        @Override
-        public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
             Log.d("GalleryGroupListener", databaseError.toString());
+            Toast.makeText(getApplicationContext(), "Firebase error occurred!", Toast.LENGTH_SHORT).show();
         }
     };
 
