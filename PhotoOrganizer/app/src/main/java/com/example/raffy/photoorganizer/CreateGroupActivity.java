@@ -97,7 +97,7 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                         .addFormDataPart("user", user.getEmail())
                         .build();
                 Request request = new Request.Builder()
-                        .url("http://10.0.2.2:5000/create_group")  // TODO
+                        .url(SettingsHelper.BACKEND_URL + "/create_group")
                         .post(body)
                         .build();
                 new ApiHttp(context, progress).execute(request);

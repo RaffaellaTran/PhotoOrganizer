@@ -2,11 +2,14 @@ from flask import Flask, request, jsonify, Response
 #from flask.ext.api import status
 import google.auth.transport.requests
 import google.oauth2.id_token
-from firebase import firebase
+
+import pyrebase
+
 from google.cloud import datastore, storage, vision
 from google.cloud.vision import types
 from datetime import datetime
 from settings import *
+
 import firebase_admin
 from firebase_admin import auth, credentials
 import uuid
@@ -20,7 +23,7 @@ app = Flask(__name__)
 
 cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
 firebase_admin.initialize_app(cred)
-
+firebase = pyrebase.initialize_app(PYREBASE_CONFIG)
 
 @app.route('/create_group', methods=['POST'])
 def create_group():
@@ -34,7 +37,6 @@ def create_group():
     except ValueError:
         return jsonify("Token has expired or was not included"), 401
 
-    fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
 
     group_name = data['group_name']
     expiration_time = data['expiration_time']
@@ -47,6 +49,10 @@ def create_group():
 
     fb.put('/users/', uid, {'group': group_name})
 
+    db = firebase.database()
+
+    putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [{uid:user}] }}
+    response = db.child('groups').set(putdata)
     return jsonify(response)
 
 
@@ -63,15 +69,14 @@ def join_group():
     except ValueError:
         return jsonify("Authorization token has expired or was not included"), 401
 
-
-    fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
-
     join_token = data['join_token']
     group_name = data['group_name']
     user = data['user']
 
-    group = fb.get('/groups/' + group_name + '/join_token', None)
 
+    db = firebase.database()
+
+    group = db.child('groups').child(group_name).child('/join_token').get().val()
 
     if group == join_token:
         response = fb.put('/groups/' + group_name + '/users/', uid, user)
@@ -95,17 +100,17 @@ def leave_group():
     except ValueError:
         return jsonify("Token has expired or was not included"), 401
 
-    fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
+    db = firebase.database()
 
     group_name = data['group_name']
     group_uri = '/groups/' + group_name
 
-    get = fb.get(group_uri + '/owner', None)
+    get = db.child('groups').child(group_name).child('owner').get().val()
 
     if get == uid:
-        response = fb.delete('/groups', group_name)
+        response = db.child('groups').child(group_name).remove()
     else:
-        response = fb.delete(group_uri + '/users', uid)
+        response = db.child('groups').child(group_name).child('users').child(uid).remove()
     return jsonify(response)
 
 
@@ -123,7 +128,7 @@ def label():
         return jsonify("Token has expired or was not included"), 401
 
 
-    fb = firebase.FirebaseApplication(FIREBASE_PROJECT_URL, None)
+    db = firebase.database()
 
     try:
         #Get image from request
@@ -195,7 +200,7 @@ def label():
             faces = True
 
         picture_json = {"owner" : uid, "bucket_identifier" : image_name, "faces" : faces  }
-        res = fb.post("/pictures/" + group, picture_json)
+        res = db.child('pictures').child(group).push(picture_json)
 
         return jsonify(res)
 
