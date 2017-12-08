@@ -74,18 +74,13 @@ public class GalleryActivity extends AppCompatActivity {
         db.getReference("users/" + FirebaseAuth.getInstance().getUid()).addValueEventListener(groupListener);
     }
 
-    static class UserInfo {
-        String group;
-        UserInfo() {}
-    }
-
     ValueEventListener groupListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             // Add a new album for this group if current user is in the group
-            UserInfo userInfo = dataSnapshot.getValue(UserInfo.class);
-            if (userInfo != null && userInfo.group != null && userInfo.group.length() > 0) {
-                addAlbum(userInfo.group);
+            User user = dataSnapshot.getValue(User.class);
+            if (user != null && user.getGroup() != null && user.getGroup().length() > 0) {
+                addAlbum(user.getGroup());
             }
             // TODO Remove previous group's album
         }
