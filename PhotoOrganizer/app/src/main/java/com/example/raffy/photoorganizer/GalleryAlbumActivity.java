@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
@@ -18,20 +17,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,6 +47,8 @@ public class GalleryAlbumActivity extends AppCompatActivity {
 
     LinearLayout layout;
     TextView title;
+    TextView infoText;
+
     int imageWidth;
     int imageHeight;
     int columns = 3;
@@ -66,6 +59,10 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_gallery_album);
         layout = findViewById(R.id.linearLayout);
         title = findViewById(R.id.albumName);
+
+        // Set info text
+        infoText = findViewById(R.id.info);
+        infoText.setText("Nothing to display \nThis album has no images!");
 
         // TODO: Get sorting style from shared preferences?
         sortedBy = SortOption.FACES;
@@ -97,7 +94,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
 
         DatabaseReference picturesRef = db.getReference("pictures/" + albumPath);
-        AlbumListener albumListener = new AlbumListener(onNewImage, onImageUri, getApplicationContext());
+        GalleryAlbumListener albumListener = new GalleryAlbumListener(onNewImage, onImageUri, getApplicationContext());
         picturesRef.addChildEventListener(albumListener);
     }
 
@@ -113,7 +110,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     };
 
     // Create listener for adding new images to the album
-    AlbumListener.AlbumEventListener onNewImage = new AlbumListener.AlbumEventListener() {
+    GalleryAlbumListener.AlbumEventListener onNewImage = new GalleryAlbumListener.AlbumEventListener() {
         @Override
         public void callback(GalleryImage image) {
             // Add image to the main album (redundant?)
@@ -128,7 +125,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     };
 
     // Create listener for updating imageViews when the image URL becomes available
-    AlbumListener.AlbumEventListener onImageUri = new AlbumListener.AlbumEventListener() {
+    GalleryAlbumListener.AlbumEventListener onImageUri = new GalleryAlbumListener.AlbumEventListener() {
         @Override
         public void callback(GalleryImage image) {
             String sortedTitle = getSortedName(image, sortedBy);
@@ -137,6 +134,9 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     };
 
     void addGridViewForAlbum(GalleryAlbum album) {
+        // Hide infotext
+        infoText.setVisibility(View.GONE);
+
         // Set up image grid
         View view = getLayoutInflater().inflate(R.layout.image_grid, null);
         GridView grid = view.findViewById(R.id.grid);

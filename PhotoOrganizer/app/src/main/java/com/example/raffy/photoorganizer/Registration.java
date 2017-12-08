@@ -126,9 +126,9 @@ public class Registration extends AppCompatActivity {
 
                                     DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference("users");
 
-                                    String userId = mDatabase.push().getKey();
+                                    String userId = FirebaseAuth.getInstance().getUid();
 
-                                    User user = new User(name, password,email);
+                                    User user = new User(name, email);
 
                                     mDatabase.child(userId).setValue(user);
 

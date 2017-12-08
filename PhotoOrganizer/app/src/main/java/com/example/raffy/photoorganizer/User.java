@@ -6,14 +6,18 @@ import com.google.firebase.auth.FirebaseUser;
 public class User {
 
     private String name;
-    private String password;
     private String email;
+    private String group;
 
-    public User(String name, String pass, String email) {
+    public User() {
+        // Empty constructor for Firebase
+        // eg: User u = databaseSnapshot.getValue(User.class);
+    }
+
+    public User(String name, String email) {
         this.name = name;
-        this.password=pass;
-        this.email=email;
-
+        this.email = email;
+        group = null;
     }
 
     public String getName() {
@@ -24,12 +28,8 @@ public class User {
         this.name = name;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String pass) {
-        this.password = pass;
+    public String getGroup() {
+        return group;
     }
 
     public String getEmail() {

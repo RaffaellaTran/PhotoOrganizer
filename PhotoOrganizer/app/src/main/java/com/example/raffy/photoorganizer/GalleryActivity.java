@@ -18,18 +18,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by Anton on 13.11.2017.
@@ -50,7 +46,7 @@ public class GalleryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.album_grid);
+        setContentView(R.layout.activity_gallery);
 
         // Get a suitable image height and width for filling the screen
         Display display = getWindowManager().getDefaultDisplay();
@@ -74,18 +70,13 @@ public class GalleryActivity extends AppCompatActivity {
         db.getReference("users/" + FirebaseAuth.getInstance().getUid()).addValueEventListener(groupListener);
     }
 
-    static class UserInfo {
-        String group;
-        UserInfo() {}
-    }
-
     ValueEventListener groupListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             // Add a new album for this group if current user is in the group
-            UserInfo userInfo = dataSnapshot.getValue(UserInfo.class);
-            if (userInfo != null && userInfo.group != null && userInfo.group.length() > 0) {
-                addAlbum(userInfo.group);
+            User user = dataSnapshot.getValue(User.class);
+            if (user != null && user.getGroup() != null && user.getGroup().length() > 0) {
+                addAlbum(user.getGroup());
             }
             // TODO Remove previous group's album
         }
@@ -103,7 +94,7 @@ public class GalleryActivity extends AppCompatActivity {
         albums.add(album);
 
         // Create listener for adding new images to the album
-        AlbumListener.AlbumEventListener onNewImage = new AlbumListener.AlbumEventListener() {
+        GalleryAlbumListener.AlbumEventListener onNewImage = new GalleryAlbumListener.AlbumEventListener() {
             @Override
             public void callback(GalleryImage image) {
                 album.images.add(image);
@@ -111,7 +102,7 @@ public class GalleryActivity extends AppCompatActivity {
         };
 
         // Create listener for updating imageViews when the image URL becomes available
-        AlbumListener.AlbumEventListener onImageUri = new AlbumListener.AlbumEventListener() {
+        GalleryAlbumListener.AlbumEventListener onImageUri = new GalleryAlbumListener.AlbumEventListener() {
             @Override
             public void callback(GalleryImage image) {
                 ((BaseAdapter) gridView.getAdapter()).notifyDataSetChanged();
@@ -119,7 +110,7 @@ public class GalleryActivity extends AppCompatActivity {
         };
 
         // Start listening for all FireBase events for this album
-        AlbumListener listener = new AlbumListener(onNewImage, onImageUri, getApplicationContext());
+        GalleryAlbumListener listener = new GalleryAlbumListener(onNewImage, onImageUri, getApplicationContext());
         db.getReference("pictures/" + name).addChildEventListener(listener);
 
         // Hide info text
@@ -160,7 +151,7 @@ public class GalleryActivity extends AppCompatActivity {
         public View getView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder = null;
             if (convertView == null) {
-                convertView = View.inflate(mContext, R.layout.album_view, null);
+                convertView = View.inflate(mContext, R.layout.gallery_album, null);
                 holder = new ViewHolder();
                 holder.txtTitle = (TextView) convertView.findViewById(R.id.name);
                 holder.txtImages = (TextView) convertView.findViewById(R.id.numImages);
