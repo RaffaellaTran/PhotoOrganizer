@@ -47,6 +47,8 @@ public class GalleryAlbumActivity extends AppCompatActivity {
 
     LinearLayout layout;
     TextView title;
+    TextView infoText;
+
     int imageWidth;
     int imageHeight;
     int columns = 3;
@@ -57,6 +59,10 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_gallery_album);
         layout = findViewById(R.id.linearLayout);
         title = findViewById(R.id.albumName);
+
+        // Set info text
+        infoText = findViewById(R.id.info);
+        infoText.setText("Nothing to display \nThis album has no images!");
 
         // TODO: Get sorting style from shared preferences?
         sortedBy = SortOption.FACES;
@@ -128,6 +134,9 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     };
 
     void addGridViewForAlbum(GalleryAlbum album) {
+        // Hide infotext
+        infoText.setVisibility(View.GONE);
+
         // Set up image grid
         View view = getLayoutInflater().inflate(R.layout.image_grid, null);
         GridView grid = view.findViewById(R.id.grid);
