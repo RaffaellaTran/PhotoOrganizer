@@ -45,11 +45,13 @@
         android:textColor="@color/blue"
         android:textStyle="bold" />
 
+
     <EditText
         android:id="@+id/ins_pass"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="text" />
+        android:ems="6"
+        android:inputType="textPassword" />
 
     <Button
         android:id="@+id/login"

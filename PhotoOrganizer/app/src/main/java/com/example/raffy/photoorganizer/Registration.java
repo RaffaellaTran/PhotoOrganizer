@@ -1,5 +1,6 @@
 package com.example.raffy.photoorganizer;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import android.content.SharedPreferences;
 /**
  * Created by Raffy on 10/11/2017.
  */
@@ -35,12 +37,17 @@ public class Registration extends AppCompatActivity {
     String email;
     String password;
     String name;
-
+    SharedPreferences sharedpreferences;
+    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String Name = "nameKey";
+    public static final String Password = "pass";
+    public static final String Email = "emailKey";
 
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         FirebaseApp.initializeApp(this);
+
         setContentView(R.layout.sign_up);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
     
@@ -62,7 +69,7 @@ public class Registration extends AppCompatActivity {
         inputPassword = (EditText) findViewById(R.id.ins_pass);
         btnSignIn = (Button) findViewById(R.id.sign_in_button);
       //  progressBar = (ProgressBar) findViewById(R.id.progressBar);
-
+            sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
         txtSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,7 +121,7 @@ public class Registration extends AppCompatActivity {
                         .addOnCompleteListener(Registration.this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
-                                Toast.makeText(Registration.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(Registration.this, "createUserWithEmail:onComplete:" + task.isSuccessful(), Toast.LENGTH_SHORT).show();
                           //      progressBar.setVisibility(View.GONE);
                                 // If sign in fails, display a message to the user. If sign in succeeds
                                 // the auth state listener will be notified and logic to handle the
@@ -131,7 +138,11 @@ public class Registration extends AppCompatActivity {
                                     User user = new User(name, email);
 
                                     mDatabase.child(userId).setValue(user);
-
+                                    SharedPreferences.Editor editor = sharedpreferences.edit();
+                                    editor.putString(Name, name);
+                                    editor.putString(Password, password);
+                                    editor.putString(Email, email);
+                                    editor.commit();
                                     startActivity(new Intent(Registration.this, MainActivity.class));
                                     finish();
                                 }

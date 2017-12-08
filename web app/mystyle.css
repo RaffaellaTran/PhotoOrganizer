@@ -1,0 +1,51 @@
+* {
+  box-sizing: border-box;
+}
+
+img {
+ max-width:100%;
+ max-height:100%;
+    padding: 8px;
+    margin: 12px;
+}
+
+td {
+    text-align: left;
+    padding: 8px;
+}
+.jumbotron {background-color:#011fff5c;
+text-align:center;}
+
+h1{font-weight: bold;}
+
+.main {
+  text-align:center;
+  width:100%;
+  padding:0 20px;
+}
+.jumbotron {background-color:#011fff5c;
+text-align:center;
+	}
+form{
+   font-size: 20px;
+   padding: 10px;
+}
+
+ .p:hover { COLOR: blue; TEXT-DECORATION: none; font-weight: none }
+
+.footer {
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   background-color: #e5e5e5;
+   color: black;
+   text-align: center;
+   padding:10px;margin-top:7px;
+}
+
+.error{
+	
+	color: #ff0000;
+	
+}
