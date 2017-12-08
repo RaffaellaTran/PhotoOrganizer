@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 auth.signOut();
                 startActivity(intent);
-
+                finish();
 
                 return true;
             default:

@@ -50,6 +50,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, Registration.class));
+                finish();
             }
         });
 
@@ -82,7 +83,7 @@ public class LoginActivity extends AppCompatActivity {
                                     if (password.length() < 6) {
                                         Toast.makeText(getApplicationContext(), "Password too short, enter minimum 6 characters!", Toast.LENGTH_SHORT).show();
                                          }
-                                    Toast.makeText(getApplicationContext(), "Registration failed!", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "The password/email is incorrect or you are not register!", Toast.LENGTH_SHORT).show();
                                 } else {
                                     Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                     startActivity(intent);

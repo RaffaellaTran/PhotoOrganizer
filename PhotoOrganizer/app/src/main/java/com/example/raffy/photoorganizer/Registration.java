@@ -43,11 +43,13 @@ public class Registration extends AppCompatActivity {
         FirebaseApp.initializeApp(this);
         setContentView(R.layout.sign_up);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+    
         auth = FirebaseAuth.getInstance();
+
         if (auth.getCurrentUser() != null) {
             // User is logged in
             startActivity(new Intent(Registration.this, MainActivity.class));
+            finish();
         } else{
 
         //Get Firebase auth instance
