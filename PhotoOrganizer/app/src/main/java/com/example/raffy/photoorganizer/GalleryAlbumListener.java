@@ -19,7 +19,7 @@ import com.google.firebase.storage.StorageReference;
 /**
  * Created by Anton on 3.12.2017.
  */
-class AlbumListener implements ChildEventListener {
+class GalleryAlbumListener implements ChildEventListener {
 
     interface AlbumEventListener {
         // Listener for custom callbacks
@@ -31,7 +31,7 @@ class AlbumListener implements ChildEventListener {
     Context context;
     SettingsHelper preferences;
 
-    public AlbumListener(AlbumEventListener onNewImage, AlbumEventListener onUriFetched, Context context) {
+    public GalleryAlbumListener(AlbumEventListener onNewImage, AlbumEventListener onUriFetched, Context context) {
         this.context = context;
         this.onNewImage = onNewImage;
         this.onUriFetched = onUriFetched;
@@ -51,7 +51,7 @@ class AlbumListener implements ChildEventListener {
         try {
             ref = storage.getReference(img.bucket_identifier);
         } catch (IllegalArgumentException exception) {
-            Log.d("AlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
+            Log.d("GalleryAlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
             ref = null;
         }
 
@@ -66,7 +66,7 @@ class AlbumListener implements ChildEventListener {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
-                    Log.d("AlbumListener", exception.toString());
+                    Log.d("GalleryAlbumListener", exception.toString());
                     onUriFetched.callback(img);
                 }
             });
