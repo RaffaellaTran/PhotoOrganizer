@@ -66,6 +66,7 @@ public class CameraActivity extends AppCompatActivity {
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
                 new ExamineImageTask(this).execute(imageBitmap);
             }
+          ///  if (resultCode == RESULT_CANCELED) {startActivity(new Intent(CameraActivity.this, MainActivity.class) );}
         }
     }
 
@@ -75,7 +76,7 @@ public class CameraActivity extends AppCompatActivity {
 
 
 
-    private static class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
+    private class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
 
         private WeakReference<Activity> context;
 
@@ -86,8 +87,8 @@ public class CameraActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Bitmap... bitmaps) {
             BarcodeDetector codeDetector = new BarcodeDetector.Builder(context.get())
-                    .setBarcodeFormats(Barcode.QR_CODE)
-                    .build();
+                    .setBarcodeFormats( Barcode.ALL_FORMATS/*Barcode.QR_CODE | Barcode.CODABAR*/ ).build();
+
             for (final Bitmap bitmap : bitmaps) {
                 float ratio = 1200.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
                 final Bitmap scaled = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * ratio), Math.round(bitmap.getHeight() * ratio), false);
@@ -96,19 +97,16 @@ public class CameraActivity extends AppCompatActivity {
                 context.get().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Boolean hasBarcodes = barcodes.size() > 0;
-
-                        if (hasBarcodes) {
-                            Log.d("ciao", "barecode");
+                        Boolean hasBarcodes = barcodes.size() > 0;;
+                        if (hasBarcodes ) {
                             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
-							context.get().finish();
                             new PrivatePhotoActivity(context.get()).
                                     setFileName("private.png").
-                                    setDirectoryName("images").
+                                    setDirectoryName("./images").
                                     save(bitmap);
-                            
 
-                            return;
+                            context.get().finish();
+                            startActivity(new Intent(CameraActivity.this, MainActivity.class) );
                         }
 
                         final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
