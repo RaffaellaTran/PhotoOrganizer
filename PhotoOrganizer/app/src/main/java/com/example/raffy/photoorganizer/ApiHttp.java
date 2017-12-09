@@ -50,9 +50,9 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
             Log.i("ApiHttp: ", message);
             Toast.makeText(context.get(), "Success!!", Toast.LENGTH_LONG).show();
         }
+        if (mAfter != null) mAfter.run();
         progress.dismiss();
         context.get().finish();
-        if (mAfter != null) mAfter.run();
     }
 
     public static abstract class After {

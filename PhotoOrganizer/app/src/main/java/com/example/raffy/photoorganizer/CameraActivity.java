@@ -95,27 +95,6 @@ public class CameraActivity extends AppCompatActivity {
                     public void run() {
                         Boolean hasBarcodes = barcodes.size() > 1;
 
-                        /*FirebaseStorage storage = FirebaseStorage.getInstance();
-                        StorageReference storageReference = storage.getReferenceFromUrl("gs://mcc-fall-2017-g08.appspot.com");
-                        StorageReference imageReference = storageReference.child("testi.jpg");
-
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-                        byte[] data = stream.toByteArray();
-
-                        UploadTask uploadTask = imageReference.putBytes(data);
-                        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Toast.makeText(context.get(), "Success!", Toast.LENGTH_LONG).show();
-                            }
-                        }).addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(context.get(), "Dammit: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        });*/
-
                         if (hasBarcodes) {
                             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
                             return;
@@ -155,16 +134,18 @@ public class CameraActivity extends AppCompatActivity {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     byte[] data = stream.toByteArray();
 
+                    // backend apparently uses this to store locally -> randomize to prevent overrides
+                    String tempFileName = Long.toString(System.currentTimeMillis());
                     String token = task.getResult().getToken();
                     RequestBody body = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("token", token)
                             .addFormDataPart("group_name", groupName)
-                            .addFormDataPart("imagefile","", RequestBody.create(MEDIA_TYPE_JPEG, data))
+                            .addFormDataPart("imagefile", tempFileName, RequestBody.create(MEDIA_TYPE_JPEG, data))
                             .build();
                     Request request = new Request.Builder()
                             .post(body)
-                            .url(SettingsHelper.BACKEND_URL + "/label")  // TODO
+                            .url(SettingsHelper.BACKEND_URL + "/label")
                             .build();
                     new ApiHttp(context.get(), progress).execute(request);
                 }

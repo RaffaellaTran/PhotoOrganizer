@@ -49,6 +49,7 @@ public class JoinActivity extends AppCompatActivity {
     private Camera mCamera;
     private QRCameraPreview mPreview;
     private Timer mTimer;
+    private boolean inAction = false;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,9 +125,9 @@ public class JoinActivity extends AppCompatActivity {
 
     private static class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
 
-        private WeakReference<Activity> context;
+        private WeakReference<JoinActivity> context;
 
-        ExamineImageTask(Activity context) {
+        ExamineImageTask(JoinActivity context) {
             this.context = new WeakReference<>(context);
         }
 
@@ -143,7 +144,8 @@ public class JoinActivity extends AppCompatActivity {
                 context.get().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if (barcodes.size() > 0) {
+                        if (barcodes.size() > 0 && !context.get().inAction) {
+                            context.get().inAction = true;
                             String qr = barcodes.valueAt(0).displayValue;
                             String groupName = qr.split(":")[0];
                             String joinCode = qr.split(":")[1];
@@ -169,20 +171,15 @@ public class JoinActivity extends AppCompatActivity {
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("token", token)
-                        .addFormDataPart("join_token", join_code)
+                        .addFormDataPart("join_token", group_name + ":" + join_code)
                         .addFormDataPart("group_name", group_name)
-                        .addFormDataPart("user", user.getUid())
+                        .addFormDataPart("user", user.getEmail())
                         .build();
                 Request request = new Request.Builder()
                         .url(SettingsHelper.BACKEND_URL + "/join_group")  // TODO
                         .post(body)
                         .build();
-                new ApiHttp(context, progress).addAfter(new ApiHttp.After() {
-                    @Override
-                    public void run() {
-                        context.finish();
-                    }
-                }).execute(request);
+                new ApiHttp(context, progress).execute(request);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
