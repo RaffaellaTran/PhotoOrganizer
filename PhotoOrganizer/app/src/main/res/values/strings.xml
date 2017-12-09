@@ -36,6 +36,20 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="join_group_code">Join group with this QR</string>
+
     <string name="default_notification_channel_id">Default channel</string>
     <string name="default_notification_channel_name">Default channel</string>
+
+    <string name="camera_success">Image uploaded successfully</string>
+    <string name="camera_failure">Image could not be uploaded</string>
+    <string name="camera_failure_group">Could not take picture because user is not in a group</string>
+    <string name="group_create_success">Group created successfully</string>
+    <string name="group_create_failure">Group could not be created</string>
+    <string name="group_leave_success">Group left successfully</string>
+    <string name="group_leave_failure">Group could not be left</string>
+    <string name="group_join_success">Group joined successfully</string>
+    <string name="group_join_failure">Group could not be joined</string>
+    <string name="error_user_null">Could not fetch user.</string>
+    <string name="barcode_wait">Barcode found - please wait</string>
+
 </resources>

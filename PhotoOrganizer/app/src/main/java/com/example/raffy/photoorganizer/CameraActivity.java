@@ -1,6 +1,5 @@
 package com.example.raffy.photoorganizer;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,19 +15,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.lang.ref.WeakReference;
@@ -45,10 +38,12 @@ import okhttp3.RequestBody;
 public class CameraActivity extends AppCompatActivity {
 
     static final private int REQUEST_IMAGE_CAPTURE = 1;
+    private SettingsHelper settings;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settings = new SettingsHelper(getApplicationContext());
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -74,9 +69,9 @@ public class CameraActivity extends AppCompatActivity {
 
     private static class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
 
-        private WeakReference<Activity> context;
+        private WeakReference<CameraActivity> context;
 
-        ExamineImageTask(Activity context) {
+        ExamineImageTask(CameraActivity context) {
             this.context = new WeakReference<>(context);
         }
 
@@ -93,10 +88,11 @@ public class CameraActivity extends AppCompatActivity {
                 context.get().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Boolean hasBarcodes = barcodes.size() > 1;
+                        Boolean hasBarcodes = barcodes.size() > 0;
 
                         if (hasBarcodes) {
-                            Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();    // TODO
+                            context.get().finish();
                             return;
                         }
 
@@ -107,12 +103,28 @@ public class CameraActivity extends AppCompatActivity {
                                 progress.dismiss();
                                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                 if (group != null && user != null) {
-                                    startUploadAction(group.getName(), user, bitmap);
+                                    Float ratio = null;
+                                    switch (context.get().settings.getImageQuality()) {
+                                        case "LOW":
+                                            ratio = 640.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
+                                            break;
+                                        case "HIGH":
+                                            ratio = 1280.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    if (ratio == null) {
+                                        startUploadAction(group.getName(), user, bitmap);
+                                    } else {
+                                        Bitmap bitmap2 = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * ratio), Math.round(bitmap.getHeight() * ratio), false);
+                                        startUploadAction(group.getName(), user, bitmap2);
+                                    }
                                 } else {
                                     if (group == null)
-                                        Toast.makeText(context.get(), "You must be in a group to take photos!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(context.get(), context.get().getString(R.string.camera_failure_group), Toast.LENGTH_LONG).show();
                                     else
-                                        Toast.makeText(context.get(), "User null!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(context.get(), context.get().getString(R.string.error_user_null), Toast.LENGTH_LONG).show();
                                     context.get().finish();
                                 }
                             }
@@ -137,6 +149,7 @@ public class CameraActivity extends AppCompatActivity {
                     // backend apparently uses this to store locally -> randomize to prevent overrides
                     String tempFileName = Long.toString(System.currentTimeMillis());
                     String token = task.getResult().getToken();
+                    if (token == null) token = "";
                     RequestBody body = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("token", token)
@@ -147,7 +160,9 @@ public class CameraActivity extends AppCompatActivity {
                             .post(body)
                             .url(SettingsHelper.BACKEND_URL + "/label")
                             .build();
-                    new ApiHttp(context.get(), progress).execute(request);
+                    String success = context.get().getString(R.string.camera_success);
+                    String failure = context.get().getString(R.string.camera_failure);
+                    new ApiHttp(context.get(), progress, success, failure).execute(request);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override

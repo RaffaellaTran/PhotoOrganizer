@@ -2,7 +2,6 @@ package com.example.raffy.photoorganizer;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -19,22 +18,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Locale;
 
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class CreateGroupActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -88,7 +77,9 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onComplete(@NonNull Task<GetTokenResult> task) {
                 String token = task.getResult().getToken();
+                if (token == null) token = "";
                 String expiration = Group.getDateFormat().format(group.getExpires().getTime());
+                @SuppressWarnings("ConstantConditions")
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("token", token)
@@ -100,7 +91,9 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                         .url(SettingsHelper.BACKEND_URL + "/create_group")
                         .post(body)
                         .build();
-                new ApiHttp(context, progress).execute(request);
+                String success = context.getString(R.string.group_create_success);
+                String failure = context.getString(R.string.group_create_failure);
+                new ApiHttp(context, progress, success, failure).execute(request);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

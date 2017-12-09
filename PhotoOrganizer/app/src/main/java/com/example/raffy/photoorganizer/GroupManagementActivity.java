@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -24,14 +23,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-
 import okhttp3.MultipartBody;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 public class GroupManagementActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -145,6 +139,7 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
             @Override
             public void onComplete(@NonNull Task<GetTokenResult> task) {
                 String token = task.getResult().getToken();
+                if (token == null) token = "";
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("token", token)
@@ -154,7 +149,9 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                         .url(SettingsHelper.BACKEND_URL + "/leave_group")
                         .delete(body)
                         .build();
-                new ApiHttp(context, progress).execute(request);
+                String success = context.getString(R.string.group_leave_success);
+                String failure = context.getString(R.string.group_leave_failure);
+                new ApiHttp(context, progress, success, failure).execute(request);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
