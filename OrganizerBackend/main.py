@@ -46,7 +46,7 @@ def create_group():
     db = firebase.database()
 
     putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': {uid:user} }}
-    response = db.child('groups').set(putdata)
+    response = db.child('groups').update(putdata)
     update_group = db.child('users').update({uid:{'group':group_name}})
     return jsonify(response)
 
@@ -154,18 +154,26 @@ def label():
         #Save files temporarily
         with open(path, 'r+b') as img_file:
             with Image.open(img_file) as img:
-                small = resizeimage.resize_contain(img, IMAGE_SIZE_SMALL)
-                small = small.convert("RGB")
+                if(img.size[0] > IMAGE_SIZE_SMALL):
+                    small = resizeimage.resize_contain(img, IMAGE_SIZE_SMALL)
+                    small = small.convert("RGB")
+                else:
+                    small = img
                 small.save(small_path, img.format)
-                large = resizeimage.resize_contain(img, IMAGE_SIZE_LARGE)
-                large = large.convert("RGB")
+
+                if(img.size[0] > IMAGE_SIZE_LARGE):
+                    large = resizeimage.resize_contain(img, IMAGE_SIZE_LARGE)
+                    large = large.convert("RGB")
+                else:
+                    large = img
                 large.save(large_path, img.format)
 
         #Get storage bucket
         bucket = storage_client.get_bucket(FIREBASE_BUCKET_URL)
         storage_uid = uuid.uuid4().hex + '.' + img.format
         picture_blob = bucket.blob(storage_uid)
-
+        picture_blob.content_type = 'image/' + img.format
+        picture_blob.patch()
         #Upload picture from file to cloud storage
         picture_blob.upload_from_filename(path)
 
@@ -173,10 +181,12 @@ def label():
         large_bucket = storage_client.get_bucket(FIREBASE_BUCKET_LARGE)
         blob_small = small_bucket.blob(storage_uid)
         blob_large = large_bucket.blob(storage_uid)
-
+        blob_small.content_type = 'image/' + img.format
+        blob_small.patch()
         blob_small.upload_from_filename(small_path)
         blob_large.upload_from_filename(large_path)
-
+        blob_large.content_type = 'image/' + img.format
+        blob_large.patch()
 
         os.remove(path)
         os.remove(small_path)
