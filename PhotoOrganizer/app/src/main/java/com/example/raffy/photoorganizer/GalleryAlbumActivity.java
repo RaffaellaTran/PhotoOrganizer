@@ -19,6 +19,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -231,8 +232,9 @@ public class GalleryAlbumActivity extends AppCompatActivity {
                         .resize(imageWidth, imageHeight)
                         .centerCrop()
                         .into(imageView);
-            } catch (IllegalArgumentException exception) {
-                Log.d("Picasso", exception.toString());
+            } catch (Exception exception) {
+                Log.e("Picasso", "Failed to load image: " + exception.toString());
+                Toast.makeText(getApplicationContext(), "Error while loading image! \n" + exception.toString(), Toast.LENGTH_LONG).show();
             }
 
             return imageView;
