@@ -17,10 +17,14 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
 
     private WeakReference<Activity> context;
     private ProgressDialog progress;
+    private String successMessage;
+    private String failureMessage;
 
-    ApiHttp(Activity context, ProgressDialog progress) {
+    ApiHttp(Activity context, ProgressDialog progress, String successMessage, String failureMessage) {
         this.context = new WeakReference<>(context);
         this.progress = progress;
+        this.successMessage = successMessage;
+        this.failureMessage = failureMessage;
     }
 
     @Override
@@ -30,9 +34,11 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
         for (Request request : requests) {
             try {
                 Response response = client.newCall(request).execute();
-                return "Success! " + response.toString();
+                Log.i("ApiHttp: ", response.toString());
+                return successMessage;
             } catch (IOException e) {
-                return "Network error: " + e.getMessage();
+                Log.e("ApiHttp: ", e.getMessage());
+                return failureMessage + ": " + e.getMessage();
             }
         }
         return null;
@@ -42,8 +48,7 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
     protected void onPostExecute(String message) {
         super.onPostExecute(message);
         if (message != null) {
-            Log.i("ApiHttp: ", message);
-            Toast.makeText(context.get(), "Success!!", Toast.LENGTH_LONG).show();
+            Toast.makeText(context.get(), message, Toast.LENGTH_LONG).show();
         }
         progress.dismiss();
         context.get().finish();

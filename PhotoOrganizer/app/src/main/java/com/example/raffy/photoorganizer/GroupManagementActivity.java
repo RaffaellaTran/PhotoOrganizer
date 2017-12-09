@@ -149,7 +149,9 @@ public class GroupManagementActivity extends AppCompatActivity implements View.O
                         .url(SettingsHelper.BACKEND_URL + "/leave_group")
                         .delete(body)
                         .build();
-                new ApiHttp(context, progress).execute(request);
+                String success = context.getString(R.string.group_leave_success);
+                String failure = context.getString(R.string.group_leave_failure);
+                new ApiHttp(context, progress, success, failure).execute(request);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

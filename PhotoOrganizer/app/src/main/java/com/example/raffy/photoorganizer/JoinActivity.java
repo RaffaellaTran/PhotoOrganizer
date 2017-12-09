@@ -148,8 +148,8 @@ public class JoinActivity extends AppCompatActivity {
                             String qr = barcodes.valueAt(0).displayValue;
                             String groupName = qr.split(":")[0];
                             String joinCode = qr.split(":")[1];
+                            Toast.makeText(context.get(), context.get().getString(R.string.barcode_wait), Toast.LENGTH_SHORT).show();
                             startJoinGroupAction(context.get(), groupName, joinCode);
-                            Toast.makeText(context.get(), "Barcode found", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -180,7 +180,9 @@ public class JoinActivity extends AppCompatActivity {
                         .url(SettingsHelper.BACKEND_URL + "/join_group")
                         .post(body)
                         .build();
-                new ApiHttp(context, progress).execute(request);
+                String success = context.getString(R.string.group_join_success);
+                String failure = context.getString(R.string.group_join_failure);
+                new ApiHttp(context, progress, success, failure).execute(request);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
