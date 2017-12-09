@@ -1,6 +1,7 @@
 package com.example.raffy.photoorganizer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -28,7 +29,7 @@ class GalleryAlbumListener implements ChildEventListener {
 
     AlbumEventListener onNewImage;
     AlbumEventListener onUriFetched;
-    Context context;
+    static Context context;
     SettingsHelper preferences;
 
     public GalleryAlbumListener(AlbumEventListener onNewImage, AlbumEventListener onUriFetched, Context context) {
@@ -72,6 +73,9 @@ class GalleryAlbumListener implements ChildEventListener {
             });
         }
     }
+
+
+
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {

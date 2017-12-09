@@ -9,21 +9,17 @@ import java.util.List;
  * Created by Anton on 13.11.2017.
  */
 
-public class GalleryAlbum {
+public class GalleryAlbumPrivate {
     String name;
-    List<GalleryImage> images;
+
     List<Bitmap> privateImages;
 
-    public GalleryAlbum(String name) {
-        this.name = name;
-        images = new ArrayList<>();
-    }
 
-    public void Private(String name){
+    public GalleryAlbumPrivate(String name) {
         this.name = name;
         privateImages = new ArrayList<>();
-
     }
+
 
 
 }

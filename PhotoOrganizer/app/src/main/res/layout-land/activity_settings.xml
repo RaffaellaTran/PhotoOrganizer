@@ -3,14 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:layout_editor_absoluteY="81dp">
 
     <TextView
         android:id="@+id/wifiText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:layout_marginStart="9dp"
         android:text="WiFi"
         app:layout_constraintBottom_toTopOf="@+id/wifiRadioGroup"
@@ -21,8 +20,8 @@
         android:id="@+id/mobileDataText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="38dp"
-        android:layout_marginStart="35dp"
+        android:layout_marginBottom="3dp"
+        android:layout_marginStart="3dp"
         android:text="Mobile data network"
         app:layout_constraintBottom_toTopOf="@+id/mobileRadioGroup"
         app:layout_constraintStart_toStartOf="parent"
@@ -31,10 +30,8 @@
     <TextView
         android:id="@+id/settingsText"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="26dp"
-        android:layout_marginStart="26dp"
-        android:layout_marginTop="17dp"
+        android:layout_height="78dp"
+        android:layout_marginTop="2dp"
         android:text="Specify the image quality when uploading or synchronizing pictures under:"
         app:layout_constraintBottom_toTopOf="@+id/wifiText"
         app:layout_constraintEnd_toEndOf="parent"
@@ -45,7 +42,8 @@
         android:id="@+id/wifiRadioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginStart="35dp"
         android:checkedButton="@+id/wifiRadioBtnHigh"
         android:gravity="center"
         android:orientation="horizontal"
@@ -91,8 +89,8 @@
         android:id="@+id/mobileRadioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="260dp"
-        android:layout_marginStart="32dp"
+        android:layout_marginBottom="2dp"
+        android:layout_marginStart="47dp"
         android:checkedButton="@+id/mobileRadioBtnHigh"
         android:gravity="center"
         android:orientation="horizontal"
@@ -133,16 +131,5 @@
             app:layout_constraintTop_toTopOf="@+id/mobileRadioGroup" />
 
     </RadioGroup>
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:onClick="retrieveChoices"
-        android:text="Apply"
-        app:layout_constraintTop_toBottomOf="@+id/mobileRadioGroup"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="85dp" />
 
 </android.support.constraint.ConstraintLayout>
