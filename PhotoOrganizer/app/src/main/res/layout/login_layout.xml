@@ -28,12 +28,14 @@
         android:textColor="@color/blue"
         android:textStyle="bold" />
 
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/ins_mail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-
-        android:inputType="text" />
+        android:completionThreshold="1"
+        android:hint="@string/email"
+        android:inputType="text"
+        android:imeOptions="actionNext"/>
 
     <TextView
         android:id="@+id/password"
@@ -51,6 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="6"
+        android:hint="@string/password"
         android:inputType="textPassword" />
 
     <Button

@@ -6,8 +6,12 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,26 +26,33 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import android.content.SharedPreferences;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Raffy on 10/11/2017.
  */
 
-public class Registration extends AppCompatActivity {
+public class Registration extends AppCompatActivity implements TextWatcher {
 
-    private EditText inputEmail, inputPassword, inputName;
+    private EditText inputPassword, inputName;
     private Button btnSignUp, btnSignIn;
   //  private ProgressBar progressBar;
     private TextView txtSignIn;
     private FirebaseAuth auth;
 
+    private List<String> myList;
+    private ArrayAdapter<String> myAutoCompleteAdapter;
+    AutoCompleteTextView inputEmail;
+    String item[]={"dd@dd.it"};
+
     String email;
     String password;
     String name;
-    SharedPreferences sharedpreferences;
-    public static final String MyPREFERENCES = "MyPrefs" ;
-    public static final String Name = "nameKey";
-    public static final String Password = "pass";
-    public static final String Email = "emailKey";
+
+    //Create the bundle
+    Bundle bundle = new Bundle();
 
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -65,11 +76,17 @@ public class Registration extends AppCompatActivity {
         txtSignIn = (TextView) findViewById(R.id.name);
         btnSignUp = (Button) findViewById(R.id.register);
         inputName= (EditText) findViewById(R.id.ins_name);
-        inputEmail = (EditText) findViewById(R.id.ins_mail);
+        inputEmail = (AutoCompleteTextView) findViewById(R.id.ins_mail);
         inputPassword = (EditText) findViewById(R.id.ins_pass);
         btnSignIn = (Button) findViewById(R.id.sign_in_button);
-      //  progressBar = (ProgressBar) findViewById(R.id.progressBar);
-            sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+
+            prepareMyList();
+            inputEmail.addTextChangedListener(this);
+            myAutoCompleteAdapter= new ArrayAdapter<String>(
+                    Registration.this, android.R.layout.simple_dropdown_item_1line,
+                    myList
+            );
+            inputEmail.setAdapter(myAutoCompleteAdapter);
 
         txtSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,10 +95,38 @@ public class Registration extends AppCompatActivity {
             }
         });
 
+            // TODO Auto-generated method stub
+
+            String newAdd = inputEmail.getText().toString();
+
+            if(!myList.contains(newAdd)){
+                myList.add(newAdd);
+                bundle.putString("email",newAdd);
+                // I don't know why simple notifyDataSetChanged()
+                // cannot update the autocomplete words
+                //myAutoCompleteAdapter.notifyDataSetChanged();
+
+                //update the autocomplete words
+                myAutoCompleteAdapter = new ArrayAdapter<String>(
+                        Registration.this,
+                        android.R.layout.simple_dropdown_item_1line,
+                        myList);
+
+                inputEmail.setAdapter(myAutoCompleteAdapter);
+            }
+
+            //display the words in myList for your reference
+            String s = "";
+            for(int i = 0; i < myList.size(); i++){
+                s += myList.get(i) + "\n";
+            }
+
             btnSignIn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(Registration.this, LoginActivity.class));
+                    Intent i=new Intent(Registration.this, LoginActivity.class);
+                    i.putExtras(bundle);
+                    startActivity(i);
                     finish();
                 }
             });
@@ -114,8 +159,7 @@ public class Registration extends AppCompatActivity {
                     return;
                 }
 
-               // progressBar.setVisibility(View.VISIBLE);
-                //create user
+
 
                 auth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(Registration.this, new OnCompleteListener<AuthResult>() {
@@ -138,12 +182,9 @@ public class Registration extends AppCompatActivity {
                                     User user = new User(name, email);
 
                                     mDatabase.child(userId).setValue(user);
-                                    SharedPreferences.Editor editor = sharedpreferences.edit();
-                                    editor.putString(Name, name);
-                                    editor.putString(Password, password);
-                                    editor.putString(Email, email);
-                                    editor.commit();
-                                    startActivity(new Intent(Registration.this, MainActivity.class));
+                                   Intent i= new Intent(Registration.this, MainActivity.class);
+                                   i.putExtras(bundle);
+                                    startActivity(i );
                                     finish();
                                 }
                             }
@@ -151,6 +192,31 @@ public class Registration extends AppCompatActivity {
 
             }
         });}
+    }
+    private void prepareMyList(){
+        //prepare your list of words for AutoComplete
+        myList = new ArrayList<String>();
+        for(int i = 0; i < item.length; i++){
+            myList.add(item[i]);
+        }
+    }
+    @Override
+    public void afterTextChanged(Editable arg0) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count,
+                                  int after) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        // TODO Auto-generated method stub
+
     }
 
 }
