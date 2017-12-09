@@ -180,7 +180,9 @@ public class JoinActivity extends AppCompatActivity {
                         .url(SettingsHelper.BACKEND_URL + "/join_group")
                         .post(body)
                         .build();
-                new ApiHttp(context, progress).execute(request);
+                String success = context.getString(R.string.group_join_success);
+                String failure = context.getString(R.string.group_join_failure);
+                new ApiHttp(context, progress, success, failure).execute(request);
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

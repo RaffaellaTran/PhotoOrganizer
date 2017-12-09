@@ -161,7 +161,9 @@ public class CameraActivity extends AppCompatActivity {
                             .post(body)
                             .url(SettingsHelper.BACKEND_URL + "/label")
                             .build();
-                    new ApiHttp(context.get(), progress).execute(request);
+                    String success = context.get().getString(R.string.camera_success);
+                    String failure = context.get().getString(R.string.camera_failure);
+                    new ApiHttp(context.get(), progress, success, failure).execute(request);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
