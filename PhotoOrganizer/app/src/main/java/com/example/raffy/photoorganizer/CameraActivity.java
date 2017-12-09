@@ -39,10 +39,12 @@ import okhttp3.RequestBody;
 public class CameraActivity extends AppCompatActivity {
 
     static final private int REQUEST_IMAGE_CAPTURE = 1;
+    private SettingsHelper settings;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settings = new SettingsHelper(getApplicationContext());
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -87,10 +89,11 @@ public class CameraActivity extends AppCompatActivity {
                 context.get().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Boolean hasBarcodes = barcodes.size() > 1;
+                        Boolean hasBarcodes = barcodes.size() > 0;
 
                         if (hasBarcodes) {
                             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
+                            context.get().finish();
                             return;
                         }
 
