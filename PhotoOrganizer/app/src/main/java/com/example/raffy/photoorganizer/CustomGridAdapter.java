@@ -27,12 +27,12 @@ public class CustomGridAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return null;    // TODO possibly to be implemented
+        return gridValues[position];
     }
 
     @Override
     public long getItemId(int position) {
-        return 0;       // TODO possibly to be implemented
+        return position;
     }
 
     // Number of times getView method call depends upon gridValues.length
