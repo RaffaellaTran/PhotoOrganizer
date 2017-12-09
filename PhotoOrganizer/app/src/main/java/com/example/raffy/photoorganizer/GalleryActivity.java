@@ -111,8 +111,6 @@ public class GalleryActivity extends AppCompatActivity {
         final GalleryAlbum album = new GalleryAlbum(name);
         albums.add(album);
 
-
-
         // Create listener for adding new images to the album
         GalleryAlbumListener.AlbumEventListener onNewImage = new GalleryAlbumListener.AlbumEventListener() {
             @Override
@@ -138,23 +136,6 @@ public class GalleryActivity extends AppCompatActivity {
         infoText.setVisibility(View.GONE);
     }
 
-    void addAlbumPrivate(String name) {
-
-        final GalleryAlbumPrivate album = new GalleryAlbumPrivate(name);
-        albumsPrivate.add(album);
-        // Adds a new album to the grid view
-        Bitmap bitmap = new PrivatePhotoActivity(getApplicationContext()).
-                setFileName("private.png").
-                setDirectoryName("images").
-                load();
-      //  Toast.makeText(getApplicationContext(), "PRIVATE!", Toast.LENGTH_SHORT).show();
-
-        album.privateImages.add(bitmap);
-
-      //  privateAlbum.add(bitmap);
-        // Hide info text
-        infoText.setVisibility(View.GONE);
-    }
 
     AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -208,9 +189,11 @@ public class GalleryActivity extends AppCompatActivity {
             holder.imageView.setImageResource(R.mipmap.ic_launcher);
 
             GalleryAlbum album = getItem(position);
-            if (album.images.size() > 0) {
+            if (album.images.size() > 0 && !album.images.get(position).getBucketIdentifier().contains("private")) {
+                //System.out.println(album.images.get(position).getBucketIdentifier());
                 // Display the first image as thumbnail
                 Uri imageUri = getItem(position).images.get(0).downloadUri;
+
                 try {
                     Picasso.with(mContext).load(imageUri)
                             .placeholder(R.mipmap.ic_launcher)
@@ -222,23 +205,29 @@ public class GalleryActivity extends AppCompatActivity {
                 Log.e("Picasso", "Failed to load image: " + exception.toString());
                 Toast.makeText(getApplicationContext(), "Error while loading image! \n" + exception.toString(), Toast.LENGTH_LONG).show();
                 }
-            }
-            if (album.name.equals("private")){
+
+            }else{
+
 
             File f = new File("/storage/emulated/0/Android/data/com.example.raffy.photoorganizer/files/Pictures/Private");
+
+                Uri u= Uri.fromFile(f);
                 try {
-            Picasso.with(mContext).load(f).placeholder(R.mipmap.ic_launcher)
+            Picasso.with(mContext).load(u).placeholder(R.mipmap.ic_launcher)
                     .error(R.mipmap.ic_launcher)
                     .resize(imageWidth, imageHeight)
                     .centerCrop()
-                    .into(holder.imageView);} catch (IllegalArgumentException exception) {
+                    .into(holder.imageView);
+
+                System.out.println(u);}
+                    catch (IllegalArgumentException exception) {
                     Log.d("Picasso", exception.toString());
                     Toast.makeText(getApplicationContext(), "FUNZIONAAA", Toast.LENGTH_SHORT).show();
 
                 }}
 
             holder.txtTitle.setText(album.name);
-            Toast.makeText(getApplicationContext(), album.name, Toast.LENGTH_SHORT).show();
+
             Integer numImages = album.images.size();
             holder.txtImages.setText(numImages.toString());
             holder.imageView.getLayoutParams().height = imageHeight;
