@@ -22,16 +22,36 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
-        <activity android:name=".GalleryActivity" />
-        <activity android:name=".GalleryAlbumActivity" />
-        <activity android:name=".GalleryImageActivity" />
-        <activity android:name=".CameraActivity" />
-        <activity android:name=".GroupManagementActivity" />
-        <activity android:name=".SettingsActivity" />
-        <activity android:name=".JoinActivity" />
-        <activity android:name=".CreateGroupActivity"/>
-        <activity android:name=".AddMemberActivity" />
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".MainActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".GalleryActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".GalleryAlbumActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".GalleryImageActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".CameraActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".GroupManagementActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".SettingsActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".JoinActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".CreateGroupActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".AddMemberActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>
+        <service android:name=".PushNotifications.MessageService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
+        <service android:name=".PushNotifications.FirebaseIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>
+            </intent-filter>
+        </service>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id"/>
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_push_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
     </application>
 </manifest>

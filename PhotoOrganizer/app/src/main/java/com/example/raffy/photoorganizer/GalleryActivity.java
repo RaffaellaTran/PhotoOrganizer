@@ -217,8 +217,9 @@ public class GalleryActivity extends AppCompatActivity {
                             .resize(imageWidth, imageHeight)
                             .centerCrop()
                             .into(holder.imageView);
-                } catch (IllegalArgumentException exception) {
-                    Log.d("Picasso", exception.toString());
+                } catch (Exception exception) {
+                Log.e("Picasso", "Failed to load image: " + exception.toString());
+                Toast.makeText(getApplicationContext(), "Error while loading image! \n" + exception.toString(), Toast.LENGTH_LONG).show();
                 }
             }
             holder.txtTitle.setText(album.name);

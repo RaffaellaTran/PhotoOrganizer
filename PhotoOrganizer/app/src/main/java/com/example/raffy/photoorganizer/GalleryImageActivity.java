@@ -2,7 +2,9 @@ package com.example.raffy.photoorganizer;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -29,10 +31,18 @@ public class GalleryImageActivity extends AppCompatActivity {
             imagePath = (String) savedInstanceState.getSerializable(INTENT_IMAGE_PATH);
         }
 
-        Picasso.with(getApplicationContext()).load(imagePath)
-                .placeholder(R.drawable.ic_launcher_foreground)
-                .error(R.drawable.ic_launcher_background)
-                .into(imageView);
+        try {
+            Picasso.with(getApplicationContext()).load(imagePath)
+                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .error(R.drawable.ic_launcher_background)
+                    .into(imageView);
+        }
+        catch (Exception exception) {
+            Log.e("Picasso", "Failed to load image: " + exception.toString());
+            Toast.makeText(getApplicationContext(), "Error while loading image! \n" + exception.toString(), Toast.LENGTH_LONG).show();
+        }
+
+
     }
 
     @Override
