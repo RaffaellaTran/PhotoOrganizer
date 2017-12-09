@@ -27,6 +27,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -43,7 +44,7 @@ public class GalleryActivity extends AppCompatActivity {
 
     List<GalleryAlbumPrivate> albumsPrivate = new ArrayList<GalleryAlbumPrivate>();
     List<Bitmap> privateAlbum;
-
+    public static final int PICK_IMAGE = 1337;
     GridView gridView;
     TextView infoText;
     private ProgressDialog progressDialog;
@@ -92,7 +93,7 @@ public class GalleryActivity extends AppCompatActivity {
             if (user != null && user.getGroup() != null && user.getGroup().length() > 0) {
                 addAlbum(user.getGroup());
                 addAlbum("private");
-                addAlbumPrivate("private");
+               // addAlbumPrivate("private");
             }
             // TODO Remove previous group's album
         }
@@ -221,13 +222,29 @@ public class GalleryActivity extends AppCompatActivity {
                     Log.d("Picasso", exception.toString());
                 }
             }
+            if (album.name.equals("private")){
+
+            File f = new File("/storage/emulated/0/Android/data/com.example.raffy.photoorganizer/files/Pictures/Private");
+                try {
+            Picasso.with(mContext).load(f).placeholder(R.mipmap.ic_launcher)
+                    .error(R.mipmap.ic_launcher)
+                    .resize(imageWidth, imageHeight)
+                    .centerCrop()
+                    .into(holder.imageView);} catch (IllegalArgumentException exception) {
+                    Log.d("Picasso", exception.toString());
+                    Toast.makeText(getApplicationContext(), "FUNZIONAAA", Toast.LENGTH_SHORT).show();
+
+                }}
+
             holder.txtTitle.setText(album.name);
+            Toast.makeText(getApplicationContext(), album.name, Toast.LENGTH_SHORT).show();
             Integer numImages = album.images.size();
             holder.txtImages.setText(numImages.toString());
             holder.imageView.getLayoutParams().height = imageHeight;
             holder.imageView.getLayoutParams().width = imageWidth;
             return convertView;
         }
+
 
         private class ViewHolder {
             ImageView imageView;
