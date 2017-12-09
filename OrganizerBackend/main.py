@@ -86,6 +86,7 @@ def join_group():
         update_group = db.child('users').update({uid:{'group':group_name}})
 
         # Send push notification
+        users = db.child('groups').child(group_name).child('users').get().val()
         message = user + " has joined your group!"
         for member_uid in users.keys():
             if (member_uid is not uid):
@@ -231,6 +232,7 @@ def label():
         res = db.child('pictures').child(group).push(picture_json)
 
         # Send push notification to all members except the current user
+        users = db.child('groups').child(group_name).child('users').get().val()
         message = "A new picture was posted to your group!"
         for member_uid in users.keys():
             if (member_uid is not uid):
