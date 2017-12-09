@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     tools:context="com.example.raffy.photoorganizer.GalleryActivity">
 
 
@@ -28,5 +28,6 @@
         android:numColumns="2"
         android:verticalSpacing="10dp"
         tools:layout_editor_absoluteX="10dp"
-        tools:layout_editor_absoluteY="10dp" />
+        tools:layout_editor_absoluteY="10dp"
+        tools:ignore="MissingConstraints" />
 </android.support.constraint.ConstraintLayout>

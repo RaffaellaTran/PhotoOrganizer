@@ -3,9 +3,11 @@ package com.example.raffy.photoorganizer;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
@@ -26,7 +28,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by Anton on 13.11.2017.
@@ -35,6 +40,10 @@ import java.util.List;
 public class GalleryActivity extends AppCompatActivity {
 
     List<GalleryAlbum> albums = new ArrayList<GalleryAlbum>();
+
+    List<GalleryAlbumPrivate> albumsPrivate = new ArrayList<GalleryAlbumPrivate>();
+    List<Bitmap> privateAlbum;
+
     GridView gridView;
     TextView infoText;
     private ProgressDialog progressDialog;
@@ -82,6 +91,8 @@ public class GalleryActivity extends AppCompatActivity {
             User user = dataSnapshot.getValue(User.class);
             if (user != null && user.getGroup() != null && user.getGroup().length() > 0) {
                 addAlbum(user.getGroup());
+                addAlbum("private");
+                addAlbumPrivate("private");
             }
             // TODO Remove previous group's album
         }
@@ -99,11 +110,14 @@ public class GalleryActivity extends AppCompatActivity {
         final GalleryAlbum album = new GalleryAlbum(name);
         albums.add(album);
 
+
+
         // Create listener for adding new images to the album
         GalleryAlbumListener.AlbumEventListener onNewImage = new GalleryAlbumListener.AlbumEventListener() {
             @Override
             public void callback(GalleryImage image) {
                 album.images.add(image);
+
             }
         };
 
@@ -123,13 +137,33 @@ public class GalleryActivity extends AppCompatActivity {
         infoText.setVisibility(View.GONE);
     }
 
+    void addAlbumPrivate(String name) {
+
+        final GalleryAlbumPrivate album = new GalleryAlbumPrivate(name);
+        albumsPrivate.add(album);
+        // Adds a new album to the grid view
+        Bitmap bitmap = new PrivatePhotoActivity(getApplicationContext()).
+                setFileName("private.png").
+                setDirectoryName("images").
+                load();
+      //  Toast.makeText(getApplicationContext(), "PRIVATE!", Toast.LENGTH_SHORT).show();
+
+        album.privateImages.add(bitmap);
+
+      //  privateAlbum.add(bitmap);
+        // Hide info text
+        infoText.setVisibility(View.GONE);
+    }
 
     AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
             // Start the album viewer for selected album
             Intent intent = new Intent(getApplicationContext(), GalleryAlbumActivity.class);
             GalleryAlbum album = (GalleryAlbum) gridView.getItemAtPosition(position);
+
+           // GalleryAlbumPrivate pAlbum= (GalleryAlbumPrivate) gridView.getItemAtPosition(position);
             intent.putExtra("album", album.name);
+           // intent.putExtra("private",pAlbum.name);
             startActivity(intent);
         }
     };
@@ -148,6 +182,9 @@ public class GalleryActivity extends AppCompatActivity {
         public GalleryAlbum getItem(int position) {
             return albums.get(position);
         }
+      //  public GalleryAlbumPrivate getItem(int position) {
+      //      return albums.get(position);
+      //  }
 
         public long getItemId(int position) {
             return 0;
@@ -168,8 +205,6 @@ public class GalleryActivity extends AppCompatActivity {
             }
 
             holder.imageView.setImageResource(R.mipmap.ic_launcher);
-
-
 
             GalleryAlbum album = getItem(position);
             if (album.images.size() > 0) {

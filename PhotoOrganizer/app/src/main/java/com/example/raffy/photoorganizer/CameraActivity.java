@@ -1,6 +1,8 @@
 package com.example.raffy.photoorganizer;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -24,6 +26,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import okhttp3.MediaType;
@@ -60,6 +65,7 @@ public class CameraActivity extends AppCompatActivity {
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
                 new ExamineImageTask(this).execute(imageBitmap);
             }
+          ///  if (resultCode == RESULT_CANCELED) {startActivity(new Intent(CameraActivity.this, MainActivity.class) );}
         }
     }
 
@@ -67,7 +73,9 @@ public class CameraActivity extends AppCompatActivity {
      * Use a static class to prevent leaks.
      */
 
-    private static class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
+
+
+    private class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
 
         private WeakReference<CameraActivity> context;
 
@@ -78,8 +86,8 @@ public class CameraActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Bitmap... bitmaps) {
             BarcodeDetector codeDetector = new BarcodeDetector.Builder(context.get())
-                    .setBarcodeFormats(Barcode.QR_CODE)
-                    .build();
+                    .setBarcodeFormats( Barcode.ALL_FORMATS/*Barcode.QR_CODE | Barcode.CODABAR*/ ).build();
+
             for (final Bitmap bitmap : bitmaps) {
                 float ratio = 1200.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
                 final Bitmap scaled = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * ratio), Math.round(bitmap.getHeight() * ratio), false);
@@ -88,12 +96,17 @@ public class CameraActivity extends AppCompatActivity {
                 context.get().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Boolean hasBarcodes = barcodes.size() > 0;
 
-                        if (hasBarcodes) {
-                            Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();    // TODO
+                        Boolean hasBarcodes = barcodes.size() > 0;;
+                        if (hasBarcodes ) {
+                            Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
+                            new PrivatePhotoActivity(context.get()).
+                                    setFileName("private.png").
+                                    setDirectoryName("./images").
+                                    save(bitmap);
+
                             context.get().finish();
-                            return;
+                            startActivity(new Intent(CameraActivity.this, MainActivity.class) );
                         }
 
                         final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
@@ -134,6 +147,9 @@ public class CameraActivity extends AppCompatActivity {
             }
             return null;
         }
+
+
+
 
         private void startUploadAction(final String groupName, FirebaseUser user, final Bitmap bitmap) {
             final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());

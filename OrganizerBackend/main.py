@@ -89,11 +89,10 @@ def join_group():
         users = db.child('groups').child(group_name).child('users').get().val()
         message = user + " has joined your group!"
         for member_uid in users.keys():
-            if (member_uid is not uid):
+            if member_uid != uid:
                 # Notify all members except the current user
                 result = push_service.notify_topic_subscribers(topic_name=member_uid, message_body=message)
-
-
+                print(result)
 
         return jsonify(response)
 
@@ -237,8 +236,9 @@ def label():
         users = db.child('groups').child(group).child('users').get().val()
         message = "A new picture was posted to your group!"
         for member_uid in users.keys():
-            if (member_uid is not uid):
+            if member_uid != uid:
                 result = push_service.notify_topic_subscribers(topic_name=member_uid, message_body=message)
+                print(result) # For debugging
 
         return jsonify(res)
 
