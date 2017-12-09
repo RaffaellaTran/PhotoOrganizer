@@ -17,16 +17,10 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
 
     private WeakReference<Activity> context;
     private ProgressDialog progress;
-    private After mAfter;
 
     ApiHttp(Activity context, ProgressDialog progress) {
         this.context = new WeakReference<>(context);
         this.progress = progress;
-    }
-
-    public ApiHttp addAfter(After after) {
-        mAfter = after;
-        return this;
     }
 
     @Override
@@ -50,13 +44,8 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
             Log.i("ApiHttp: ", message);
             Toast.makeText(context.get(), "Success!!", Toast.LENGTH_LONG).show();
         }
-        if (mAfter != null) mAfter.run();
         progress.dismiss();
         context.get().finish();
-    }
-
-    public static abstract class After {
-        public abstract void run();
     }
 
     public static ProgressDialog getProgressDialog(Activity context) {
