@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(new NotificationChannel(channelId,
                     channelName, NotificationManager.IMPORTANCE_LOW));
         }
+        // Start listening to push notifications sent to this uid
+        FirebaseMessaging.getInstance().subscribeToTopic(FirebaseAuth.getInstance().getUid());
         
         gridView = (GridView) findViewById(R.id.gridView);
         CustomGridAdapter customGridAdapter = new CustomGridAdapter(getApplicationContext(), data);
