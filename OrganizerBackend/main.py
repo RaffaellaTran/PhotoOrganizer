@@ -284,9 +284,12 @@ def bucket_remove_blobs(id, bucket, small_bucket, large_bucket):
         pass
 
 @app.route('/clean', methods=['GET'])
-def clean_up():
+def clean():
 
-    if not 'X-Appengine-Cron' in request.headers:
+    print request.headers
+    print request.headers['X-Appengine-Cron']
+    if request.headers['X-Appengine-Cron'] != 'true':
+
         return jsonify('Error'), 201
 
     db = firebase.database()
