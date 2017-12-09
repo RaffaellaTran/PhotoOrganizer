@@ -1,5 +1,6 @@
 package com.example.raffy.photoorganizer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
@@ -8,6 +9,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -35,12 +38,15 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         FACES, AUTHORS
     }
 
+    static final String GALLERY_SORTING = "sortGalleryBy";
+
     SortOption sortedBy;
 
     GalleryAlbum mainAlbum; // Redundant?
 
     FirebaseDatabase db;
     FirebaseStorage storage;
+    SettingsHelper settings;
 
 
     Map<String, ImageAdapter> imageAdapterMap;
@@ -64,10 +70,13 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         infoText = findViewById(R.id.info);
         infoText.setText("Nothing to display \nThis album has no images!");
 
-        // TODO: Get sorting style from shared preferences?
-        sortedBy = SortOption.FACES;
-
-        imageAdapterMap = new HashMap<>();
+        // Get sorting style from shared preferences
+        settings = new SettingsHelper(getApplicationContext());
+        String sort = settings.getString(GALLERY_SORTING, "FACES");
+        if (sort.equalsIgnoreCase(SortOption.AUTHORS.toString()))
+            sortedBy = SortOption.AUTHORS;
+        else
+            sortedBy = SortOption.FACES;
 
         // Get a suitable image height and width for filling the screen
         Display display = getWindowManager().getDefaultDisplay();
@@ -88,6 +97,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         }
         mainAlbum = new GalleryAlbum(albumPath);
         title.setText(mainAlbum.name);
+        imageAdapterMap = new HashMap<>();
 
         // Start synchronizing album images from firebase
         db = FirebaseDatabase.getInstance();
@@ -217,6 +227,39 @@ public class GalleryAlbumActivity extends AppCompatActivity {
             }
 
             return imageView;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.gallery_menu, menu);
+        MenuItem sort = menu.findItem(R.id.sort);
+        if (sortedBy == SortOption.AUTHORS)
+            sort.setTitle("Sort by people");
+        else
+            sort.setTitle("Sort by authors");
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.sort:
+                // Switch sorting option
+                if (sortedBy == SortOption.FACES)
+                    sortedBy = SortOption.AUTHORS;
+                else
+                    sortedBy = SortOption.FACES;
+
+                // Save selected option to shared preferences and reload this activity
+                settings.editString(GALLERY_SORTING, sortedBy.toString());
+                recreate();
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 }
