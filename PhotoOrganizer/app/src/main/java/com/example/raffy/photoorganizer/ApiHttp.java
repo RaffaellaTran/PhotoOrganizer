@@ -26,6 +26,7 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
     @Override
     protected String doInBackground(Request... requests) {
         OkHttpClient client = new OkHttpClient();
+        //noinspection LoopStatementThatDoesntLoop
         for (Request request : requests) {
             try {
                 Response response = client.newCall(request).execute();
@@ -48,7 +49,7 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
         context.get().finish();
     }
 
-    public static ProgressDialog getProgressDialog(Activity context) {
+    static ProgressDialog getProgressDialog(Activity context) {
         ProgressDialog progress = new ProgressDialog(context);
         progress.setCancelable(false);
         progress.show();

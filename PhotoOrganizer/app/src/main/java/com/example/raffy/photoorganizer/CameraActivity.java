@@ -18,19 +18,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.FaceDetector;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -50,10 +44,12 @@ import okhttp3.RequestBody;
 public class CameraActivity extends AppCompatActivity {
 
     static final private int REQUEST_IMAGE_CAPTURE = 1;
+    private SettingsHelper settings;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        settings = new SettingsHelper(getApplicationContext());
 
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -105,10 +101,13 @@ public class CameraActivity extends AppCompatActivity {
                         if (hasBarcodes) {
                             Log.d("ciao", "barecode");
                             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
+							context.get().finish();
                             new PrivatePhotoActivity(context.get()).
                                     setFileName("private.png").
                                     setDirectoryName("images").
                                     save(bitmap);
+                            
+
                             return;
                         }
 
@@ -152,6 +151,7 @@ public class CameraActivity extends AppCompatActivity {
                     // backend apparently uses this to store locally -> randomize to prevent overrides
                     String tempFileName = Long.toString(System.currentTimeMillis());
                     String token = task.getResult().getToken();
+                    if (token == null) token = "";
                     RequestBody body = new MultipartBody.Builder()
                             .setType(MultipartBody.FORM)
                             .addFormDataPart("token", token)

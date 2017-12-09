@@ -1,7 +1,6 @@
 package com.example.raffy.photoorganizer;
 
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,7 +26,7 @@ public class Group {
     private HashMap<String, String> users;
     private String joinCode;
 
-    public Group(String name, Calendar expires, String owner, HashMap<String, String> users) {
+    Group(String name, Calendar expires, String owner, HashMap<String, String> users) {
         this.name = name;
         this.expires = expires;
         this.owner = owner;
@@ -38,20 +37,20 @@ public class Group {
         return this.name;
     }
 
-    public Calendar getExpires() {
+    Calendar getExpires() {
         return this.expires;
     }
 
-    public String getOwner() {
+    String getOwner() {
         return this.owner;
     }
 
-    public HashMap<String, String> getUsers() {
+    HashMap<String, String> getUsers() {
         return this.users;
     }
 
     @Nullable
-    public String getJoinCode() {
+    String getJoinCode() {
         return this.joinCode;
     }
 
@@ -85,6 +84,7 @@ public class Group {
                 String groupName = dataSnapshot.getValue().toString();
                 DatabaseReference groupRef = databaseRef.child("groups").child(groupName);
                 groupRef.addValueEventListener(new ValueEventListener() {
+                    @SuppressWarnings("ConstantConditions")
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         try {

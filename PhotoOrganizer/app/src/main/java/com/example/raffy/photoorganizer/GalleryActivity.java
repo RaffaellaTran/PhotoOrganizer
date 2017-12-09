@@ -1,5 +1,6 @@
 package com.example.raffy.photoorganizer;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
@@ -36,6 +37,7 @@ public class GalleryActivity extends AppCompatActivity {
     List<GalleryAlbum> albums = new ArrayList<GalleryAlbum>();
     GridView gridView;
     TextView infoText;
+    private ProgressDialog progressDialog;
 
     int imageWidth;
     int imageHeight;
@@ -66,6 +68,7 @@ public class GalleryActivity extends AppCompatActivity {
         infoText.setText("Nothing to display \nYou don't belong to any groups!");
 
         // Get all FireBase related variables
+        progressDialog = ApiHttp.getProgressDialog(this);
         db = FirebaseDatabase.getInstance();
         db.getReference("users/" + FirebaseAuth.getInstance().getUid()).addValueEventListener(groupListener);
     }
@@ -73,6 +76,7 @@ public class GalleryActivity extends AppCompatActivity {
     ValueEventListener groupListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            if (progressDialog.isShowing()) progressDialog.dismiss();
             // Add a new album for this group if current user is in the group
             User user = dataSnapshot.getValue(User.class);
             if (user != null && user.getGroup() != null && user.getGroup().length() > 0) {
@@ -83,6 +87,7 @@ public class GalleryActivity extends AppCompatActivity {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
+            if (progressDialog.isShowing()) progressDialog.dismiss();
             Log.d("GalleryGroupListener", databaseError.toString());
             Toast.makeText(getApplicationContext(), "Firebase error occurred!", Toast.LENGTH_SHORT).show();
         }
