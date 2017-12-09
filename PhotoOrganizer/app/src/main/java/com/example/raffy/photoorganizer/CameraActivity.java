@@ -1,6 +1,5 @@
 package com.example.raffy.photoorganizer;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -92,7 +91,7 @@ public class CameraActivity extends AppCompatActivity {
                         Boolean hasBarcodes = barcodes.size() > 0;
 
                         if (hasBarcodes) {
-                            Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
+                            Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();    // TODO
                             context.get().finish();
                             return;
                         }
@@ -123,9 +122,9 @@ public class CameraActivity extends AppCompatActivity {
                                     }
                                 } else {
                                     if (group == null)
-                                        Toast.makeText(context.get(), "You must be in a group to take photos!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(context.get(), context.get().getString(R.string.camera_failure_group), Toast.LENGTH_LONG).show();
                                     else
-                                        Toast.makeText(context.get(), "User null!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(context.get(), context.get().getString(R.string.error_user_null), Toast.LENGTH_LONG).show();
                                     context.get().finish();
                                 }
                             }

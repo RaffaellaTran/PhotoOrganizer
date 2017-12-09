@@ -49,6 +49,7 @@ public class GalleryActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+        setTitle(getString(R.string.gallery));
 
         // Get a suitable image height and width for filling the screen
         Display display = getWindowManager().getDefaultDisplay();
