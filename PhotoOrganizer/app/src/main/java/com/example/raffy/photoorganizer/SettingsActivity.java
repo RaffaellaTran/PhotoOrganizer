@@ -30,6 +30,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+        setTitle(R.string.settings);
 
         this.wifiRadioBtn.low = (RadioButton) findViewById(R.id.wifiRadioBtnLow);
         this.wifiRadioBtn.high = (RadioButton) findViewById(R.id.wifiRadioBtnHigh);

@@ -25,7 +25,6 @@ app = Flask(__name__)
 cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
 firebase_admin.initialize_app(cred)
 firebase = pyrebase.initialize_app(PYREBASE_CONFIG)
-
 @app.route('/create_group', methods=['POST'])
 def create_group():
 
@@ -46,7 +45,7 @@ def create_group():
     db = firebase.database()
 
     putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': {uid:user} }}
-    response = db.child('groups').set(putdata)
+    response = db.child('groups').update(putdata)
     update_group = db.child('users').update({uid:{'group':group_name}})
     return jsonify(response)
 
@@ -104,9 +103,11 @@ def leave_group():
     get = db.child('groups').child(group_name).child('owner').get().val()
 
     if get == uid:
-        response = db.child('groups').child(group_name).remove()
+        response = clean_group_and_data(db, group_name)
+        #response = db.child('groups').child(group_name).remove()
     else:
         response = db.child('groups').child(group_name).child('users').child(uid).remove()
+
     update_group = db.child('users').child(uid).remove()
     return jsonify(response)
 
@@ -154,29 +155,42 @@ def label():
         #Save files temporarily
         with open(path, 'r+b') as img_file:
             with Image.open(img_file) as img:
-                small = resizeimage.resize_contain(img, IMAGE_SIZE_SMALL)
-                small = small.convert("RGB")
+                if(img.size[0] > IMAGE_SIZE_SMALL):
+                    small = resizeimage.resize_contain(img, IMAGE_SIZE_SMALL)
+                    small = small.convert("RGB")
+                else:
+                    small = img
                 small.save(small_path, img.format)
-                large = resizeimage.resize_contain(img, IMAGE_SIZE_LARGE)
-                large = large.convert("RGB")
+
+                if(img.size[0] > IMAGE_SIZE_LARGE):
+                    large = resizeimage.resize_contain(img, IMAGE_SIZE_LARGE)
+                    large = large.convert("RGB")
+                else:
+                    large = img
                 large.save(large_path, img.format)
 
         #Get storage bucket
         bucket = storage_client.get_bucket(FIREBASE_BUCKET_URL)
         storage_uid = uuid.uuid4().hex + '.' + img.format
         picture_blob = bucket.blob(storage_uid)
+        picture_blob.content_type = 'image/' + img.format
 
         #Upload picture from file to cloud storage
         picture_blob.upload_from_filename(path)
+        picture_blob.patch()
 
         small_bucket = storage_client.get_bucket(FIREBASE_BUCKET_SMALL)
         large_bucket = storage_client.get_bucket(FIREBASE_BUCKET_LARGE)
         blob_small = small_bucket.blob(storage_uid)
         blob_large = large_bucket.blob(storage_uid)
 
+        blob_small.content_type = 'image/' + img.format
         blob_small.upload_from_filename(small_path)
-        blob_large.upload_from_filename(large_path)
+        blob_small.patch()
 
+        blob_large.upload_from_filename(large_path)
+        blob_large.content_type = 'image/' + img.format
+        blob_large.patch()
 
         os.remove(path)
         os.remove(small_path)
@@ -203,3 +217,66 @@ def label():
 
     except Exception as err:
         return jsonify(str(err)), 400
+
+def clean_group_and_data(db, grp_name):
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(FIREBASE_BUCKET_URL)
+    small_bucket = storage_client.get_bucket(FIREBASE_BUCKET_SMALL)
+    large_bucket = storage_client.get_bucket(FIREBASE_BUCKET_LARGE)
+
+    pics = db.child('pictures').child(grp_name).get()
+    if pics.each() is not None:
+        for pic in pics.each():
+            id = pic.val()['bucket_identifier']
+            bucket_remove_blobs(id, bucket, small_bucket, large_bucket)
+
+    users = db.child('groups').child(grp_name).child('users').get()
+
+    if users.each() is not None:
+        for usr in users.each():
+            db.child('users').child(usr.key()).remove()
+
+    db.child('pictures').child(grp_name).remove()
+    return db.child('groups').child(grp_name).remove()
+
+
+def bucket_remove_blobs(id, bucket, small_bucket, large_bucket):
+
+
+    try:
+        blb = bucket.blob(id)
+        if blb != None:
+            blb.delete()
+
+        blb = small_bucket.blob(id)
+        if blb != None:
+            blb.delete()
+
+        blb = large_bucket.blob(id)
+        if blb != None:
+            blb.delete()
+    except Exception:
+        pass
+
+@app.route('/clean', methods=['GET'])
+def clean_up():
+    data = request.args
+    if data['id'] != "08f682d78f50623733df0d9bb8a9aead4a3b309b" :
+        return jsonify('Error'), 201
+
+    db = firebase.database()
+    groups = db.child('groups').get()
+
+    if groups is None:
+        return jsonify('No groups'), 201
+
+    for group in groups.each():
+
+        grp_name = group.key()
+        grp = group.val()
+        exp_time = datetime.strptime(grp['expiration_time'], '%Y-%m-%d %H:%M:%S')
+        t = datetime.now()
+        g = t - exp_time
+        if(datetime.now() > exp_time):
+            clean_group_and_data(db, grp_name)
+    return jsonify('Cleanup done'), 200

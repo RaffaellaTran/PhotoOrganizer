@@ -1,6 +1,5 @@
 package com.example.raffy.photoorganizer;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -78,9 +77,9 @@ public class CameraActivity extends AppCompatActivity {
 
     private class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
 
-        private WeakReference<Activity> context;
+        private WeakReference<CameraActivity> context;
 
-        ExamineImageTask(Activity context) {
+        ExamineImageTask(CameraActivity context) {
             this.context = new WeakReference<>(context);
         }
 
@@ -97,6 +96,7 @@ public class CameraActivity extends AppCompatActivity {
                 context.get().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+
                         Boolean hasBarcodes = barcodes.size() > 0;;
                         if (hasBarcodes ) {
                             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
@@ -116,12 +116,28 @@ public class CameraActivity extends AppCompatActivity {
                                 progress.dismiss();
                                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                 if (group != null && user != null) {
-                                    startUploadAction(group.getName(), user, bitmap);
+                                    Float ratio = null;
+                                    switch (context.get().settings.getImageQuality()) {
+                                        case "LOW":
+                                            ratio = 640.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
+                                            break;
+                                        case "HIGH":
+                                            ratio = 1280.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    if (ratio == null) {
+                                        startUploadAction(group.getName(), user, bitmap);
+                                    } else {
+                                        Bitmap bitmap2 = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * ratio), Math.round(bitmap.getHeight() * ratio), false);
+                                        startUploadAction(group.getName(), user, bitmap2);
+                                    }
                                 } else {
                                     if (group == null)
-                                        Toast.makeText(context.get(), "You must be in a group to take photos!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(context.get(), context.get().getString(R.string.camera_failure_group), Toast.LENGTH_LONG).show();
                                     else
-                                        Toast.makeText(context.get(), "User null!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(context.get(), context.get().getString(R.string.error_user_null), Toast.LENGTH_LONG).show();
                                     context.get().finish();
                                 }
                             }
@@ -160,7 +176,9 @@ public class CameraActivity extends AppCompatActivity {
                             .post(body)
                             .url(SettingsHelper.BACKEND_URL + "/label")
                             .build();
-                    new ApiHttp(context.get(), progress).execute(request);
+                    String success = context.get().getString(R.string.camera_success);
+                    String failure = context.get().getString(R.string.camera_failure);
+                    new ApiHttp(context.get(), progress, success, failure).execute(request);
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
