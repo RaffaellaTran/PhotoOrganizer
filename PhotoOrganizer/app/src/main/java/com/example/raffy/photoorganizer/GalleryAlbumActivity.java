@@ -45,6 +45,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
 
     GalleryAlbum mainAlbum; // Redundant?
     String albumPath;
+    Boolean isPrivateAlbum;
 
     FirebaseDatabase db;
     FirebaseStorage storage;
@@ -67,6 +68,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_gallery_album);
         layout = findViewById(R.id.linearLayout);
         title = findViewById(R.id.albumName);
+        imageAdapterMap = new HashMap<>();
 
         // Set info text
         infoText = findViewById(R.id.info);
@@ -92,27 +94,36 @@ public class GalleryAlbumActivity extends AppCompatActivity {
             Bundle extras = getIntent().getExtras();
             if(extras != null) {
                 albumPath = extras.getString("album", "");
+                isPrivateAlbum = extras.getBoolean("private_album", false);
             }
         } else {
             albumPath = (String) savedInstanceState.getSerializable("album");
+            isPrivateAlbum = savedInstanceState.getBoolean("private_album");
         }
-        mainAlbum = new GalleryAlbum(albumPath);
-        title.setText(mainAlbum.name);
-        imageAdapterMap = new HashMap<>();
+        if (isPrivateAlbum) {
+            mainAlbum = GalleryAlbum.createPrivateAlbum(getApplicationContext(), "Private");
+            addGridViewForAlbum(mainAlbum);
+        } else {
+            mainAlbum = new GalleryAlbum(albumPath);
+            title.setText(mainAlbum.name);
 
-        // Start synchronizing album images from firebase
-        db = FirebaseDatabase.getInstance();
-        storage = FirebaseStorage.getInstance();
 
-        DatabaseReference picturesRef = db.getReference("pictures/" + albumPath);
-        GalleryAlbumListener albumListener = new GalleryAlbumListener(onNewImage, onImageUri, getApplicationContext());
-        picturesRef.addChildEventListener(albumListener);
+            // Start synchronizing album images from firebase
+            db = FirebaseDatabase.getInstance();
+            storage = FirebaseStorage.getInstance();
+
+            DatabaseReference picturesRef = db.getReference("pictures/" + albumPath);
+            GalleryAlbumListener albumListener = new GalleryAlbumListener(onNewImage, onImageUri, getApplicationContext());
+            picturesRef.addChildEventListener(albumListener);
+        }
+
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         // Save album path when this activity is restarted
         outState.putString("album", albumPath);
+        outState.putBoolean("private_album", isPrivateAlbum);
 
         // call superclass to save any view hierarchy
         super.onSaveInstanceState(outState);

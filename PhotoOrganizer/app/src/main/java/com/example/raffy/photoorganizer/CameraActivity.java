@@ -81,7 +81,7 @@ public class CameraActivity extends AppCompatActivity {
      */
     int i=0;
 
-  public   File myDir = new File("/storage/emulated/0/Android/data/com.example.raffy.photoorganizer/files/Pictures/Private");
+  //public   File myDir = new File("/storage/emulated/0/Android/data/com.example.raffy.photoorganizer/files/Pictures/Private");
 
 
 
@@ -107,10 +107,11 @@ public class CameraActivity extends AppCompatActivity {
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void run() {
+                        File myDir = SettingsHelper.getPrivateImageFolder(getApplicationContext());
                         if (!myDir.exists()) {
                             myDir.mkdirs();
                         }
-                        Boolean hasBarcodes = barcodes.size() > 0;;
+                        Boolean hasBarcodes = barcodes.size() > 0;
                         if (hasBarcodes ) {
                             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
                             i = ThreadLocalRandom.current().nextInt(0, 40 + 1);
@@ -140,40 +141,42 @@ public class CameraActivity extends AppCompatActivity {
                             context.get().finish();
                             startActivity(new Intent(CameraActivity.this, MainActivity.class) );
                         }
-
-                        final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
-                        Group.getMyGroup(new Group.GetMyGroupResult() {
-                            @Override
-                            public void react(@Nullable Group group) {
-                                progress.dismiss();
-                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                if (group != null && user != null) {
-                                    Float ratio = null;
-                                    switch (context.get().settings.getImageQuality()) {
-                                        case "LOW":
-                                            ratio = 640.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
-                                            break;
-                                        case "HIGH":
-                                            ratio = 1280.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
-                                            break;
-                                        default:
-                                            break;
-                                    }
-                                    if (ratio == null) {
-                                        startUploadAction(group.getName(), user, bitmap);
+                        else {
+                            final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
+                            Group.getMyGroup(new Group.GetMyGroupResult() {
+                                @Override
+                                public void react(@Nullable Group group) {
+                                    progress.dismiss();
+                                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                    if (group != null && user != null) {
+                                        Float ratio = null;
+                                        switch (context.get().settings.getImageQuality()) {
+                                            case "LOW":
+                                                ratio = 640.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
+                                                break;
+                                            case "HIGH":
+                                                ratio = 1280.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        if (ratio == null) {
+                                            startUploadAction(group.getName(), user, bitmap);
+                                        } else {
+                                            Bitmap bitmap2 = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * ratio), Math.round(bitmap.getHeight() * ratio), false);
+                                            startUploadAction(group.getName(), user, bitmap2);
+                                        }
                                     } else {
-                                        Bitmap bitmap2 = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * ratio), Math.round(bitmap.getHeight() * ratio), false);
-                                        startUploadAction(group.getName(), user, bitmap2);
+                                        if (group == null)
+                                            Toast.makeText(context.get(), context.get().getString(R.string.camera_failure_group), Toast.LENGTH_LONG).show();
+                                        else
+                                            Toast.makeText(context.get(), context.get().getString(R.string.error_user_null), Toast.LENGTH_LONG).show();
+                                        context.get().finish();
                                     }
-                                } else {
-                                    if (group == null)
-                                        Toast.makeText(context.get(), context.get().getString(R.string.camera_failure_group), Toast.LENGTH_LONG).show();
-                                    else
-                                        Toast.makeText(context.get(), context.get().getString(R.string.error_user_null), Toast.LENGTH_LONG).show();
-                                    context.get().finish();
                                 }
-                            }
-                        });
+                            });
+                        }
+
                     }
                 });
             }

@@ -7,6 +7,8 @@ import android.net.NetworkInfo;
 
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.io.File;
+
 import static com.example.raffy.photoorganizer.SettingsHelper.ImageQuality.*;
 
 /**
@@ -26,6 +28,13 @@ public class SettingsHelper {
     public static final String PREFERENCES = "preferences";
     SharedPreferences sharedpreferences;
     Context context;
+
+    // File storage
+    static File getPrivateImageFolder(Context context) {
+        String path = context.getFilesDir() + "/private/";
+        File folder = new File(path);
+        return folder;
+    }
 
     public enum ImageQuality {
         LOW, HIGH, FULL
