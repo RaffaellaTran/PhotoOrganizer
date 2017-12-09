@@ -25,7 +25,6 @@ app = Flask(__name__)
 cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
 firebase_admin.initialize_app(cred)
 firebase = pyrebase.initialize_app(PYREBASE_CONFIG)
-
 @app.route('/create_group', methods=['POST'])
 def create_group():
 
@@ -173,17 +172,20 @@ def label():
         storage_uid = uuid.uuid4().hex + '.' + img.format
         picture_blob = bucket.blob(storage_uid)
         picture_blob.content_type = 'image/' + img.format
-        picture_blob.patch()
+
         #Upload picture from file to cloud storage
         picture_blob.upload_from_filename(path)
+        picture_blob.patch()
 
         small_bucket = storage_client.get_bucket(FIREBASE_BUCKET_SMALL)
         large_bucket = storage_client.get_bucket(FIREBASE_BUCKET_LARGE)
         blob_small = small_bucket.blob(storage_uid)
         blob_large = large_bucket.blob(storage_uid)
+
         blob_small.content_type = 'image/' + img.format
-        blob_small.patch()
         blob_small.upload_from_filename(small_path)
+        blob_small.patch()
+
         blob_large.upload_from_filename(large_path)
         blob_large.content_type = 'image/' + img.format
         blob_large.patch()
