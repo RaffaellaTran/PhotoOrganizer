@@ -2,6 +2,8 @@ package com.example.raffy.photoorganizer;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -31,6 +33,9 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import okhttp3.MediaType;
@@ -72,6 +77,8 @@ public class CameraActivity extends AppCompatActivity {
      * Use a static class to prevent leaks.
      */
 
+
+
     private static class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
 
         private WeakReference<Activity> context;
@@ -93,10 +100,15 @@ public class CameraActivity extends AppCompatActivity {
                 context.get().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Boolean hasBarcodes = barcodes.size() > 1;
+                        Boolean hasBarcodes = barcodes.size() > 0;
 
                         if (hasBarcodes) {
+                            Log.d("ciao", "barecode");
                             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
+                            new PrivatePhotoActivity(context.get()).
+                                    setFileName("private.png").
+                                    setDirectoryName("images").
+                                    save(bitmap);
                             return;
                         }
 
@@ -122,6 +134,9 @@ public class CameraActivity extends AppCompatActivity {
             }
             return null;
         }
+
+
+
 
         private void startUploadAction(final String groupName, FirebaseUser user, final Bitmap bitmap) {
             final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
