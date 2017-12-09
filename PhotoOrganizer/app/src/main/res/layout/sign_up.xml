@@ -97,14 +97,5 @@
         android:textColor="#001FFF"
         android:textSize="15dp" />
 
-   <!-- <TextView
-        android:id="@+id/login_reg"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:gravity="bottom|center"
-        android:text="@string/already"
-        android:textColor="@color/blue"
-        android:textStyle="bold" />-->
 
 </LinearLayout>

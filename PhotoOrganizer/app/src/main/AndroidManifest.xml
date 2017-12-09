@@ -4,8 +4,10 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"></uses-permission>
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />   <!-- Internet permission -->
 
     <application
         android:allowBackup="true"
@@ -14,23 +16,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Registration" android:screenOrientation="portrait">
+        <activity android:name=".Registration">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".GalleryActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".GalleryAlbumActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".GalleryImageActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".CameraActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".GroupManagementActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".SettingsActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".JoinActivity" android:screenOrientation="landscape"/>
-        <activity android:name=".CreateGroupActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".AddMemberActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".GalleryActivity" />
+        <activity android:name=".GalleryAlbumActivity" />
+        <activity android:name=".GalleryImageActivity" />
+        <activity android:name=".CameraActivity" />
+        <activity android:name=".GroupManagementActivity" />
+        <activity android:name=".SettingsActivity" />
+        <activity android:name=".JoinActivity" />
+        <activity android:name=".CreateGroupActivity"/>
+        <activity android:name=".AddMemberActivity" />
+        <activity android:name=".LoginActivity" />
     </application>
 </manifest>
