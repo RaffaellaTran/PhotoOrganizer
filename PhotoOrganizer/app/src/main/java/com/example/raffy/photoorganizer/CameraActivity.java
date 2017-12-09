@@ -5,11 +5,15 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.MediaScannerConnection;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
@@ -30,6 +34,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.ThreadLocalRandom;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -44,6 +49,8 @@ public class CameraActivity extends AppCompatActivity {
 
     static final private int REQUEST_IMAGE_CAPTURE = 1;
     private SettingsHelper settings;
+    public String photopath;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +79,9 @@ public class CameraActivity extends AppCompatActivity {
     /**
      * Use a static class to prevent leaks.
      */
+    int i=0;
+
+  public   File myDir = new File("/storage/emulated/0/Android/data/com.example.raffy.photoorganizer/files/Pictures/Private");
 
 
 
@@ -94,16 +104,38 @@ public class CameraActivity extends AppCompatActivity {
                 Frame frame = new Frame.Builder().setBitmap(scaled).build();
                 final SparseArray<Barcode> barcodes = codeDetector.detect(frame);
                 context.get().runOnUiThread(new Runnable() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void run() {
-
+                        if (!myDir.exists()) {
+                            myDir.mkdirs();
+                        }
                         Boolean hasBarcodes = barcodes.size() > 0;;
                         if (hasBarcodes ) {
                             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
-                            new PrivatePhotoActivity(context.get()).
-                                    setFileName("private.png").
-                                    setDirectoryName("./images").
-                                    save(bitmap);
+                            i = ThreadLocalRandom.current().nextInt(0, 40 + 1);
+                            String filename= "private"+i+".jpg";
+                            File file = new File(myDir, filename);
+
+                            try {
+                                MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{"Image/*"}, null);
+                                System.out.println(file);
+
+                                //FileOutputStream out = new FileOutputStream(file);
+                                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+
+
+                                file.createNewFile();
+                                FileOutputStream fo = new FileOutputStream(file);
+                                fo.write(out.toByteArray());
+                                fo.close();
+
+                                out.flush();
+                                out.close();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
 
                             context.get().finish();
                             startActivity(new Intent(CameraActivity.this, MainActivity.class) );

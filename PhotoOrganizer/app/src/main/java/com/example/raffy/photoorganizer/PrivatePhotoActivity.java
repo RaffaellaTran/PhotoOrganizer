@@ -22,6 +22,7 @@ import java.io.IOException;
 public class PrivatePhotoActivity  {
 
     private String directoryName = "images";
+    private File path;
     private String fileName = "image.png";
     private Context context;
     private boolean external;
@@ -32,6 +33,10 @@ public class PrivatePhotoActivity  {
 
     public PrivatePhotoActivity setFileName(String fileName) {
         this.fileName = fileName;
+        return this;
+    }
+    public PrivatePhotoActivity setFilePath (File path){
+        this.path= path;
         return this;
     }
 
