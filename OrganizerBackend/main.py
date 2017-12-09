@@ -121,9 +121,11 @@ def leave_group():
     get = db.child('groups').child(group_name).child('owner').get().val()
 
     if get == uid:
-        response = db.child('groups').child(group_name).remove()
+        response = clean_group_and_data(db, group_name)
+        #response = db.child('groups').child(group_name).remove()
     else:
         response = db.child('groups').child(group_name).child('users').child(uid).remove()
+
     update_group = db.child('users').child(uid).remove()
 
 
@@ -242,3 +244,66 @@ def label():
 
     except Exception as err:
         return jsonify(str(err)), 400
+
+def clean_group_and_data(db, grp_name):
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket(FIREBASE_BUCKET_URL)
+    small_bucket = storage_client.get_bucket(FIREBASE_BUCKET_SMALL)
+    large_bucket = storage_client.get_bucket(FIREBASE_BUCKET_LARGE)
+
+    pics = db.child('pictures').child(grp_name).get()
+    if pics.each() is not None:
+        for pic in pics.each():
+            id = pic.val()['bucket_identifier']
+            bucket_remove_blobs(id, bucket, small_bucket, large_bucket)
+
+    users = db.child('groups').child(grp_name).child('users').get()
+
+    if users.each() is not None:
+        for usr in users.each():
+            db.child('users').child(usr.key()).remove()
+
+    db.child('pictures').child(grp_name).remove()
+    return db.child('groups').child(grp_name).remove()
+
+
+def bucket_remove_blobs(id, bucket, small_bucket, large_bucket):
+
+
+    try:
+        blb = bucket.blob(id)
+        if blb != None:
+            blb.delete()
+
+        blb = small_bucket.blob(id)
+        if blb != None:
+            blb.delete()
+
+        blb = large_bucket.blob(id)
+        if blb != None:
+            blb.delete()
+    except Exception:
+        pass
+
+@app.route('/clean', methods=['GET'])
+def clean_up():
+    data = request.args
+    if data['id'] != "08f682d78f50623733df0d9bb8a9aead4a3b309b" :
+        return jsonify('Error'), 201
+
+    db = firebase.database()
+    groups = db.child('groups').get()
+
+    if groups is None:
+        return jsonify('No groups'), 201
+
+    for group in groups.each():
+
+        grp_name = group.key()
+        grp = group.val()
+        exp_time = datetime.strptime(grp['expiration_time'], '%Y-%m-%d %H:%M:%S')
+        t = datetime.now()
+        g = t - exp_time
+        if(datetime.now() > exp_time):
+            clean_group_and_data(db, grp_name)
+    return jsonify('Cleanup done'), 200
