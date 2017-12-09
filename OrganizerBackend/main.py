@@ -4,6 +4,7 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 
 import pyrebase
+import json
 
 from google.cloud import datastore, storage, vision
 from google.cloud.vision import types
@@ -42,17 +43,11 @@ def create_group():
     expiration_time = data['expiration_time']
     user = data['user']
 
-    users = {uid: user}
-    putdata = {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': users }
-
-    response = fb.put('/groups', group_name, putdata)
-
-    fb.put('/users/', uid, {'group': group_name})
-
     db = firebase.database()
 
-    putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': [{uid:user}] }}
+    putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': {uid:user} }}
     response = db.child('groups').set(putdata)
+    update_group = db.child('users').update({uid:{'group':group_name}})
     return jsonify(response)
 
 
@@ -69,19 +64,20 @@ def join_group():
     except ValueError:
         return jsonify("Authorization token has expired or was not included"), 401
 
+
     join_token = data['join_token']
     group_name = data['group_name']
     user = data['user']
 
-
     db = firebase.database()
 
-    group = db.child('groups').child(group_name).child('/join_token').get().val()
+    group = db.child('groups').child(group_name).child('join_token').get().val()
 
     if group == join_token:
-        response = fb.put('/groups/' + group_name + '/users/', uid, user)
-        set_new = fb.put('/groups/' + group_name, 'join_token', uuid.uuid4().hex)
-        fb.put('/users/' + uid, 'group', group_name)
+
+        response = db.child('groups').child(group_name).child('users').update({uid:user})
+        set_new = db.child('groups').child(group_name).child('join_token').set(group_name + ':' + uuid.uuid4().hex)
+        update_group = db.child('users').update({uid:{'group':group_name}})
         return jsonify(response)
 
     else:
@@ -111,6 +107,7 @@ def leave_group():
         response = db.child('groups').child(group_name).remove()
     else:
         response = db.child('groups').child(group_name).child('users').child(uid).remove()
+    update_group = db.child('users').child(uid).remove()
     return jsonify(response)
 
 
@@ -166,16 +163,16 @@ def label():
 
         #Get storage bucket
         bucket = storage_client.get_bucket(FIREBASE_BUCKET_URL)
-
-        picture_blob = bucket.blob(image_name)
+        storage_uid = uuid.uuid4().hex + '.' + img.format
+        picture_blob = bucket.blob(storage_uid)
 
         #Upload picture from file to cloud storage
         picture_blob.upload_from_filename(path)
 
         small_bucket = storage_client.get_bucket(FIREBASE_BUCKET_SMALL)
         large_bucket = storage_client.get_bucket(FIREBASE_BUCKET_LARGE)
-        blob_small = small_bucket.blob(image_name)
-        blob_large = large_bucket.blob(image_name)
+        blob_small = small_bucket.blob(storage_uid)
+        blob_large = large_bucket.blob(storage_uid)
 
         blob_small.upload_from_filename(small_path)
         blob_large.upload_from_filename(large_path)
@@ -190,7 +187,7 @@ def label():
         #Init gcloud vision client
         vision_client = vision.ImageAnnotatorClient()
         image = types.Image()
-        image.source.image_uri = "gs://" + FIREBASE_BUCKET_URL + '/' + image_name
+        image.source.image_uri = "gs://" + FIREBASE_BUCKET_URL + '/' + storage_uid
 
         #Get response and labels from vision API
         response = vision_client.face_detection(image = image)
@@ -199,7 +196,7 @@ def label():
         if len(response.face_annotations) != 0:
             faces = True
 
-        picture_json = {"owner" : uid, "bucket_identifier" : image_name, "faces" : faces  }
+        picture_json = {"owner" : uid, "bucket_identifier" : storage_uid, "faces" : faces  }
         res = db.child('pictures').child(group).push(picture_json)
 
         return jsonify(res)

@@ -66,12 +66,19 @@ public class Group {
             result.react(null);
             return;
         }
+
         final DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
         DatabaseReference groupNameRef = databaseRef.child("users").child(user.getUid()).child("group");
+
+        if (groupNameRef == null) {
+            result.react(null);
+            return;
+        }
+
         groupNameRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null) {
+                if (dataSnapshot == null || dataSnapshot.getValue() == null) {
                     result.react(null);
                     return;
                 }

@@ -1,7 +1,5 @@
 package com.example.raffy.photoorganizer;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -19,12 +17,11 @@ public class SettingsActivity extends AppCompatActivity {
     ImageQualityRadioBtn mobileRadioBtn = new ImageQualityRadioBtn();
 
     // Image Quality
-    ImageQuality wifiQuality = new ImageQuality();
-    ImageQuality mobileQuality = new ImageQuality();
+    Quality wifiImageQuality = new Quality();
+    Quality mobileImageQuality = new Quality();
 
     // SharedPreferences
-    public static final String PREFERENCES = "preferences";
-    SharedPreferences sharedpreferences;
+    SettingsHelper preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,10 +38,9 @@ public class SettingsActivity extends AppCompatActivity {
         this.mobileRadioBtn.full = (RadioButton) findViewById(R.id.mobileRadioBtnFull);
         this.mobileRadioBtn.radioBtns = (RadioGroup) findViewById(R.id.mobileRadioGroup);
 
-        sharedpreferences = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
+        preferences = new SettingsHelper(this.getApplicationContext());
 
         setRadioButtons();
-
         setWifiImageQuality();
         setMobileImageQuality();
 
@@ -55,9 +51,7 @@ public class SettingsActivity extends AppCompatActivity {
                 // checkedId is the RadioButton selected
                 setWifiImageQuality();
 
-                SharedPreferences.Editor editor = sharedpreferences.edit();
-                editor.putString("wifiQuality", wifiQuality.getQuality());
-                editor.commit();
+                preferences.editWifiImageQuality(wifiImageQuality.getQuality());
             }
         });
 
@@ -69,27 +63,24 @@ public class SettingsActivity extends AppCompatActivity {
                 // checkedId is the RadioButton selected
                 setMobileImageQuality();
 
-                SharedPreferences.Editor editor = sharedpreferences.edit();
-                editor.putString("mobileQuality", mobileQuality.getQuality());
-                editor.commit();
+                preferences.editMobileImageQuality(mobileImageQuality.getQuality());
             }
         });
     }
 
     public void setRadioButtons() {
-        String wQuality = this.sharedpreferences.getString("wifiQuality", "high");
-        String mQuality = this.sharedpreferences.getString("mobileQuality", "high");
+        String wQuality = this.preferences.getWifiImageQuality();
+        String mQuality = this.preferences.getMobileImageQuality();
 
-
-        if (wQuality.equals(this.wifiQuality.LOW)) {
+        if (wQuality.equals(SettingsHelper.ImageQuality.LOW)) {
             this.wifiRadioBtn.low.setChecked(true);
         }
 
-        else if (wQuality.equals(this.wifiQuality.HIGH)) {
+        else if (wQuality.equals(SettingsHelper.ImageQuality.HIGH)) {
             this.wifiRadioBtn.high.setChecked(true);
         }
 
-        else if (wQuality.equals(this.wifiQuality.FULL)) {
+        else if (wQuality.equals(SettingsHelper.ImageQuality.FULL)) {
             this.wifiRadioBtn.full.setChecked(true);
         }
 
@@ -97,15 +88,15 @@ public class SettingsActivity extends AppCompatActivity {
             this.wifiRadioBtn.high.setChecked(true);
         }
 
-        if (mQuality.equals(this.mobileQuality.LOW)) {
+        if (mQuality.equals(SettingsHelper.ImageQuality.LOW)) {
             this.mobileRadioBtn.low.setChecked(true);
         }
 
-        else if (mQuality.equals(this.mobileQuality.HIGH)) {
+        else if (mQuality.equals(SettingsHelper.ImageQuality.HIGH)) {
             this.mobileRadioBtn.high.setChecked(true);
         }
 
-        else if (mQuality.equals(this.mobileQuality.FULL)) {
+        else if (mQuality.equals(SettingsHelper.ImageQuality.FULL)) {
             this.mobileRadioBtn.full.setChecked(true);
         }
 
@@ -117,31 +108,31 @@ public class SettingsActivity extends AppCompatActivity {
 
     public void setWifiImageQuality() {
         if (this.wifiRadioBtn.getActiveRadioBtn().equals(this.wifiRadioBtn.low)) {
-            this.wifiQuality.setImageQualityToLow();
+            this.wifiImageQuality.setImageQualityToLow();
         }
         else if (this.wifiRadioBtn.getActiveRadioBtn().equals(this.wifiRadioBtn.high)) {
-            this.wifiQuality.setImageQualityToHigh();
+            this.wifiImageQuality.setImageQualityToHigh();
         }
         else if (this.wifiRadioBtn.getActiveRadioBtn().equals(this.wifiRadioBtn.full)) {
-            this.wifiQuality.setImageQualityToFull();
+            this.wifiImageQuality.setImageQualityToFull();
         }
         else {
-            this.wifiQuality.setImageQualityToHigh();
+            this.wifiImageQuality.setImageQualityToHigh();
         }
     }
 
     public void setMobileImageQuality() {
         if (this.mobileRadioBtn.getActiveRadioBtn().equals(this.mobileRadioBtn.low)) {
-            this.mobileQuality.setImageQualityToLow();
+            this.mobileImageQuality.setImageQualityToLow();
         }
         else if (this.mobileRadioBtn.getActiveRadioBtn().equals(this.mobileRadioBtn.high)) {
-            this.mobileQuality.setImageQualityToHigh();
+            this.mobileImageQuality.setImageQualityToHigh();
         }
         else if (this.mobileRadioBtn.getActiveRadioBtn().equals(this.mobileRadioBtn.full)) {
-            this.mobileQuality.setImageQualityToFull();
+            this.mobileImageQuality.setImageQualityToFull();
         }
         else {
-            this.mobileQuality.setImageQualityToHigh();
+            this.mobileImageQuality.setImageQualityToHigh();
         }
     }
 }
@@ -175,53 +166,26 @@ class ImageQualityRadioBtn {
     }
 }
 
-class ImageQuality {
-    int width;
-    int height;
+class Quality {
     String quality;
-    String LOW = "low";
-    String HIGH = "high";
-    String FULL = "full";
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getHeight() {
-        return height;
-    }
 
     public void setQuality(String quality) {
         this.quality = quality;
     }
 
     public String getQuality() {
-        return quality;
+        return this.quality;
     }
 
     public void setImageQualityToLow() {
-        this.setWidth(640);
-        this.setHeight(480);
-        this.setQuality(this.LOW);
+        this.setQuality(SettingsHelper.ImageQuality.LOW.toString());
     }
 
     public void setImageQualityToHigh() {
-        this.setWidth(1280);
-        this.setHeight(960);
-        this.setQuality(this.HIGH);
+        this.setQuality(SettingsHelper.ImageQuality.HIGH.toString());
     }
 
     public void setImageQualityToFull() {
-        this.setWidth(0);
-        this.setHeight(0);
-        this.setQuality(this.FULL);
+        this.setQuality(SettingsHelper.ImageQuality.FULL.toString());
     }
 }

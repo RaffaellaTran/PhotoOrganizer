@@ -81,14 +81,14 @@ public class MainActivity extends AppCompatActivity {
             case R.id.search:
                 //your code here
 
-                Intent intent = new Intent(MainActivity.this, Registration.class)
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class)
                         .setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 finish();
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 auth.signOut();
                 startActivity(intent);
-
+                finish();
 
                 return true;
             default:

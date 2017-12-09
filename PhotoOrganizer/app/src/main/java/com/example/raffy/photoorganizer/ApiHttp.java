@@ -48,7 +48,7 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
         super.onPostExecute(message);
         if (message != null) {
             Log.i("ApiHttp: ", message);
-            Toast.makeText(context.get(), message, Toast.LENGTH_LONG).show();
+            Toast.makeText(context.get(), "Success!!", Toast.LENGTH_LONG).show();
         }
         progress.dismiss();
         context.get().finish();

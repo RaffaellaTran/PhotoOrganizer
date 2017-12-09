@@ -53,6 +53,13 @@ group_name : {name of the group to be left from}
 imagefile : {file that is to be uploaded}
 
 
+#STEPS TO DEPLOY TO gcloud
+0. Install gcloud SDK and authenticate
+1. Set permissions on deploy.sh script
+2. Run $ ./deploy.sh
+3. ???
+4. profit
+
 ## Windows (by Aleksi)
 
 ```
