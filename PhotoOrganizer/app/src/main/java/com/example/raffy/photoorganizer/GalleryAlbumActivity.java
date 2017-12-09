@@ -123,7 +123,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), GalleryImageActivity.class);
             GalleryImage img = (GalleryImage) parent.getItemAtPosition(position);
             Uri imageUri = img.downloadUri;
-            intent.putExtra("image_path", imageUri.toString());
+            intent.putExtra(GalleryImageActivity.INTENT_IMAGE_PATH, imageUri.toString());
             startActivity(intent);
         }
     };
