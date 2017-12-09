@@ -46,4 +46,5 @@
     <string name="group_join_success">Group joined successfully</string>
     <string name="group_join_failure">Group could not be joined</string>
     <string name="error_user_null">Could not fetch user.</string>
+    <string name="barcode_wait">Barcode found - please wait</string>
 </resources>
