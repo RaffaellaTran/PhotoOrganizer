@@ -43,6 +43,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     SortOption sortedBy;
 
     GalleryAlbum mainAlbum; // Redundant?
+    String albumPath;
 
     FirebaseDatabase db;
     FirebaseStorage storage;
@@ -86,7 +87,6 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         imageHeight = imageWidth;
 
         // Get album path from intent
-        String albumPath = "";
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if(extras != null) {
@@ -106,6 +106,15 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         DatabaseReference picturesRef = db.getReference("pictures/" + albumPath);
         GalleryAlbumListener albumListener = new GalleryAlbumListener(onNewImage, onImageUri, getApplicationContext());
         picturesRef.addChildEventListener(albumListener);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        // Save album path when this activity is restarted
+        outState.putString("album", albumPath);
+
+        // call superclass to save any view hierarchy
+        super.onSaveInstanceState(outState);
     }
 
     AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
