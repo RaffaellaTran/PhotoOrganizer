@@ -1,4 +1,4 @@
 cron:
-    description: "Do cleanup"
-    url: /clean?id=08f682d78f50623733df0d9bb8a9aead4a3b309b
-    schedule: every 5 mins
+- description: "Clean job"
+  url: /clean
+  schedule: every 5 minutes

@@ -234,7 +234,7 @@ def label():
         res = db.child('pictures').child(group).push(picture_json)
 
         # Send push notification to all members except the current user
-        users = db.child('groups').child(group_name).child('users').get().val()
+        users = db.child('groups').child(group).child('users').get().val()
         message = "A new picture was posted to your group!"
         for member_uid in users.keys():
             if (member_uid is not uid):
@@ -268,8 +268,6 @@ def clean_group_and_data(db, grp_name):
 
 
 def bucket_remove_blobs(id, bucket, small_bucket, large_bucket):
-
-
     try:
         blb = bucket.blob(id)
         if blb != None:
@@ -287,8 +285,8 @@ def bucket_remove_blobs(id, bucket, small_bucket, large_bucket):
 
 @app.route('/clean', methods=['GET'])
 def clean_up():
-    data = request.args
-    if data['id'] != "08f682d78f50623733df0d9bb8a9aead4a3b309b" :
+
+    if not 'X-Appengine-Cron' in request.headers:
         return jsonify('Error'), 201
 
     db = firebase.database()
