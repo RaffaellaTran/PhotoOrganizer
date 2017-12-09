@@ -36,4 +36,6 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="join_group_code">Join group with this QR</string>
+    <string name="default_notification_channel_id">Default channel</string>
+    <string name="default_notification_channel_name">Default channel</string>
 </resources>
