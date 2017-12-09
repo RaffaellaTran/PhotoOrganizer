@@ -12,4 +12,10 @@ public class GalleryImage {
     Boolean faces = false;
 
     Uri downloadUri;
+
+    GalleryImage(){}
+    String getBucketIdentifier (){
+        return this.bucket_identifier;
+
+    }
 }
