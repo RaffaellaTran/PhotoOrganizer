@@ -46,7 +46,6 @@ import static com.example.raffy.photoorganizer.QRCameraPreview.getCameraInstance
 public class JoinActivity extends AppCompatActivity {
 
     public static final int PERMISSIONS_REQUEST_CAMERA = 1;
-    private Camera mCamera;
     private QRCameraPreview mPreview;
     private Timer mTimer;
     private boolean inAction = false;
@@ -101,7 +100,7 @@ public class JoinActivity extends AppCompatActivity {
 
     private void setPreview() {
         // Create an instance of Camera
-        mCamera = getCameraInstance();
+        Camera mCamera = getCameraInstance();
         // Create our Preview view and set it as the content of our activity.
         mPreview = new QRCameraPreview(this, mCamera);
         FrameLayout preview = findViewById(R.id.camera_preview);
@@ -168,6 +167,8 @@ public class JoinActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<GetTokenResult> task) {
                 String token = task.getResult().getToken();
+                if (token == null) token = "";
+                @SuppressWarnings("ConstantConditions")
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("token", token)
@@ -176,7 +177,7 @@ public class JoinActivity extends AppCompatActivity {
                         .addFormDataPart("user", user.getEmail())
                         .build();
                 Request request = new Request.Builder()
-                        .url(SettingsHelper.BACKEND_URL + "/join_group")  // TODO
+                        .url(SettingsHelper.BACKEND_URL + "/join_group")
                         .post(body)
                         .build();
                 new ApiHttp(context, progress).execute(request);
