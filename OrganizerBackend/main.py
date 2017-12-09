@@ -20,11 +20,18 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 from resizeimage import resizeimage
 
+from pyfcm import FCMNotification
+
 app = Flask(__name__)
 
 cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
 firebase_admin.initialize_app(cred)
 firebase = pyrebase.initialize_app(PYREBASE_CONFIG)
+
+
+push_service = FCMNotification(api_key=MESSAGING_API_KEY)
+
+
 @app.route('/create_group', methods=['POST'])
 def create_group():
 
@@ -77,6 +84,16 @@ def join_group():
         response = db.child('groups').child(group_name).child('users').update({uid:user})
         set_new = db.child('groups').child(group_name).child('join_token').set(group_name + ':' + uuid.uuid4().hex)
         update_group = db.child('users').update({uid:{'group':group_name}})
+
+        # Send push notification
+        message = user + " has joined your group!"
+        for member_uid in users.keys():
+            if (member_uid is not uid):
+                # Notify all members except the current user
+                result = push_service.notify_topic_subscribers(topic_name=member_uid, message_body=message)
+
+
+
         return jsonify(response)
 
     else:
@@ -107,6 +124,8 @@ def leave_group():
     else:
         response = db.child('groups').child(group_name).child('users').child(uid).remove()
     update_group = db.child('users').child(uid).remove()
+
+
     return jsonify(response)
 
 
@@ -210,6 +229,12 @@ def label():
 
         picture_json = {"owner" : uid, "bucket_identifier" : storage_uid, "faces" : faces  }
         res = db.child('pictures').child(group).push(picture_json)
+
+        # Send push notification to all members except the current user
+        message = "A new picture was posted to your group!"
+        for member_uid in users.keys():
+            if (member_uid is not uid):
+                result = push_service.notify_topic_subscribers(topic_name=member_uid, message_body=message)
 
         return jsonify(res)
 

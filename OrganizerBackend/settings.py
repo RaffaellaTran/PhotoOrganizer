@@ -18,3 +18,5 @@ PYREBASE_CONFIG = {
   "storageBucket": "mcc-fall-2017-g08.appspot.com",
   "serviceAccount": "mcc-fall-2017-g08-08f682d78f50.json"
 }
+
+MESSAGING_API_KEY = "AAAAnK8xYCo:APA91bGjXYM4LTpFdDN00K9icdZegKCIdiL6BaXhQhQRyEIb0SXiSkzSSNdrEERAaKzHe1CABWVR5kpPC7KgN8ERK2ha3i-B4hmSfAeKYvyonstgxCtGCfxbyHkeyJZbl4aY10ywTirG"
