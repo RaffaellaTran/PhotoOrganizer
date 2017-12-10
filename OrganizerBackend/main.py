@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, Response
 import google.auth.transport.requests
 import google.oauth2.id_token
 
+import pytz
 import pyrebase
 import json
 
@@ -296,8 +297,9 @@ def clean():
             grp_name = group.key()
             grp = group.val()
             exp_time = datetime.strptime(grp['expiration_time'], '%Y-%m-%d %H:%M:%S')
-
-            if(datetime.now() > exp_time):
+            tz = pytz.timezone('Europe/Helsinki')
+            helsinki_time = datetime.now(tz)
+            if(helsinki_time > exp_time):
                 clean_group_and_data(db, grp_name)
         return jsonify('Cleanup done'), 200
     else:
