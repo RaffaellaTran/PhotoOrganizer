@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
@@ -35,6 +36,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.net.URI;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.ThreadLocalRandom;
 
 import okhttp3.MediaType;
@@ -51,6 +55,7 @@ public class CameraActivity extends AppCompatActivity {
     static final private int REQUEST_IMAGE_CAPTURE = 1;
     private SettingsHelper settings;
     public int i;
+    public Uri imageUri;
 
 
     @Override
@@ -58,9 +63,33 @@ public class CameraActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         settings = new SettingsHelper(getApplicationContext());
 
+        /*
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }*/
+
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Ensure that there's a camera activity to handle the intent
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Log.e("CameraActivity", ex.toString());
+                Toast.makeText(this, "IOException!", Toast.LENGTH_LONG).show();
+                finish();
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.example.raffy.photoorganizer",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
         }
     }
 
@@ -69,12 +98,15 @@ public class CameraActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == RESULT_OK) {
 
-                Uri uri = data.getData();
+                //Uri uri = data.getData();
+                //if (uri == null)
+                //    uri = imageUri;
+                Uri uri = imageUri;
                 try {
                     if (uri == null) throw new IllegalArgumentException();
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                     File file = new File(uri.getPath());
-                    if (file.exists()) file.delete();
+                    //if (file.exists()) file.delete();
                     File privateImageFolder = SettingsHelper.getPrivateImageFolder(this);
                     new ExamineImageTask(this, privateImageFolder).execute(bitmap);
                 } catch (IOException|IllegalArgumentException e) {
@@ -91,6 +123,27 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = SettingsHelper.getPrivateImageFolder(this);
+        if (!storageDir.exists()) {
+            storageDir.mkdirs();
+        }
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        imageUri = Uri.fromFile(image);
+        return image;
+    }
+
+
     /**
      * Use a static class to prevent leaks.
      */
@@ -104,7 +157,7 @@ public class CameraActivity extends AppCompatActivity {
         ExamineImageTask(CameraActivity context, File privateImageFolder) {
             this.context = new WeakReference<>(context);
             this.privateImageFolder = privateImageFolder;
-            BarcodeDetector codeDetector = new BarcodeDetector.Builder(context)
+            codeDetector = new BarcodeDetector.Builder(context)
                     .setBarcodeFormats(Barcode.ALL_FORMATS).build();
         }
 
@@ -117,7 +170,7 @@ public class CameraActivity extends AppCompatActivity {
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void run() {
-                        Boolean hasBarcodes = barcodes > 0;
+                        Boolean hasBarcodes = barcodes == 0; // FIXME: ALWAYS TRUE FOR DEBUGGING
                         if (hasBarcodes) {
                             handlePrivateImage(bitmap);
                         }

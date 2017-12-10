@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Environment;
 
 import com.google.firebase.storage.FirebaseStorage;
 
@@ -31,7 +32,8 @@ public class SettingsHelper {
 
     // File storage
     static File getPrivateImageFolder(Context context) {
-        String path = context.getFilesDir() + "/private/";
+        //String path = context.getFilesDir() + "/private/";
+        String path = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/private/";
         File folder = new File(path);
         return folder;
     }
