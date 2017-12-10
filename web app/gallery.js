@@ -1,3 +1,5 @@
+//https://firebasestorage.googleapis.com/v0/b/mcc-fall-2017-g08.appspot.com/o/db2fcebae77f464faef314b046335fc3.JPEG?alt=media&token=3520db59-dc10-40be-9226-934eb2302e72
+
 (function(){
 	// Initialize Firebase
  var config = {
@@ -9,7 +11,7 @@
     messagingSenderId: "672954146858"
   };
   firebase.initializeApp(config);
-  
+  var uid;
   var imgName = 'hi.jpeg';
   var img= '<div class="row" id="img"><div class="col-md-2"><img class="img"  src="'+ imgName +'" ></div></div>';
   
@@ -17,11 +19,13 @@
   firebase.auth().onAuthStateChanged(firebaseUser=>{
 	 if (firebaseUser){
 		 console.log(firebaseUser);
+		 uid = firebaseUser['uid'];
+	
 	 } else{
 		 console.log('not logged in');
 	 }
 	  
-  //});
+  });
 	const btnOut= document.getElementById('btnSignOut');
 	btnOut.addEventListener('click', e=> {
 		
@@ -42,6 +46,9 @@
 	//var fileName = window.AppInventor.getWebViewString();
 	var storage    = firebase.storage();
 	var storageRef = storage.ref();
+	var groupname = storageRef.child('/users/'+uid+'/group');
+	console.log(groupname);
+	
 	//var pathReference = storage.ref(fileName);
 //	document.getElementById("mess").innerHTML =pathReference;
             /*      pathReference.getDownloadURL().then(function(url) {
