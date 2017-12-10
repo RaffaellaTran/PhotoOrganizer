@@ -42,7 +42,7 @@
   firebase.auth().onAuthStateChanged(firebaseUser=>{
 	 if (firebaseUser){
 		 console.log(firebaseUser);
-		 window.location.href="./gallery.html";
+		 window.location.href="./after_reg.html";
 	 } else{
 		 console.log('not logged in');
 	 }
