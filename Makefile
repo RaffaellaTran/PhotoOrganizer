@@ -4,6 +4,9 @@ help:
 	@echo "  android  		to install application to Android device"
 	@echo "  backend 		to deploy backend to Google Cloud"
 	@echo "  backend-docker 	to deploy backend with a custom Dockerfile to Google Cloud"
+	@echo "  web 			Run web-based frontend locally"
+	@echo "  web-deploy 			Push website to Google Cloud"
+
 
 
 deploy: android backend
@@ -34,3 +37,17 @@ backend-docker:
 	cd OrganizerBackend && \
 	chmod +x deploy.sh && \
 	./deploy.sh docker
+
+web:
+	@echo ""
+	@echo ""
+	@echo "Starting webserver in http://localhost:8000/login.html"
+	@echo ""
+	cd web_app && python -m SimpleHTTPServer 8000
+
+web-deploy:
+	@echo ""
+	@echo ""
+	@echo "Pushing static website to Google Cloud"
+	@echo ""
+	gsutil rsync -R web_app gs://mcc-fall-2017-g08_web

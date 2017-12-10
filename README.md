@@ -5,6 +5,11 @@ Group 8
 
  - All required frontend and backend requirements are completed.
  - As extra work, we created a web application.
+    - Features:
+        - Login
+        - Display all images from current group
+        - Logout
+        - Not deployed to cloud, only local serving implemented
 
 ## Project structure
 
@@ -23,7 +28,7 @@ Group 8
     - /lib/ is the library installation path
     - /venv/ is the virtual environment folder
     - readme.md contains instructions on how to install and run the backend project
-    - appengine_config.py contains gcloud App Engine definitions 
+    - appengine_config.py contains gcloud App Engine definitions
  - PhotoOrganizer/
     - /install.sh: Builds and installs this Application to a connected Android device
     - /java/
@@ -92,3 +97,8 @@ The Backend can be deployed to the Google Cloud as follows:
 There is also a possibility to deploy the backend as a Docker image to the Google Cloud. This can be done as follows:
 
     make backend-docker
+
+#### Local website
+The following command starts serving a website on localhost.
+
+    make web
