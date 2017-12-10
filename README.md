@@ -13,7 +13,17 @@ Group 8
     - Contains the backend made with Flask and served with Gunicorn
     - Main.py
     - deploy.sh: Used for deploying to the Google Cloud
-    - TODO: Explain the most important files here...?
+    - main.py contains all the executable code for backend
+    - app.yaml is the project file that describes how the backend should be deployed to gcloud
+    - cron.yaml is the cron job description file for gcloud. It contains just one cron task that
+        cleans up the groups after expiration. Cleanup is executed every 5 minutes
+    - settings.py contains project specific strings and settings
+    - .json files are firebase and gcloud service account definitions
+    -  requirements.txt contains main libraries needed to run the project. Pip itself handles library dependencies
+    - /lib/ is the library installation path
+    - /venv/ is the virtual environment folder
+    - readme.md contains instructions on how to install and run the backend project
+    - appengine_config.py contains gcloud App Engine definitions 
  - PhotoOrganizer/
     - /install.sh: Builds and installs this Application to a connected Android device
     - /java/
@@ -49,10 +59,10 @@ Group 8
         TODO: Explain the most important files here...?
  - Web app/
     - TODO:
-        
+
 ## Usage instructions
 
-This project includes a Makefile for easy deployment. 
+This project includes a Makefile for easy deployment.
 
 Run ``make help`` to see all commands.
 
@@ -77,9 +87,8 @@ The Application can be built and installed as follows:
 The Backend can be deployed to the Google Cloud as follows:
 
     make backend
-    
+
 #### Backend only (docker)
 There is also a possibility to deploy the backend as a Docker image to the Google Cloud. This can be done as follows:
 
     make backend-docker
-
