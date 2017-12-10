@@ -1,6 +1,10 @@
 # PhotoOrganizer
 Group 8
 
+## Implemented features
+
+ - All required frontend and backend requirements are completed.
+ - As extra work, we created a web application.
 
 ## Project structure
 
