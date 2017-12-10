@@ -1,8 +1,6 @@
 package com.example.raffy.photoorganizer;
 
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
@@ -10,7 +8,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -36,10 +33,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.ThreadLocalRandom;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -108,7 +103,7 @@ public class CameraActivity extends AppCompatActivity {
                     File file = new File(uri.getPath());
                     //if (file.exists()) file.delete();
                     File privateImageFolder = SettingsHelper.getPrivateImageFolder(this);
-                    new ExamineImageTask(this, privateImageFolder).execute(bitmap);
+                    new ExamineImageTask(this, file).execute(bitmap);
                 } catch (IOException|IllegalArgumentException e) {
                     Toast.makeText(this, getString(R.string.camera_error), Toast.LENGTH_LONG).show();
                     finish();
@@ -152,11 +147,11 @@ public class CameraActivity extends AppCompatActivity {
 
         private WeakReference<CameraActivity> context;
         BarcodeDetector codeDetector;
-        File privateImageFolder;
+        File imageFile;
 
-        ExamineImageTask(CameraActivity context, File privateImageFolder) {
+        ExamineImageTask(CameraActivity context, File localImage) {
             this.context = new WeakReference<>(context);
-            this.privateImageFolder = privateImageFolder;
+            this.imageFile = localImage;
             codeDetector = new BarcodeDetector.Builder(context)
                     .setBarcodeFormats(Barcode.ALL_FORMATS).build();
         }
@@ -170,11 +165,18 @@ public class CameraActivity extends AppCompatActivity {
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void run() {
-                        Boolean hasBarcodes = barcodes == 0; // FIXME: ALWAYS TRUE FOR DEBUGGING
+                        //Boolean hasBarcodes = barcodes == 0; // Debugging: Always private image
+                        Boolean hasBarcodes = barcodes > 0;
                         if (hasBarcodes) {
-                            handlePrivateImage(bitmap);
+                            // Keep local image
+
+                            //handlePrivateImage(bitmap);
+                            context.get().finish();
                         }
                         else {
+                            // Delete local image and push to cloud
+                            if (imageFile.exists())
+                                imageFile.delete();
                             handlePublicImage(bitmap);
                         }
                     }
@@ -187,10 +189,10 @@ public class CameraActivity extends AppCompatActivity {
             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
             Long time = System.currentTimeMillis();
             String filename= "private" + time.toString() + ".jpg";
-            if (!privateImageFolder.exists()) {
-                privateImageFolder.mkdirs();
+            if (!imageFile.exists()) {
+                imageFile.mkdirs();
             }
-            File file = new File(privateImageFolder, filename);
+            File file = new File(imageFile, filename);
 
             try {
                 MediaScannerConnection.scanFile(context.get().getApplicationContext(), new String[]{file.getPath()}, new String[]{"Image/*"}, null);
