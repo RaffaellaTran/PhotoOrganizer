@@ -296,8 +296,10 @@ def clean():
         for group in groups.each():
             grp_name = group.key()
             grp = group.val()
-            exp_time = datetime.strptime(grp['expiration_time'], '%Y-%m-%d %H:%M:%S')
             tz = pytz.timezone('Europe/Helsinki')
+
+            exp_time = datetime.strptime(grp['expiration_time'], '%Y-%m-%d %H:%M:%S')
+            exp_time = tz.localize(exp_time, is_dst=True)
             helsinki_time = datetime.now(tz)
             if(helsinki_time > exp_time):
                 clean_group_and_data(db, grp_name)
