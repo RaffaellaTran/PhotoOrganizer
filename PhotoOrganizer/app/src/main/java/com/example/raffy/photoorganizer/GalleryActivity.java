@@ -26,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -199,7 +198,7 @@ public class GalleryActivity extends AppCompatActivity {
             holder.imageView.setImageResource(R.mipmap.ic_launcher);
 
             GalleryAlbum album = getItem(position);
-            if (album.images.size() > 0 && !album.images.get(position).getBucketIdentifier().contains("private")) {
+            if (album.images.size() > 0) {
                 //System.out.println(album.images.get(position).getBucketIdentifier());
                 // Display the first image as thumbnail
                 Uri imageUri = getItem(position).images.get(0).downloadUri;
@@ -216,23 +215,6 @@ public class GalleryActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error while loading image! \n" + exception.toString(), Toast.LENGTH_LONG).show();
                 }
 
-            }else{
-                infoText.setVisibility(View.GONE);
-
-            File f = new File("/storage/emulated/0/Android/data/com.example.raffy.photoorganizer/files/Pictures/Private");
-
-                Uri u= Uri.fromFile(f);
-                try {
-            Picasso.with(mContext).load(u).placeholder(R.mipmap.ic_launcher)
-                    .error(R.mipmap.ic_launcher)
-                    .resize(imageWidth, imageHeight)
-                    .centerCrop()
-                    .into(holder.imageView);
-
-                System.out.println(u);}
-                    catch (IllegalArgumentException exception) {
-                    Log.d("Picasso", exception.toString());
-                                  }}
 
             holder.txtTitle.setText(album.name);
 

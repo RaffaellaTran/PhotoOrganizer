@@ -13,7 +13,6 @@
         android:background="@android:color/holo_blue_light"
         android:gravity="left|center"
         android:padding="5dp"
-        android:text="TextView"
         android:textAllCaps="true"
         android:textSize="18sp"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -29,7 +29,7 @@
         <activity android:name=".CameraActivity" android:screenOrientation="portrait"/>
         <activity android:name=".GroupManagementActivity" android:screenOrientation="portrait"/>
         <activity android:name=".SettingsActivity" android:screenOrientation="portrait"/>
-        <activity android:name=".JoinActivity" android:screenOrientation="landscape"/>
+        <activity android:name=".JoinActivity" android:screenOrientation="portrait"/>
         <activity android:name=".CreateGroupActivity" android:screenOrientation="portrait"/>
         <activity android:name=".AddMemberActivity" android:screenOrientation="portrait"/>
         <activity android:name=".LoginActivity" android:screenOrientation="portrait"/>

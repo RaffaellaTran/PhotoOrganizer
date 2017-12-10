@@ -102,6 +102,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         }
         if (isPrivateAlbum) {
             mainAlbum = GalleryAlbum.createPrivateAlbum(getApplicationContext(), "Private");
+            title.setText("Private");
             addGridViewForAlbum(mainAlbum);
         } else {
             mainAlbum = new GalleryAlbum(albumPath);
