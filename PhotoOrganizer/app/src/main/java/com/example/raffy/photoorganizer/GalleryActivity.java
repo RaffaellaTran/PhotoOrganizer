@@ -199,7 +199,7 @@ public class GalleryActivity extends AppCompatActivity {
             holder.imageView.setImageResource(R.mipmap.ic_launcher);
 
             GalleryAlbum album = getItem(position);
-            if (album.images.size() > 0 && !album.images.get(position).getBucketIdentifier().contains("private")) {
+            if (album.images.size() > 0) {
                 //System.out.println(album.images.get(position).getBucketIdentifier());
                 // Display the first image as thumbnail
                 Uri imageUri = getItem(position).images.get(0).downloadUri;
@@ -215,26 +215,7 @@ public class GalleryActivity extends AppCompatActivity {
                 Log.e("Picasso", "Failed to load image: " + exception.toString());
                 Toast.makeText(getApplicationContext(), "Error while loading image! \n" + exception.toString(), Toast.LENGTH_LONG).show();
                 }
-
-            }else{
-
-
-            File f = new File("/storage/emulated/0/Android/data/com.example.raffy.photoorganizer/files/Pictures/Private");
-
-                Uri u= Uri.fromFile(f);
-                try {
-            Picasso.with(mContext).load(u).placeholder(R.mipmap.ic_launcher)
-                    .error(R.mipmap.ic_launcher)
-                    .resize(imageWidth, imageHeight)
-                    .centerCrop()
-                    .into(holder.imageView);
-
-                System.out.println(u);}
-                    catch (IllegalArgumentException exception) {
-                    Log.d("Picasso", exception.toString());
-                    Toast.makeText(getApplicationContext(), "FUNZIONAAA", Toast.LENGTH_SHORT).show();
-
-                }}
+            }
 
             holder.txtTitle.setText(album.name);
 
