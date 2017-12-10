@@ -128,8 +128,8 @@ public class CameraActivity extends AppCompatActivity {
 
         private void handlePrivateImage(Bitmap bitmap) {
             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
-            context.get().i = ThreadLocalRandom.current().nextInt(0, 40 + 1);
-            String filename= "private"+context.get().i+".jpg";
+            Long time = System.currentTimeMillis();
+            String filename= "private" + time.toString() + ".jpg";
             if (!privateImageFolder.exists()) {
                 privateImageFolder.mkdirs();
             }
