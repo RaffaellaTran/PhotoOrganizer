@@ -37,8 +37,6 @@ public class GalleryActivity extends AppCompatActivity {
 
     List<GalleryAlbum> albums = new ArrayList<GalleryAlbum>();
 
-    List<GalleryAlbumPrivate> albumsPrivate = new ArrayList<GalleryAlbumPrivate>();
-
     public static final int PICK_IMAGE = 1337;
     GridView gridView;
     TextView infoText;
@@ -202,6 +200,7 @@ public class GalleryActivity extends AppCompatActivity {
                 //System.out.println(album.images.get(position).getBucketIdentifier());
                 // Display the first image as thumbnail
                 Uri imageUri = getItem(position).images.get(0).downloadUri;
+                System.out.println("ffd "+ imageUri);
 
                 try {
                     Picasso.with(mContext).load(imageUri)

@@ -41,36 +41,45 @@ class GalleryAlbumListener implements ChildEventListener {
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-        final GalleryImage img = dataSnapshot.getValue(GalleryImage.class);
-        //album.images.add(img);
-        onNewImage.callback(img);
-
-
-        // Get image storage reference
-        FirebaseStorage storage = this.preferences.getFirebaseStorage(this.preferences.getImageQuality());
-        StorageReference ref;
         try {
-            ref = storage.getReference(img.bucket_identifier);
-        } catch (IllegalArgumentException exception) {
-            Log.d("GalleryAlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
-            ref = null;
-        }
+            final GalleryImage img = dataSnapshot.getValue(GalleryImage.class);
 
-        // Get URI
-        if (ref != null) {
-            ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    img.downloadUri = uri;
-                    onUriFetched.callback(img);
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception exception) {
-                    Log.d("GalleryAlbumListener", exception.toString());
-                    onUriFetched.callback(img);
-                }
-            });
+
+
+            //album.images.add(img);
+            onNewImage.callback(img);
+
+
+            // Get image storage reference
+            FirebaseStorage storage = this.preferences.getFirebaseStorage(this.preferences.getImageQuality());
+            StorageReference ref;
+            try {
+                ref = storage.getReference(img.bucket_identifier);
+            } catch (IllegalArgumentException exception) {
+                Log.d("GalleryAlbumListener", exception.toString() + "\n path: " + img.bucket_identifier);
+                ref = null;
+            }
+
+            // Get URI
+            if (ref != null) {
+                ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        img.downloadUri = uri;
+                        onUriFetched.callback(img);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        Log.d("GalleryAlbumListener", exception.toString());
+                        onUriFetched.callback(img);
+                    }
+                });
+            }
+        }
+        catch (Exception e) {
+            Log.e("Gallery", "Cant convert dataSnapshot to image!");
+            Log.e("Gallery", e.toString());
         }
     }
 

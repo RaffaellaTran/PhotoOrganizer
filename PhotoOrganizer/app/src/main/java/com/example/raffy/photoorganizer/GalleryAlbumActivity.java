@@ -15,12 +15,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -38,6 +42,8 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     enum SortOption {
         FACES, AUTHORS
     }
+
+    HashMap<String, String> userNames;
 
     static final String GALLERY_SORTING = "sortGalleryBy";
 
@@ -66,9 +72,10 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery_album);
-        layout = findViewById(R.id.linearLayout);
+        layout = findViewById(R.id.albumLayout);
         title = findViewById(R.id.albumName);
         imageAdapterMap = new HashMap<>();
+        userNames = new HashMap<>();
 
         // Set info text
         infoText = findViewById(R.id.info);
@@ -103,6 +110,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         if (isPrivateAlbum) {
             mainAlbum = GalleryAlbum.createPrivateAlbum(getApplicationContext(), "Private");
             title.setText("Private");
+            title.setVisibility(View.GONE);
             addGridViewForAlbum(mainAlbum);
         } else {
             mainAlbum = new GalleryAlbum(albumPath);
@@ -116,6 +124,45 @@ public class GalleryAlbumActivity extends AppCompatActivity {
             DatabaseReference picturesRef = db.getReference("pictures/" + albumPath);
             GalleryAlbumListener albumListener = new GalleryAlbumListener(onNewImage, onImageUri, getApplicationContext());
             picturesRef.addChildEventListener(albumListener);
+
+            if (sortedBy == SortOption.AUTHORS) {
+
+                DatabaseReference groupMembersRef = db.getReference("groups/" + albumPath + "/users");
+                groupMembersRef.addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                        try {
+                            Log.d("User", dataSnapshot.getValue(String.class));
+                            String uid = dataSnapshot.getKey();
+                            String name = dataSnapshot.getValue(String.class);
+                            if (name == null || name.length() == 0){
+                                //
+                                Log.e("GalleryAlbumActivity", "User name is empty");
+                            }
+
+                            else {
+                                userNames.put(uid, name);
+                                if (imageAdapterMap.containsKey(uid)) {
+                                    imageAdapterMap.get(uid).updateTitle(name);
+                                }
+                            }
+
+                        } catch (Exception e) {
+                            Log.e("GalleryAlbumActivity", e.toString());
+                        }
+
+                    }
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {                   }
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) { }
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {}
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {}
+                });
+            }
+
         }
 
     }
@@ -172,14 +219,18 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         // Set up image grid
         View view = getLayoutInflater().inflate(R.layout.image_grid, null);
         GridView grid = view.findViewById(R.id.grid);
-        ImageAdapter adapter = new ImageAdapter(getApplicationContext(), album);
+        TextView title = view.findViewById(R.id.title);
+        ImageAdapter adapter = new ImageAdapter(getApplicationContext(), album, grid, title);
         grid.setAdapter(adapter);
         grid.setPadding(0,0,0,0);
         grid.setNumColumns(columns);
         grid.setOnItemClickListener(clickListener);
-        TextView title = view.findViewById(R.id.title);
-        title.setText(album.name);
+        grid.setScrollContainer(false);
+        //grid.getLayoutParams().height = 500;
+
         layout.addView(view);
+        adapter.updateTitle(album.name);
+        adapter.updateHeight();
 
         imageAdapterMap.put(album.name, adapter);
     }
@@ -193,25 +244,53 @@ public class GalleryAlbumActivity extends AppCompatActivity {
                 return "No People";
         }
         else {
-            // TODO: Get user name instead of uid
-            if (image.owner != null && !image.owner.equals(""))
-                return image.owner;
+            String uid = image.owner;
+            if (uid != null && !uid.equals(""))
+                return uid;
             else
                 return "Unknown user";
+        }
+    }
+
+    String getAlbumTitle(GalleryImage image, SortOption sortBy) {
+        if (sortBy == SortOption.AUTHORS && userNames.containsKey(image.owner)) {
+            return userNames.get(image.owner);
+        }
+        else {
+            return getSortedName(image, sortBy);
         }
     }
 
     public class ImageAdapter extends BaseAdapter {
         private Context context;
         GalleryAlbum album;
+        View parent;
+        TextView titleView;
 
-        public ImageAdapter(Context c, GalleryAlbum album) {
+        public ImageAdapter(Context c, GalleryAlbum album, View parent, TextView title) {
             context = c;
             this.album = album;
+            this.parent = parent;
+            titleView = title;
+        }
+
+        public void updateTitle(String title) {
+            titleView.setText(title);
+        }
+
+        public void updateHeight() {
+            Integer images = album.images.size();
+            Integer rows = images / columns+1;
+            Integer height = rows*imageHeight;
+            parent.getLayoutParams().height = height;
         }
 
         public void addImage(GalleryImage image) {
+            if (!album.isPrivate && sortedBy == SortOption.AUTHORS) {
+                updateTitle(getAlbumTitle(image, sortedBy));
+            }
             album.images.add(image);
+            updateHeight();
             notifyDataSetChanged();
         }
 
