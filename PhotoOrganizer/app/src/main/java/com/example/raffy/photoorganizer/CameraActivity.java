@@ -83,6 +83,10 @@ public class CameraActivity extends AppCompatActivity {
                 }
 
             }
+            else {
+                // User pressed back
+                finish();
+            }
           ///  if (resultCode == RESULT_CANCELED) {startActivity(new Intent(CameraActivity.this, MainActivity.class) );}
         }
     }
@@ -159,7 +163,7 @@ public class CameraActivity extends AppCompatActivity {
             context.get().startActivity(new Intent(context.get(), MainActivity.class) );
         }
 
-        private void handlePublicImage(Bitmap bitmap) {
+        private void handlePublicImage(final Bitmap bitmap) {
             final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
             Group.getMyGroup(new Group.GetMyGroupResult() {
                 @Override
