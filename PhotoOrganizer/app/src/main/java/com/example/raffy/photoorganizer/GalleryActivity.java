@@ -37,8 +37,6 @@ public class GalleryActivity extends AppCompatActivity {
 
     List<GalleryAlbum> albums = new ArrayList<GalleryAlbum>();
 
-    List<GalleryAlbumPrivate> albumsPrivate = new ArrayList<GalleryAlbumPrivate>();
-
     public static final int PICK_IMAGE = 1337;
     GridView gridView;
     TextView infoText;
