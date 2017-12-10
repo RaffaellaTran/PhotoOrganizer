@@ -8,10 +8,14 @@ Group 8
 
 ## Project structure
 
+ - Makefile: Used for deploying this application
  - OrganizerBackend/
-    Contains the backend made with Flask and served with Gunicorn
-    TODO: Explain the most important files here...?
+    - Contains the backend made with Flask and served with Gunicorn
+    - Main.py
+    - deploy.sh: Used for deploying to the Google Cloud
+    - TODO: Explain the most important files here...?
  - PhotoOrganizer/
+    - /install.sh: Builds and installs this Application to a connected Android device
     - /java/
         - AddMemberActivity: display a QR code for new members to join
         - ApiHttp: a simple OkHttp wrapper to handle communication to backend
@@ -48,10 +52,34 @@ Group 8
         
 ## Usage instructions
 
-TODO
-```
-git clone
-cd mcc-2017-g08
-make deploy-backend
-make deploy-frontend
-```
+This project includes a Makefile for easy deployment. 
+
+Run ``make help`` to see all commands.
+
+#### Prerequisities
+
+- You need to connect your Android device
+- You may need to edit the Android SDK path in ``/PhotoOrganizer/install.sh``
+    - The default path is "$HOME/Android/Sdk"
+
+#### Deploying Backend and Frontend
+By running the following command, Backend will be deployed to the Google Cloud and
+the Android application will be installed to a connected Android device:
+
+    make deploy
+
+#### Frontend only
+The Application can be built and installed as follows:
+
+    make android
+
+#### Backend only
+The Backend can be deployed to the Google Cloud as follows:
+
+    make backend
+    
+#### Backend only (docker)
+There is also a possibility to deploy the backend as a Docker image. This can be done as follows:
+
+    make backend-docker
+
