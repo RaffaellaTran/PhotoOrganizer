@@ -26,7 +26,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +71,7 @@ public class GalleryActivity extends AppCompatActivity {
 
         // Set info text
         infoText = findViewById(R.id.info);
-        infoText.setText("Nothing to display \nYou don't belong to any groups!");
+      //  infoText.setText("Nothing to display \nYou don't belong to any groups!");
 
         // Add private album
         GalleryAlbum privateAlbum = GalleryAlbum.createPrivateAlbum(getApplicationContext(), "Private");
