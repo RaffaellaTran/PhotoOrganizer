@@ -28,9 +28,9 @@ cred = credentials.Certificate(FIREBASE_ADMIN_JSON)
 firebase_admin.initialize_app(cred)
 firebase = pyrebase.initialize_app(PYREBASE_CONFIG)
 
-
 push_service = FCMNotification(api_key=MESSAGING_API_KEY)
 
+#print firebase.auth().sign_in_with_email_and_password('kahvipuu@gmail.com', 'liDeech9ev')
 
 @app.route('/create_group', methods=['POST'])
 def create_group():
@@ -48,7 +48,7 @@ def create_group():
     group_name = data['group_name']
     expiration_time = data['expiration_time']
     user = data['user']
-
+    firebase.auth()
     db = firebase.database()
 
     putdata = {group_name: {'owner': uid, 'expiration_time': expiration_time, 'join_token': group_name + ':' + uuid.uuid4().hex, 'users': {uid:user} }}
@@ -285,26 +285,20 @@ def bucket_remove_blobs(id, bucket, small_bucket, large_bucket):
 
 @app.route('/clean', methods=['GET'])
 def clean():
-
-    print request.headers
-    print request.headers['X-Appengine-Cron']
-    if request.headers['X-Appengine-Cron'] != 'true':
-
-        return jsonify('Error'), 201
-
+    #if request.headers['X-Appengine-Cron'] != 'true':
+    #    return jsonify('Error'), 201
+    firebase.auth()
     db = firebase.database()
     groups = db.child('groups').get()
 
-    if groups is None:
+    if groups.each() is not None:
+        for group in groups.each():
+            grp_name = group.key()
+            grp = group.val()
+            exp_time = datetime.strptime(grp['expiration_time'], '%Y-%m-%d %H:%M:%S')
+
+            if(datetime.now() > exp_time):
+                clean_group_and_data(db, grp_name)
+        return jsonify('Cleanup done'), 200
+    else:
         return jsonify('No groups'), 201
-
-    for group in groups.each():
-
-        grp_name = group.key()
-        grp = group.val()
-        exp_time = datetime.strptime(grp['expiration_time'], '%Y-%m-%d %H:%M:%S')
-        t = datetime.now()
-        g = t - exp_time
-        if(datetime.now() > exp_time):
-            clean_group_and_data(db, grp_name)
-    return jsonify('Cleanup done'), 200

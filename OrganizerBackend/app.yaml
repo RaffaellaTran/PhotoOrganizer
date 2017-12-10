@@ -2,9 +2,11 @@ runtime: python
 api_version: 1
 threadsafe: true
 env: flex
+#entrypoint: flask run
+entrypoint: gunicorn -b :$PORT main:app
 
 runtime_config:
-  python_version: 27
+  python_version: 2
 
 # This sample incurs costs to run on the App Engine flexible environment.
 # The settings below are to reduce costs during testing and are not appropriate
@@ -20,6 +22,7 @@ resources:
 
 env_variables:
     FIREBASE_PROJECT_ID: 'mcc-fall-2017-g08'
+    FLASK_APP: 'main.py'
 
 skip_files:
   - venv/
