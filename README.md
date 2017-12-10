@@ -79,7 +79,7 @@ The Backend can be deployed to the Google Cloud as follows:
     make backend
     
 #### Backend only (docker)
-There is also a possibility to deploy the backend as a Docker image. This can be done as follows:
+There is also a possibility to deploy the backend as a Docker image to the Google Cloud. This can be done as follows:
 
     make backend-docker
 
