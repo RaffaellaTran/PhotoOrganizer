@@ -38,48 +38,49 @@
     // Get group name
     var userId = firebase.auth().currentUser.uid;
     return firebase.database().ref('/users/' + userId).once('value').then(function(snapshot) {
-      groupName = snapshot.val()
+      groupName = snapshot.val().group
       console.log(groupName)
       startListeningToImages(firebaseUser, groupName)
     });
+  }
 
 
 
   function startListeningToImages(firebaseUser, groupName) {
     //Create reference
-  	const dbRefObject= firebase.database().ref().child('pictures');
-  	const dbRefList= dbRefObject.child('TestGroup2');
-  	const dbimg= dbRefList.child('-L-XgfdJxKPfdTBGJOw8');
-  	const imagess= dbRefList.child('bucket_identifier');
+  	const dbRefObject= firebase.database().ref('/pictures/' + groupName).once('value').then(function(snapshot) {
+      console.log(snapshot)
+      images = snapshot.val()
+      for (id in images) {
+        image = images[id]
+        console.log(image)
+        var storage = firebase.storage();
+        var storageRef = storage.ref();
+        var imgRef = storageRef.child(image.bucket_identifier);
 
-  	//download
-  	//var fileName = window.AppInventor.getWebViewString();
-  	var storage    = firebase.storage();
-  	var storageRef = storage.ref();
-  	//var pathReference = storage.ref(fileName);
-  //	document.getElementById("mess").innerHTML =pathReference;
-              /*      pathReference.getDownloadURL().then(function(url) {
-                    window.AppInventor.setWebViewString(url);
-   });*/
-  	for (var i = 0; i < dbRefList.length; i++){
-      var obj = dbRefList[i];
-      for (var key in obj){
-          var attrName = key;
-          var attrValue = obj[key];
-
+        imgRef.getDownloadURL().then(function(url)
+        {
+            showImage(image, url)
+        })
       }
+    });
   }
-  	//Sync object change
-  	dbimg.on('value', snap=>{
 
-  		preObject.innerText= JSON.stringify(snap.val(), null,3);
-  		img.innerHTML= attrValue;
-  	//	document.getElementById("mess").innerHTML = JSON.stringify(snap.val(), null,3);
-  	//	document.getElementById("mess").innerHTML =pathReference;
-  	//	if (key='bucket_identifier'){document.getElementById("mess").innerHTML =snap.val();}
-  	});
+  function showImage(image, downloadURL) {
+    console.log(downloadURL)
   }
-  }
+	//Sync object change
+  /*
+	dbimg.on('value', snap=>{
+
+		preObject.innerText= JSON.stringify(snap.val(), null,3);
+		img.innerHTML= attrValue;
+	//	document.getElementById("mess").innerHTML = JSON.stringify(snap.val(), null,3);
+	//	document.getElementById("mess").innerHTML =pathReference;
+	//	if (key='bucket_identifier'){document.getElementById("mess").innerHTML =snap.val();}
+	});
+  */
+
 
 
 
