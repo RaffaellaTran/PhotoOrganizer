@@ -16,7 +16,6 @@
         android:layout_marginStart="8dp"
         android:gravity="center_vertical|center_horizontal"
         android:paddingTop="50dp"
-        android:text="info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
