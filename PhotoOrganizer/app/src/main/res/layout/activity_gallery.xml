@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_alignParentStart="true"
     tools:context="com.example.raffy.photoorganizer.GalleryActivity">
 
 
@@ -15,7 +16,6 @@
         android:layout_marginStart="8dp"
         android:gravity="center_vertical|center_horizontal"
         android:paddingTop="50dp"
-        android:text="info"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
@@ -27,7 +27,7 @@
         android:horizontalSpacing="10dp"
         android:numColumns="2"
         android:verticalSpacing="10dp"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="10dp"
-        tools:layout_editor_absoluteY="10dp"
-        tools:ignore="MissingConstraints" />
+        tools:layout_editor_absoluteY="10dp" />
 </android.support.constraint.ConstraintLayout>

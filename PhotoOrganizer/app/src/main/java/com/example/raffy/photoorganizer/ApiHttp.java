@@ -34,8 +34,13 @@ public class ApiHttp extends AsyncTask<Request, Void, String> {
         for (Request request : requests) {
             try {
                 Response response = client.newCall(request).execute();
-                Log.i("ApiHttp: ", response.toString());
-                return successMessage;
+                if (response.code() == 200) {
+                    Log.i("ApiHttp: ", response.toString());
+                    return successMessage;
+                } else {
+                    Log.e("ApiHttp: ", response.toString());
+                    return failureMessage + ": " + response.toString();
+                }
             } catch (IOException e) {
                 Log.e("ApiHttp: ", e.getMessage());
                 return failureMessage + ": " + e.getMessage();

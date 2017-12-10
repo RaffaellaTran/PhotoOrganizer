@@ -1,10 +1,8 @@
 package com.example.raffy.photoorganizer;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -14,7 +12,6 @@ import android.widget.RadioGroup;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static final String MY_PREF_KEY = "chose";
     // RadioButtons
     ImageQualityRadioBtn wifiRadioBtn = new ImageQualityRadioBtn();
     ImageQualityRadioBtn mobileRadioBtn = new ImageQualityRadioBtn();
@@ -30,7 +27,6 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        setTitle(R.string.settings);
 
         this.wifiRadioBtn.low = (RadioButton) findViewById(R.id.wifiRadioBtnLow);
         this.wifiRadioBtn.high = (RadioButton) findViewById(R.id.wifiRadioBtnHigh);
@@ -76,15 +72,15 @@ public class SettingsActivity extends AppCompatActivity {
         String wQuality = this.preferences.getWifiImageQuality();
         String mQuality = this.preferences.getMobileImageQuality();
 
-        if (wQuality.equals(SettingsHelper.ImageQuality.LOW)) {
+        if (wQuality.equals(SettingsHelper.ImageQuality.LOW.toString())) {
             this.wifiRadioBtn.low.setChecked(true);
         }
 
-        else if (wQuality.equals(SettingsHelper.ImageQuality.HIGH)) {
+        else if (wQuality.equals(SettingsHelper.ImageQuality.HIGH.toString())) {
             this.wifiRadioBtn.high.setChecked(true);
         }
 
-        else if (wQuality.equals(SettingsHelper.ImageQuality.FULL)) {
+        else if (wQuality.equals(SettingsHelper.ImageQuality.FULL.toString())) {
             this.wifiRadioBtn.full.setChecked(true);
         }
 
@@ -92,21 +88,22 @@ public class SettingsActivity extends AppCompatActivity {
             this.wifiRadioBtn.high.setChecked(true);
         }
 
-        if (mQuality.equals(SettingsHelper.ImageQuality.LOW)) {
+        if (mQuality.equals(SettingsHelper.ImageQuality.LOW.toString())) {
             this.mobileRadioBtn.low.setChecked(true);
         }
 
-        else if (mQuality.equals(SettingsHelper.ImageQuality.HIGH)) {
+        else if (mQuality.equals(SettingsHelper.ImageQuality.HIGH.toString())) {
             this.mobileRadioBtn.high.setChecked(true);
         }
 
-        else if (mQuality.equals(SettingsHelper.ImageQuality.FULL)) {
+        else if (mQuality.equals(SettingsHelper.ImageQuality.FULL.toString())) {
             this.mobileRadioBtn.full.setChecked(true);
         }
 
         else {
             this.mobileRadioBtn.high.setChecked(true);
         }
+
     }
 
     public void setWifiImageQuality() {
@@ -138,40 +135,7 @@ public class SettingsActivity extends AppCompatActivity {
             this.mobileImageQuality.setImageQualityToHigh();
         }
     }
-//DOESN'T WORK!!! ;(
-    private void saveRadioChoice(){
-        SharedPreferences mSharedPref = getSharedPreferences(MY_PREF_KEY,MODE_PRIVATE);
-
-        SharedPreferences.Editor editor = mSharedPref.edit();
-
-// Initialize Radiogroup  WIFI
-        RadioGroup localRadioGroupWifi = (RadioGroup) findViewById(R.id.wifiRadioGroup);
-        editor.putInt(this.wifiImageQuality.getQuality(), localRadioGroupWifi.indexOfChild(findViewById(localRadioGroupWifi.getCheckedRadioButtonId())));
-        editor.apply();
-        // Initialize Radiogroup  Quality
-        RadioGroup localRadioGroupQuality = (RadioGroup) findViewById(R.id.mobileRadioGroup);
-        editor.putInt(this.mobileImageQuality.getQuality(), localRadioGroupQuality.indexOfChild(findViewById(localRadioGroupQuality.getCheckedRadioButtonId())));
-        editor.apply();
-    }
-
-    private void retrieveChoices(View view){
-        saveRadioChoice();
-        SharedPreferences sharedPref = getSharedPreferences(MY_PREF_KEY,MODE_PRIVATE);
-        int i = sharedPref.getInt(this.wifiImageQuality.getQuality(),-1);
-        if( i >= 0){
-            ((RadioButton) ((RadioGroup)findViewById(R.id.wifiRadioGroup)).getChildAt(i)).setChecked(true);
-        }
-        SharedPreferences sharedPrefQuality = getSharedPreferences(MY_PREF_KEY,MODE_PRIVATE);
-        int ii = sharedPrefQuality.getInt(this.mobileImageQuality.getQuality(),-1);
-        if( ii >= 0){
-            ((RadioButton) ((RadioGroup)findViewById(R.id.mobileRadioGroup)).getChildAt(ii)).setChecked(true);
-        }
-
-
-    }
-
 }
-
 
 class ImageQualityRadioBtn {
 

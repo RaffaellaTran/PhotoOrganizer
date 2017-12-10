@@ -134,15 +134,4 @@
 
     </RadioGroup>
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
-        android:onClick="retrieveChoices"
-        android:text="Apply"
-        app:layout_constraintTop_toBottomOf="@+id/mobileRadioGroup"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="85dp" />
-
 </android.support.constraint.ConstraintLayout>

@@ -7,7 +7,6 @@ import android.graphics.Bitmap;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Display;
@@ -28,10 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Created by Anton on 13.11.2017.
@@ -42,8 +38,8 @@ public class GalleryActivity extends AppCompatActivity {
     List<GalleryAlbum> albums = new ArrayList<GalleryAlbum>();
 
     List<GalleryAlbumPrivate> albumsPrivate = new ArrayList<GalleryAlbumPrivate>();
-    List<Bitmap> privateAlbum;
 
+    public static final int PICK_IMAGE = 1337;
     GridView gridView;
     TextView infoText;
     private ProgressDialog progressDialog;
@@ -75,11 +71,18 @@ public class GalleryActivity extends AppCompatActivity {
 
         // Set info text
         infoText = findViewById(R.id.info);
-        infoText.setText("Nothing to display \nYou don't belong to any groups!");
+      //  infoText.setText("Nothing to display \nYou don't belong to any groups!");
+
+        // Add private album
+        GalleryAlbum privateAlbum = GalleryAlbum.createPrivateAlbum(getApplicationContext(), "Private");
+        albums.add(privateAlbum);
+        updateGridView();
 
         // Get all FireBase related variables
         progressDialog = ApiHttp.getProgressDialog(this);
         db = FirebaseDatabase.getInstance();
+
+        // Start listening
         db.getReference("users/" + FirebaseAuth.getInstance().getUid()).addValueEventListener(groupListener);
     }
 
@@ -90,9 +93,9 @@ public class GalleryActivity extends AppCompatActivity {
             // Add a new album for this group if current user is in the group
             User user = dataSnapshot.getValue(User.class);
             if (user != null && user.getGroup() != null && user.getGroup().length() > 0) {
-                addAlbum(user.getGroup());
-                addAlbum("private");
-                addAlbumPrivate("private");
+                addCloudAlbum(user.getGroup());
+
+               // addAlbumPrivate("private");
             }
             // TODO Remove previous group's album
         }
@@ -105,12 +108,16 @@ public class GalleryActivity extends AppCompatActivity {
         }
     };
 
-    void addAlbum(String name) {
+    void updateGridView() {
+        ((BaseAdapter) gridView.getAdapter()).notifyDataSetChanged();
+    }
+
+
+
+    void addCloudAlbum(String name) {
         // Adds a new album to the grid view
         final GalleryAlbum album = new GalleryAlbum(name);
         albums.add(album);
-
-
 
         // Create listener for adding new images to the album
         GalleryAlbumListener.AlbumEventListener onNewImage = new GalleryAlbumListener.AlbumEventListener() {
@@ -125,7 +132,7 @@ public class GalleryActivity extends AppCompatActivity {
         GalleryAlbumListener.AlbumEventListener onImageUri = new GalleryAlbumListener.AlbumEventListener() {
             @Override
             public void callback(GalleryImage image) {
-                ((BaseAdapter) gridView.getAdapter()).notifyDataSetChanged();
+                updateGridView();
             }
         };
 
@@ -137,23 +144,6 @@ public class GalleryActivity extends AppCompatActivity {
         infoText.setVisibility(View.GONE);
     }
 
-    void addAlbumPrivate(String name) {
-
-        final GalleryAlbumPrivate album = new GalleryAlbumPrivate(name);
-        albumsPrivate.add(album);
-        // Adds a new album to the grid view
-        Bitmap bitmap = new PrivatePhotoActivity(getApplicationContext()).
-                setFileName("private.png").
-                setDirectoryName("images").
-                load();
-      //  Toast.makeText(getApplicationContext(), "PRIVATE!", Toast.LENGTH_SHORT).show();
-
-        album.privateImages.add(bitmap);
-
-      //  privateAlbum.add(bitmap);
-        // Hide info text
-        infoText.setVisibility(View.GONE);
-    }
 
     AdapterView.OnItemClickListener clickListener = new AdapterView.OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -163,6 +153,7 @@ public class GalleryActivity extends AppCompatActivity {
 
            // GalleryAlbumPrivate pAlbum= (GalleryAlbumPrivate) gridView.getItemAtPosition(position);
             intent.putExtra("album", album.name);
+            intent.putExtra("private_album", album.isPrivate);
            // intent.putExtra("private",pAlbum.name);
             startActivity(intent);
         }
@@ -208,8 +199,10 @@ public class GalleryActivity extends AppCompatActivity {
 
             GalleryAlbum album = getItem(position);
             if (album.images.size() > 0) {
+                //System.out.println(album.images.get(position).getBucketIdentifier());
                 // Display the first image as thumbnail
                 Uri imageUri = getItem(position).images.get(0).downloadUri;
+
                 try {
                     Picasso.with(mContext).load(imageUri)
                             .placeholder(R.mipmap.ic_launcher)
@@ -222,13 +215,16 @@ public class GalleryActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Error while loading image! \n" + exception.toString(), Toast.LENGTH_LONG).show();
                 }
             }
+
             holder.txtTitle.setText(album.name);
+
             Integer numImages = album.images.size();
             holder.txtImages.setText(numImages.toString());
             holder.imageView.getLayoutParams().height = imageHeight;
             holder.imageView.getLayoutParams().width = imageWidth;
             return convertView;
         }
+
 
         private class ViewHolder {
             ImageView imageView;

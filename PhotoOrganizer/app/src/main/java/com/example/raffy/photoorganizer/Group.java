@@ -74,7 +74,7 @@ public class Group {
             return;
         }
 
-        groupNameRef.addValueEventListener(new ValueEventListener() {
+        groupNameRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot == null || dataSnapshot.getValue() == null) {
