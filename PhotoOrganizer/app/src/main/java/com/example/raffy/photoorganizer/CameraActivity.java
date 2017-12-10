@@ -6,6 +6,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -67,10 +68,17 @@ public class CameraActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (resultCode == RESULT_OK) {
-                Bundle extras = data.getExtras();
-                @SuppressWarnings("ConstantConditions")
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                new ExamineImageTask(this).execute(imageBitmap);
+                Uri uri = data.getData();
+                try {
+                    if (uri == null) throw new IllegalArgumentException();
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    File file = new File(uri.getPath());
+                    if (file.exists()) file.delete();
+                    new ExamineImageTask(this).execute(bitmap);
+                } catch (IOException|IllegalArgumentException e) {
+                    Toast.makeText(this, getString(R.string.camera_error), Toast.LENGTH_LONG).show();
+                    finish();
+                }
             }
           ///  if (resultCode == RESULT_CANCELED) {startActivity(new Intent(CameraActivity.this, MainActivity.class) );}
         }
@@ -156,9 +164,11 @@ public class CameraActivity extends AppCompatActivity {
                                                 break;
                                         }
                                         if (ratio == null) {
+                                            Log.i("CameraActivity", "Resolution: " + bitmap.getWidth() + "x" + bitmap.getHeight());
                                             startUploadAction(group.getName(), user, bitmap);
                                         } else {
                                             Bitmap bitmap2 = Bitmap.createScaledBitmap(bitmap, Math.round(bitmap.getWidth() * ratio), Math.round(bitmap.getHeight() * ratio), false);
+                                            Log.i("CameraActivity", "Resolution: " + bitmap2.getWidth() + "x" + bitmap2.getHeight());
                                             startUploadAction(group.getName(), user, bitmap2);
                                         }
                                     } else {
@@ -206,6 +216,7 @@ public class CameraActivity extends AppCompatActivity {
                     String success = context.get().getString(R.string.camera_success);
                     String failure = context.get().getString(R.string.camera_failure);
                     new ApiHttp(context.get(), progress, success, failure).execute(request);
+                    bitmap.recycle();   // important!
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
@@ -214,6 +225,7 @@ public class CameraActivity extends AppCompatActivity {
                     Toast.makeText(context.get(), e.getMessage(), Toast.LENGTH_SHORT).show();
                     progress.dismiss();
                     context.get().finish();
+                    bitmap.recycle();   // important!
                 }
             });
         }
