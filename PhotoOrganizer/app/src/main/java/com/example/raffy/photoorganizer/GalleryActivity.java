@@ -202,6 +202,7 @@ public class GalleryActivity extends AppCompatActivity {
                 //System.out.println(album.images.get(position).getBucketIdentifier());
                 // Display the first image as thumbnail
                 Uri imageUri = getItem(position).images.get(0).downloadUri;
+                System.out.println("ffd "+ imageUri);
 
                 try {
                     Picasso.with(mContext).load(imageUri)

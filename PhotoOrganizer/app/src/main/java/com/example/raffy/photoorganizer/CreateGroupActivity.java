@@ -17,9 +17,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.database.DataSnapshot;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.Request;
@@ -68,6 +70,10 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
         }
     }
 
+
+
+
+
     private static void startCreateGroupAction(final Activity context, final Group group) {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) return;
@@ -80,6 +86,7 @@ public class CreateGroupActivity extends AppCompatActivity implements View.OnCli
                 if (token == null) token = "";
                 String expiration = Group.getDateFormat().format(group.getExpires().getTime());
                 @SuppressWarnings("ConstantConditions")
+
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("token", token)
