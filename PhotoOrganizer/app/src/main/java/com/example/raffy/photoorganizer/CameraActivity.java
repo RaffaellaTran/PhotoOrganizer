@@ -49,7 +49,7 @@ public class CameraActivity extends AppCompatActivity {
 
     static final private int REQUEST_IMAGE_CAPTURE = 1;
     private SettingsHelper settings;
-    public String photopath;
+    public int i;
 
 
     @Override
@@ -79,13 +79,8 @@ public class CameraActivity extends AppCompatActivity {
     /**
      * Use a static class to prevent leaks.
      */
-    int i=0;
 
-  //public   File myDir = new File("/storage/emulated/0/Android/data/com.example.raffy.photoorganizer/files/Pictures/Private");
-
-
-
-    private class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
+    private static class ExamineImageTask extends AsyncTask<Bitmap, Void, Void> {
 
         private WeakReference<CameraActivity> context;
 
@@ -96,7 +91,7 @@ public class CameraActivity extends AppCompatActivity {
         @Override
         protected Void doInBackground(Bitmap... bitmaps) {
             BarcodeDetector codeDetector = new BarcodeDetector.Builder(context.get())
-                    .setBarcodeFormats( Barcode.ALL_FORMATS/*Barcode.QR_CODE | Barcode.CODABAR*/ ).build();
+                    .setBarcodeFormats(Barcode.ALL_FORMATS).build();
 
             for (final Bitmap bitmap : bitmaps) {
                 float ratio = 1200.0f / Math.max(bitmap.getWidth(), bitmap.getHeight());
@@ -107,19 +102,19 @@ public class CameraActivity extends AppCompatActivity {
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void run() {
-                        File myDir = SettingsHelper.getPrivateImageFolder(getApplicationContext());
+                        File myDir = SettingsHelper.getPrivateImageFolder(context.get().getApplicationContext());
                         if (!myDir.exists()) {
                             myDir.mkdirs();
                         }
                         Boolean hasBarcodes = barcodes.size() > 0;
-                        if (hasBarcodes ) {
+                        if (hasBarcodes) {
                             Toast.makeText(context.get(), "Barcodes found! ABORT!!!", Toast.LENGTH_LONG).show();
-                            i = ThreadLocalRandom.current().nextInt(0, 40 + 1);
-                            String filename= "private"+i+".jpg";
+                            context.get().i = ThreadLocalRandom.current().nextInt(0, 40 + 1);
+                            String filename= "private"+context.get().i+".jpg";
                             File file = new File(myDir, filename);
 
                             try {
-                                MediaScannerConnection.scanFile(getApplicationContext(), new String[]{file.getPath()}, new String[]{"Image/*"}, null);
+                                MediaScannerConnection.scanFile(context.get().getApplicationContext(), new String[]{file.getPath()}, new String[]{"Image/*"}, null);
                                 System.out.println(file);
 
                                 //FileOutputStream out = new FileOutputStream(file);
@@ -139,7 +134,7 @@ public class CameraActivity extends AppCompatActivity {
                             }
 
                             context.get().finish();
-                            startActivity(new Intent(CameraActivity.this, MainActivity.class) );
+                            context.get().startActivity(new Intent(context.get(), MainActivity.class) );
                         }
                         else {
                             final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
@@ -182,9 +177,6 @@ public class CameraActivity extends AppCompatActivity {
             }
             return null;
         }
-
-
-
 
         private void startUploadAction(final String groupName, FirebaseUser user, final Bitmap bitmap) {
             final ProgressDialog progress = ApiHttp.getProgressDialog(context.get());
