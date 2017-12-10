@@ -214,7 +214,7 @@ public class GalleryActivity extends AppCompatActivity {
                 Log.e("Picasso", "Failed to load image: " + exception.toString());
                 Toast.makeText(getApplicationContext(), "Error while loading image! \n" + exception.toString(), Toast.LENGTH_LONG).show();
                 }
-
+            }
 
             holder.txtTitle.setText(album.name);
 
