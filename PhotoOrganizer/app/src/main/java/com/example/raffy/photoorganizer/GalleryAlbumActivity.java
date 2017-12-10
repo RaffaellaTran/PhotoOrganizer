@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -66,7 +67,7 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery_album);
-        layout = findViewById(R.id.linearLayout);
+        layout = findViewById(R.id.albumLayout);
         title = findViewById(R.id.albumName);
         imageAdapterMap = new HashMap<>();
 
@@ -172,14 +173,17 @@ public class GalleryAlbumActivity extends AppCompatActivity {
         // Set up image grid
         View view = getLayoutInflater().inflate(R.layout.image_grid, null);
         GridView grid = view.findViewById(R.id.grid);
-        ImageAdapter adapter = new ImageAdapter(getApplicationContext(), album);
+        ImageAdapter adapter = new ImageAdapter(getApplicationContext(), album, grid);
         grid.setAdapter(adapter);
         grid.setPadding(0,0,0,0);
         grid.setNumColumns(columns);
         grid.setOnItemClickListener(clickListener);
+        grid.setScrollContainer(false);
+        //grid.getLayoutParams().height = 500;
         TextView title = view.findViewById(R.id.title);
         title.setText(album.name);
         layout.addView(view);
+        adapter.updateHeight();
 
         imageAdapterMap.put(album.name, adapter);
     }
@@ -204,14 +208,24 @@ public class GalleryAlbumActivity extends AppCompatActivity {
     public class ImageAdapter extends BaseAdapter {
         private Context context;
         GalleryAlbum album;
+        View parent;
 
-        public ImageAdapter(Context c, GalleryAlbum album) {
+        public ImageAdapter(Context c, GalleryAlbum album, View parent) {
             context = c;
             this.album = album;
+            this.parent = parent;
+        }
+
+        public void updateHeight() {
+            Integer images = album.images.size();
+            Integer rows = images / columns+1;
+            Integer height = rows*imageHeight;
+            parent.getLayoutParams().height = height;
         }
 
         public void addImage(GalleryImage image) {
             album.images.add(image);
+            updateHeight();
             notifyDataSetChanged();
         }
 
