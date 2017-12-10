@@ -217,7 +217,7 @@ public class GalleryActivity extends AppCompatActivity {
                 }
 
             }else{
-
+                infoText.setVisibility(View.GONE);
 
             File f = new File("/storage/emulated/0/Android/data/com.example.raffy.photoorganizer/files/Pictures/Private");
 
@@ -232,9 +232,7 @@ public class GalleryActivity extends AppCompatActivity {
                 System.out.println(u);}
                     catch (IllegalArgumentException exception) {
                     Log.d("Picasso", exception.toString());
-                    Toast.makeText(getApplicationContext(), "FUNZIONAAA", Toast.LENGTH_SHORT).show();
-
-                }}
+                                  }}
 
             holder.txtTitle.setText(album.name);
 
